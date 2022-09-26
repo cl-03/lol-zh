@@ -56,6 +56,10 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendices.html">附录</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specification.html">术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original-code.html">源代码</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production-code.html">生产代码</a></li>
 </ul>
 
         </div>
@@ -84,17 +88,6 @@
              
   <section id="chapter01">
 <span id="id1"></span><h1>第一章：概述<a class="headerlink" href="#chapter01" title="Permalink to this heading"></a></h1>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>Doug Hoyte</p>
-</dd>
-<dt class="field-even">Translator</dt>
-<dd class="field-even"><p>Xuting Yang</p>
-</dd>
-<dt class="field-odd">Proof-Reading</dt>
-<dd class="field-odd"><p>Yuqi Liu</p>
-</dd>
-</dl>
 <section id="macros">
 <span id="id2"></span><h2>1.1 宏<a class="headerlink" href="#macros" title="Permalink to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Lisp 的核心在编程领域中的某些方面具有一定的优势。 ——lisp 创始人谦逊之词
@@ -237,18 +230,18 @@ Doug Hoyte
 函数、宏和其他的标识符，不论它们有没有出现过。注意有些词有多种含义，例如 <strong>lambda</strong>
 是COMMON LISP的宏，而 <em>lambda</em> 是概念；<strong>let</strong> 是特殊结构，而 <strong>list</strong> 则是个
 <strong>let</strong> 结构。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun example-program-listing()
-<span class="linenos">2</span>  &#39;(this is
-<span class="linenos">3</span>    (a (program
-<span class="linenos">4</span>      (listing)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">example-program-listing</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">this</span><span class="w"> </span><span class="nv">is</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">a</span><span class="w"> </span><span class="p">(</span><span class="nv">program</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nv">listing</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>在本书中，新出现的程序代码都会单独的显示代码框中。正如 <strong>example-program-listing</strong>
 函数的定义一样，代码是为重复使用而设计，或者为恰当地实现例子而设计的。但有时我们仅希
 望展示一点代码的使用，或者只是想讨论一些表达式的属性，并不想与书面文本脱离太多。在这
 些情况下，代码或代码的使用示例将像这样出现</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(this is
-<span class="linenos">2</span>  (demonstration code))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">this</span><span class="w"> </span><span class="nv">is</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">demonstration</span><span class="w"> </span><span class="nv">code</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>许多教学编程的文章都使用大量孤立的、设计好的例子来说明问题，但却忘了将其与现实相结合。
@@ -257,11 +250,11 @@ Doug Hoyte
 首先试图不把自己（或任何东西）看得太严肃。但与阅读其他书籍不同的是，你需要去寻找它。
 由于 lisp 的交互性质，计算一个简单表达式的结果往往比等量的 U 语言表达地要多。在这种情
 况下，我们将这样显示 COMMON LISP Read Evaluate Print Loop（称为REPL）的输出：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (this is
-<span class="linenos">2</span>    (the expression
-<span class="linenos">3</span>      (to evaluate)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>THIS-IS-THE-RESULT
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (this is
+    (the expression
+      (to evaluate)))
+
+THIS-IS-THE-RESULT
 </pre></div>
 </div>
 <p>注意输入的文本是小写的，但 lisp 返回的文本是大写的。能简便地区分 REPL 的输入输出是
@@ -286,12 +279,12 @@ Blub 是一种隐喻，用来强调 lisp 与其他语言不同的事实。Blub�
 <p>为了说明写宏的迭代过程，本书采用了这样的惯例：在定义不完整或尚未以其他方式改进的函数
 和宏的名称后面加上百分数（%）字符。在确定最终版本之前，多次修订可能会导致一个名称的末
 尾出现多个 % 字符。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun example-function% () ;first try
-<span class="linenos">2</span>  t)
-<span class="linenos">3</span>(defun example-function%% () ; second try
-<span class="linenos">4</span>  t)
-<span class="linenos">5</span>(defun example-function () : got it!
-<span class="linenos">6</span>  t)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun example-function% () ;first try
+  t)
+(defun example-function%% () ; second try
+  t)
+(defun example-function () : got it!
+  t)
 </pre></div>
 </div>
 <p>Curry 将宏描述为元编程（metaprogramming）。元程序的唯一目的是使程序员能够更好地编写软件。
@@ -334,27 +327,27 @@ C 或 lisp 编译器来处理。但是lisp用户要求对其他几乎所有的�
 一样，本书也是 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 的更深一层。这本书的中心主题是当设计良好的实用程序结合
 在一起时，可以发挥出大于各部分之和的生产力优势。本节介绍了一系列来自 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a>
 和其他资料的实用工具。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun mkstr (&amp;rest args)
-<span class="linenos">2</span>(with-output-to-string (s)
-<span class="linenos">3</span>(dolist (a args) (prince a s))))
-<span class="linenos">4</span>(defun symb (krest args)
-<span class="linenos">5</span>(values (intern (apply #&#39;mkstr args))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">mkstr</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"></span>
+<span class="p">(</span><span class="nb">with-output-to-string</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="p">(</span><span class="nb">dolist</span><span class="w"> </span><span class="p">(</span><span class="nv">a</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">prince</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">s</span><span class="p">))))</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">symb</span><span class="w"> </span><span class="p">(</span><span class="nv">krest</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"></span>
+<span class="p">(</span><span class="nb">values</span><span class="w"> </span><span class="p">(</span><span class="nb">intern</span><span class="w"> </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">mkstr</span><span class="w"> </span><span class="nv">args</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>symb</strong> 是创建符号的通用方法，分层在 <strong>mkstr</strong> 之上。由于符号可以被任何任意的字符串引用，
 而且以编程方式创建符号是非常有用的，因此 <strong>symb</strong> 是宏编程的一个基本工具，在本书中被
 大量使用。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun group (source n)
-<span class="linenos"> 2</span>  (if (zerop n) (error &quot;zero length&quot;))
-<span class="linenos"> 3</span>  (labels ((rec (source acc)
-<span class="linenos"> 4</span>            (let ((rest (nthcdr n source)))
-<span class="linenos"> 5</span>              (if (consp rest)
-<span class="linenos"> 6</span>                  (rec rest (cons
-<span class="linenos"> 7</span>                              (subseq source 0 n)
-<span class="linenos"> 8</span>                                acc))
-<span class="linenos"> 9</span>                  (nreverse
-<span class="linenos">10</span>                    (cons source acc))))))
-<span class="linenos">11</span>    (if source (rec source nil) nil)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">group</span><span class="w"> </span><span class="p">(</span><span class="nv">source</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zerop</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;zero length&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">((</span><span class="nv">rec</span><span class="w"> </span><span class="p">(</span><span class="nv">source</span><span class="w"> </span><span class="nv">acc</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nb">rest</span><span class="w"> </span><span class="p">(</span><span class="nb">nthcdr</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="nv">source</span><span class="p">)))</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">consp</span><span class="w"> </span><span class="nb">rest</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">(</span><span class="nv">rec</span><span class="w"> </span><span class="nb">rest</span><span class="w"> </span><span class="p">(</span><span class="nb">cons</span><span class="w"></span>
+<span class="w">                              </span><span class="p">(</span><span class="nb">subseq</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">                                </span><span class="nv">acc</span><span class="p">))</span><span class="w"></span>
+<span class="w">                  </span><span class="p">(</span><span class="nb">nreverse</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="nv">acc</span><span class="p">))))))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="p">(</span><span class="nv">rec</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"> </span><span class="no">nil</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>group</strong> 是另一个在编写宏时经常出现的工具。原因一是需要镜像运算符，如 COMMON LISP
@@ -362,14 +355,14 @@ C 或 lisp 编译器来处理。但是lisp用户要求对其他几乎所有的�
 最佳方式。由于我们经常使用这种功能，所以尽可能地使之抽象化是有意义的。Graham 的
 分组将按由参数 <strong>n</strong> 指定的分组量进行分组。在 <strong>setf</strong> 这样的情况下，参数被分组成对，
 <strong>n</strong> 是 2。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun flatten (x)
-<span class="linenos">2</span>  (labels ((rec (x acc)
-<span class="linenos">3</span>          (cond ((null x) acc)
-<span class="linenos">4</span>                ((atom x) (cons x acc))
-<span class="linenos">5</span>                (t (rec
-<span class="linenos">6</span>                      (car x)
-<span class="linenos">7</span>                      (rec (cdr x) acc))))))
-<span class="linenos">8</span>  (rec x nil)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">flatten</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">((</span><span class="nv">rec</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="nv">acc</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">cond</span><span class="w"> </span><span class="p">((</span><span class="nb">null</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="nv">acc</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="p">((</span><span class="nb">atom</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="nv">acc</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="nv">rec</span><span class="w"></span>
+<span class="w">                      </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="p">(</span><span class="nv">rec</span><span class="w"> </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="nv">acc</span><span class="p">))))))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">rec</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="no">nil</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>flatten</strong> 是 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 中最重要的实用工具之一。给定一个任意嵌套的列表结构，<strong>flatten</strong>
@@ -377,15 +370,15 @@ C 或 lisp 编译器来处理。但是lisp用户要求对其他几乎所有的�
 一棵树，那么 <strong>flatten</strong> 将返回该树中所有叶子的列表。如果这棵树代表 lisp 代码，通过检查
 表达式中某些对象的存在，<strong>flatten</strong> 完成了一种代码遍历（code-walking），这是本书中
 反复出现的主题。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun fact (x)
-<span class="linenos">2</span>  (if (= x 0)
-<span class="linenos">3</span>    1
-<span class="linenos">4</span>    (* x (fact (- x 1)))))
-<span class="linenos">5</span>
-<span class="linenos">6</span>(defun choose (n r)
-<span class="linenos">7</span>  (/ (fact n)
-<span class="linenos">8</span>    (fact (- n r))
-<span class="linenos">9</span>    (fact r)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">fact</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nv">fact</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="mi">1</span><span class="p">)))))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">choose</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="w"> </span><span class="nv">r</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="p">(</span><span class="nv">fact</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">fact</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="nv">r</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">fact</span><span class="w"> </span><span class="nv">r</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>fact</strong> 和 <strong>choose</strong> 是阶乘和二项式系数函数的显示实现。</p>
@@ -443,7 +436,7 @@ OpenBSD, GNU/Linux.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang.</p>
+    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang, Chuangxiu Chen.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

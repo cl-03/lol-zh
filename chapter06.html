@@ -58,6 +58,10 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendices.html">附录</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specification.html">术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original-code.html">源代码</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production-code.html">生产代码</a></li>
 </ul>
 
         </div>
@@ -86,14 +90,6 @@
              
   <section id="anaphoric">
 <span id="chapter06"></span><h1>第六章：回指（Anaphoric）宏<a class="headerlink" href="#anaphoric" title="Permalink to this heading"></a></h1>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>Doug Hoyte</p>
-</dd>
-<dt class="field-even">Translator</dt>
-<dd class="field-even"><p>Yuqi Liu</p>
-</dd>
-</dl>
 <section id="more-phors">
 <span id="id1"></span><h2>6.1 More Phors?<a class="headerlink" href="#more-phors" title="Permalink to this heading"></a></h2>
 <p>Paul Graham 的 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 中一些有趣的宏是回指宏（anaphoric macros）。回指宏是特意从
@@ -106,20 +102,20 @@ Graham 的回指和相关代码值得深究。特别是宏 <strong>defanaph</str
 （automatic anaphor）编程类型。</p>
 <p>经过一段时间的使用，发现 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 中最好用的回指宏就是 <strong>alambda</strong>。它也是个最简单和
 最优雅的回指宏及特意捕捉变量的展示。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>;; Graham &#39;s alambda
-<span class="linenos">2</span>(defmacro alambda (parms &amp;body body)
-<span class="linenos">3</span>  `(labels ((self ,parms ,@body))
-<span class="linenos">4</span>      #&#39;self))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="c1">;; Graham &#39;s alambda</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">alambda</span><span class="w"> </span><span class="p">(</span><span class="nv">parms</span><span class="w"> </span><span class="k">&amp;body</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">((</span><span class="nv">self</span><span class="w"> </span><span class="o">,</span><span class="nv">parms</span><span class="w"> </span><span class="o">,@</span><span class="nv">body</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="nf">#&#39;</span><span class="nv">self</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>通过 <strong>alambda</strong>，我们捕捉到 <strong>self</strong> 这个变量名，所以就可以在之后构建的匿名函数中引用这个
 变量。换句话说，递归就像调用 <strong>self</strong> 一样简单。例如，下面的函数返回从 <strong>n</strong> 到 1 的一个列
 表：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(alambda (n)
-<span class="linenos">2</span>  (if (&gt; n 0)
-<span class="linenos">3</span>    (cons
-<span class="linenos">4</span>      n
-<span class="linenos">5</span>      (self (- n 1)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">alambda</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">cons</span><span class="w"></span>
+<span class="w">      </span><span class="nv">n</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nv">self</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="mi">1</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>alambda</strong> 让代码更直观、更易读，并会改变我们的思维，即匿名函数是否应该像添加一个字母
@@ -132,10 +128,10 @@ true 子句(辅助子句或结果子句)使用中使用。<strong>aif</strong> �
 有时会强制抛出额外的信息来满足冗余的类型约束。Scheme 实际上添加了个组装程序（kludge），
 让 <strong>if</strong>、<strong>cond</strong>、<strong>and</strong>、<strong>or</strong> 和 <strong>do</strong> 接受非布尔值。当然，COMMON LISP 的设计
 才是对的 —— 一切都是布尔值。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>;; Graham &#39;s aif
-<span class="linenos">2</span>(defmacro aif (test then &amp;optional else)
-<span class="linenos">3</span>  `(let ((it ,test))
-<span class="linenos">4</span>    (if it ,then ,else)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="c1">;; Graham &#39;s aif</span><span class="w"></span>
+<span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">aif</span><span class="w"> </span><span class="p">(</span><span class="nv">test</span><span class="w"> </span><span class="nv">then</span><span class="w"> </span><span class="k">&amp;optional</span><span class="w"> </span><span class="nv">else</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">it</span><span class="w"> </span><span class="o">,</span><span class="nv">test</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">it</span><span class="w"> </span><span class="o">,</span><span class="nv">then</span><span class="w"> </span><span class="o">,</span><span class="nv">else</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>还必须指出，<strong>aif</strong> 和 <strong>alambda</strong>，就像所有的回指宏一样，违反了词法透明。用现在流行的话来
@@ -157,77 +153,77 @@ true 子句(辅助子句或结果子句)使用中使用。<strong>aif</strong> �
 宏这样做时，它们被称为读回指（read anaphora）。本节介绍了一个这样的 read 宏，虽然
 它本身很短，但它却是本书中最有用的宏之一，连我自己都感到惊讶。我已经尽可能快地引入
 了这个宏，以便它可以用于其余的代码。已经有几个宏使用了它</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun |#`-reader| (stream sub-char numarg)
-<span class="linenos"> 2</span>  (declare (ignore sub-char))
-<span class="linenos"> 3</span>  (unless numarg (setq numarg 1))
-<span class="linenos"> 4</span>  `(lambda ,(loop for i from 1 to numarg
-<span class="linenos"> 5</span>                  collect (symb &#39;a i))
-<span class="linenos"> 6</span>      ,(funcall
-<span class="linenos"> 7</span>        (get-macro-character #\`) stream nil)))
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>  (set-dispatch-macro-character
-<span class="linenos">10</span>    #\# #\` #&#39;|#`-reader|)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">|#`-reader|</span><span class="w"> </span><span class="p">(</span><span class="nc">stream</span><span class="w"> </span><span class="nv">sub-char</span><span class="w"> </span><span class="nv">numarg</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">declare</span><span class="w"> </span><span class="p">(</span><span class="k">ignore</span><span class="w"> </span><span class="nv">sub-char</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">unless</span><span class="w"> </span><span class="nv">numarg</span><span class="w"> </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">numarg</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="o">,</span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">numarg</span><span class="w"></span>
+<span class="w">                  </span><span class="nv">collect</span><span class="w"> </span><span class="p">(</span><span class="nv">symb</span><span class="w"> </span><span class="ss">&#39;a</span><span class="w"> </span><span class="nv">i</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="o">,</span><span class="p">(</span><span class="nb">funcall</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">get-macro-character</span><span class="w"> </span><span class="sc">#\`</span><span class="p">)</span><span class="w"> </span><span class="nc">stream</span><span class="w"> </span><span class="no">nil</span><span class="p">)))</span><span class="w"></span>
+
+<span class="w">  </span><span class="p">(</span><span class="nb">set-dispatch-macro-character</span><span class="w"></span>
+<span class="w">    </span><span class="sc">#\#</span><span class="w"> </span><span class="sc">#\`</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">|#`-reader|</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>反引号就是个 read 宏，将输入读成 lambda 结构。默认情况下，这个 lambda 结构只接收一个
 参数：<strong>a1</strong>。然后这个 read 宏递归地调用对应流的 <strong>read</strong> 函数。下面是一个停止求值(通过
 引用)的例子，这样就可以直接地观察着个回指读宏了：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* &#39;#`((,a1))
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LAMBDA (A1)
-<span class="linenos">4</span>  `((,A1)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* &#39;#`((,a1))
+
+(LAMBDA (A1)
+  `((,A1)))
 </pre></div>
 </div>
 <p>该 read 宏抽象出一个通用宏模式。例如，如果有一个列表变量，并且要用 let 来绑定这个列表，
 将每个变量绑定到一个符号(假设为 <strong>empty</strong> )，就可以像这样使用 <strong>mapcar</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (mapcar (lambda (a)
-<span class="linenos">2</span>            (list a &#39;&#39;empty))
-<span class="linenos">3</span>    &#39;(var-a var-b var-c))
-<span class="linenos">4</span>
-<span class="linenos">5</span>((VAR-A &#39;EMPTY)
-<span class="linenos">6</span>(VAR-B &#39;EMPTY)
-<span class="linenos">7</span>(VAR-C &#39;EMPTY))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (mapcar (lambda (a)
+            (list a &#39;&#39;empty))
+    &#39;(var-a var-b var-c))
+
+((VAR-A &#39;EMPTY)
+(VAR-B &#39;EMPTY)
+(VAR-C &#39;EMPTY))
 </pre></div>
 </div>
 <p>但特别是对复杂的列表结构，这样写就显得有点乱，所以 lisp 程序员喜欢用反引号将其引用提高
 一层：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (mapcar (lambda (a)
-<span class="linenos">2</span>            `(,a &#39;empty))
-<span class="linenos">3</span>    &#39;(var-a var-b var-c))
-<span class="linenos">4</span>
-<span class="linenos">5</span>((VAR-A &#39;EMPTY)
-<span class="linenos">6</span>(VAR-B &#39;EMPTY)
-<span class="linenos">7</span>(VAR-C &#39;EMPTY))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (mapcar (lambda (a)
+            `(,a &#39;empty))
+    &#39;(var-a var-b var-c))
+
+((VAR-A &#39;EMPTY)
+(VAR-B &#39;EMPTY)
+(VAR-C &#39;EMPTY))
 </pre></div>
 </div>
 <p>新的 read 回指宏隐藏了 lambda 结构：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (mapcar #`(,a1 &#39;empty)
-<span class="linenos">2</span>    &#39;(var-a var-b var-c))
-<span class="linenos">3</span>
-<span class="linenos">4</span>((VAR-A &#39;EMPTY)
-<span class="linenos">5</span>(VAR-B &#39;EMPTY)
-<span class="linenos">6</span>(VAR-C &#39;EMPTY))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (mapcar #`(,a1 &#39;empty)
+    &#39;(var-a var-b var-c))
+
+((VAR-A &#39;EMPTY)
+(VAR-B &#39;EMPTY)
+(VAR-C &#39;EMPTY))
 </pre></div>
 </div>
 <p>上述代码中 <strong>a1</strong> 变量中的 <strong>1</strong> 的原因是，read 宏的使用这可以通过提供的 <strong>numarg</strong> 的数
 字来引入不同的回指数字：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* &#39;#2`(,a1 ,a2)
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LAMBDA (A1 A2)
-<span class="linenos">4</span>  `(,A1 ,A2))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* &#39;#2`(,a1 ,a2)
+
+(LAMBDA (A1 A2)
+  `(,A1 ,A2))
 </pre></div>
 </div>
 <p>所以我们可以同时在多个表达式中 <strong>mapcar</strong> sharp-backquote（#`) 表达式：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (let ((vars &#39;(var-a var-b var-c)))
-<span class="linenos"> 2</span>    (mapcar #2`(,a1 &#39;,a2)
-<span class="linenos"> 3</span>      vars
-<span class="linenos"> 4</span>      (loop for v in vars
-<span class="linenos"> 5</span>            collect (gensym
-<span class="linenos"> 6</span>                      (symbol-name v)))))
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span>((VAR-A &#39;#:VAR-A1731)
-<span class="linenos"> 9</span>(VAR-B &#39;#:VAR-B1732)
-<span class="linenos">10</span>(VAR-C &#39;#:VAR-C1733))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((vars &#39;(var-a var-b var-c)))
+    (mapcar #2`(,a1 &#39;,a2)
+      vars
+      (loop for v in vars
+            collect (gensym
+                      (symbol-name v)))))
+
+((VAR-A &#39;#:VAR-A1731)
+(VAR-B &#39;#:VAR-B1732)
+(VAR-C &#39;#:VAR-C1733))
 </pre></div>
 </div>
 <p>另一种考虑 sharp-backquote 的方法是，它像 <strong>format</strong> 函数一样将插值（interpolation）作
@@ -235,22 +231,22 @@ true 子句(辅助子句或结果子句)使用中使用。<strong>aif</strong> �
 一样，sharp-backquote 让我们将列表插值的结构与想要拼接的值分开。由于前面描述的列表中
 函数位置的 lambda 结构和 <strong>lambda</strong> 宏展开成函数的 lambda 结构之间的语法二元性，还可以
 使用sharp-backquote 作为函数调用中的第一个元素：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (#3`(((,a1)) ,@a2 (,a3))
-<span class="linenos">2</span>      (gensym)
-<span class="linenos">3</span>      &#39;(a b c)
-<span class="linenos">4</span>      &#39;hello)
-<span class="linenos">5</span>
-<span class="linenos">6</span>(((#:G1734)) A B C (HELLO))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (#3`(((,a1)) ,@a2 (,a3))
+      (gensym)
+      &#39;(a b c)
+      &#39;hello)
+
+(((#:G1734)) A B C (HELLO))
 </pre></div>
 </div>
 <p>与 <strong>format</strong> 不同的是，sharp-quote 不用顺序定位，而是用回指绑定的数字。因此，顺序可以
 打乱，甚至可以在绑定中多次拼接：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (#3`(((,@a2)) ,a3 (,a1 ,a1))
-<span class="linenos">2</span>      (gensym)
-<span class="linenos">3</span>      &#39;(a b c)
-<span class="linenos">4</span>      &#39;hello)
-<span class="linenos">5</span>
-<span class="linenos">6</span>(((A B C)) HELLO (#:G1735 #:G1735))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (#3`(((,@a2)) ,a3 (,a1 ,a1))
+      (gensym)
+      &#39;(a b c)
+      &#39;hello)
+
+(((A B C)) HELLO (#:G1735 #:G1735))
 </pre></div>
 </div>
 <p>思考：<strong>gensym</strong> 生成的 <strong>#:G1735</strong> 的引用看起来是指向同一个符号，但是，当然，通过查看
@@ -269,57 +265,57 @@ true 子句(辅助子句或结果子句)使用中使用。<strong>aif</strong> �
 词法闭包 —— 一个通常存储并用于以后访问 let 语句中的变量的对象。因此，扩展我们的
 闭包对象模拟，<strong>alet%</strong> 宏的行为与 <strong>let</strong> 特殊结构完全相似，除了 <strong>alet%</strong> 从主体中捕获
 符号 <strong>this</strong> 并将其绑定到该结构主体中的最后一个表达式 —— 作为闭包返回的表达式。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro alet% (letargs &amp;rest body)
-<span class="linenos">2</span>  `(let ((this) ,@letargs)
-<span class="linenos">3</span>    (setq this ,@(last body))
-<span class="linenos">4</span>    ,@(butlast body)
-<span class="linenos">5</span>    this))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">alet%</span><span class="w"> </span><span class="p">(</span><span class="nv">letargs</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">this</span><span class="p">)</span><span class="w"> </span><span class="o">,@</span><span class="nv">letargs</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="o">,@</span><span class="p">(</span><span class="nb">last</span><span class="w"> </span><span class="nv">body</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="o">,@</span><span class="p">(</span><span class="nb">butlast</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nv">this</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>当在 lambda 结构中有初始化的代码，且不想重复初始化时，<strong>alet%</strong> 就很有用。因为
 <strong>this</strong> 绑定到要返回的 lambda 结构，所以我们可以在外围 let 返回它之前执行它。
 下面是一个闭包，它的构造展示了个简单的 <strong>alet%</strong> 例子，避免了重复它的重置和
 初始化代码：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet% ((sum) (mul) (expt))
-<span class="linenos"> 2</span>    (funcall this :reset)
-<span class="linenos"> 3</span>    (dlambda
-<span class="linenos"> 4</span>      (:reset ()
-<span class="linenos"> 5</span>        (psetq sum 0
-<span class="linenos"> 6</span>              mul 1
-<span class="linenos"> 7</span>              expt 2))
-<span class="linenos"> 8</span>      (t (n)
-<span class="linenos"> 9</span>        (psetq sum (+ sum n)
-<span class="linenos">10</span>              mul (* mul n)
-<span class="linenos">11</span>              expt (expt expt n))
-<span class="linenos">12</span>        (list sum mul expt))))
-<span class="linenos">13</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet% ((sum) (mul) (expt))
+    (funcall this :reset)
+    (dlambda
+      (:reset ()
+        (psetq sum 0
+              mul 1
+              expt 2))
+      (t (n)
+        (psetq sum (+ sum n)
+              mul (* mul n)
+              expt (expt expt n))
+        (list sum mul expt))))
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>我们可以依次调用它来改变 <strong>sum</strong>、<strong>mul</strong> 和 <strong>expt</strong> 的值:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (loop for i from 1 to 5 collect (funcall * 2))
-<span class="linenos">2</span>
-<span class="linenos">3</span>((2 2 4)
-<span class="linenos">4</span>(4 4 16)
-<span class="linenos">5</span>(6 8 256)
-<span class="linenos">6</span>(8 16 65536)
-<span class="linenos">7</span>(10 32 4294967296))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (loop for i from 1 to 5 collect (funcall * 2))
+
+((2 2 4)
+(4 4 16)
+(6 8 256)
+(8 16 65536)
+(10 32 4294967296))
 </pre></div>
 </div>
 <p>现在也可以调用 <strong>:reset</strong> 方法来重置这个闭包。注意多亏了 <strong>alet%</strong>，这里只需要在一个
 位置写重置的基本情况（将 <strong>sum</strong> 置为 0，<strong>mul</strong> 置为 1， <strong>expt</strong> 置为 2）：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall ** :reset)
-<span class="linenos">2</span>
-<span class="linenos">3</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall ** :reset)
+
+NIL
 </pre></div>
 </div>
 <p>现在，该闭包中的值都被重置了，我们从一开始就可以看到个新的序列了：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (loop for i from 1 to 5 collect (funcall *** 0.5))
-<span class="linenos">2</span>
-<span class="linenos">3</span>((0.5 0.5 1.4142135)
-<span class="linenos">4</span>(1.0 0.25 1.1892071)
-<span class="linenos">5</span>(1.5 0.125 1.0905077)
-<span class="linenos">6</span>(2.0 0.0625 1.0442737)
-<span class="linenos">7</span>(2.5 0.03125 1.0218971))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (loop for i from 1 to 5 collect (funcall *** 0.5))
+
+((0.5 0.5 1.4142135)
+(1.0 0.25 1.1892071)
+(1.5 0.125 1.0905077)
+(2.0 0.0625 1.0442737)
+(2.5 0.03125 1.0218971))
 </pre></div>
 </div>
 <p>值得一提的是 <strong>alet%</strong> 改变了 let 主体中结构的计算顺序。如果你去看一下这个的展开的话，
@@ -341,53 +337,53 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 而不是相互转换 —— alet over alambda 就是指定无名状态机的一种便携的方法。</p>
 <p>下面就是个典型的计数器闭包，接收参数 <strong>n</strong>，当传递符号 <strong>invert</strong> 作为参数而不是
 数字时，它的方向可以在递增和递减之间按 <strong>n</strong> 切换：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet ((acc 0))
-<span class="linenos"> 2</span>    (alambda (n)
-<span class="linenos"> 3</span>      (if (eq n &#39;invert)
-<span class="linenos"> 4</span>        (setq this
-<span class="linenos"> 5</span>              (lambda (n)
-<span class="linenos"> 6</span>                (if (eq n &#39;invert)
-<span class="linenos"> 7</span>                  (setq this #&#39;self)
-<span class="linenos"> 8</span>                  (decf acc n))))
-<span class="linenos"> 9</span>        (incf acc n))))
-<span class="linenos">10</span>
-<span class="linenos">11</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (alambda (n)
+      (if (eq n &#39;invert)
+        (setq this
+              (lambda (n)
+                (if (eq n &#39;invert)
+                  (setq this #&#39;self)
+                  (decf acc n))))
+        (incf acc n))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>让我们把这个闭包保存起来，以便我们随时可以使用：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;alet-test) *)
-<span class="linenos">2</span>
-<span class="linenos">3</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;alet-test) *)
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>开始时，是增加的：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alet-test 10)
-<span class="linenos">2</span>
-<span class="linenos">3</span>10
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet-test 10)
+
+10
 </pre></div>
 </div>
 <p>但是，可以通过将符号  <strong>invert</strong> 传递给闭包来改变要调用内部 lambda 表达式的实际函数：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alet-test &#39;invert)
-<span class="linenos">2</span>
-<span class="linenos">3</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet-test &#39;invert)
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>现在就变成递减了：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alert-test 3)
-<span class="linenos">2</span>
-<span class="linenos">3</span>7
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alert-test 3)
+
+7
 </pre></div>
 </div>
 <p>最后，多亏了 <strong>alambda</strong> 的 <strong>self</strong> 绑定，我们可以用 <strong>invert</strong> 参数再次修改函数：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alert-test &#39;invert)
-<span class="linenos">2</span>
-<span class="linenos">3</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alert-test &#39;invert)
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>又回到了刚开始时的状态，递增：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alert-test 5)
-<span class="linenos">2</span>
-<span class="linenos">3</span>12
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alert-test 5)
+
+12
 </pre></div>
 </div>
 <p>这个闭包被绑定到函数命名空间 <strong>alet-test</strong> 上了。但和常规的闭包略有不同。虽然这个
@@ -402,62 +398,62 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 并将其展开。然后使用该展开作为所需宏的模板。例如，我们希望有一种比前面介绍
 的 alet over alambda 计数器更通用的方法来创建具有多个状态的闭包。下面是上面
 由内而外展开的可逆计数器 alambda 用例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
-<span class="linenos"> 2</span>  &#39;(alambda (n)
-<span class="linenos"> 3</span>      (if (eq n &#39;invert)
-<span class="linenos"> 4</span>        (setq this
-<span class="linenos"> 5</span>              (lambda (n)
-<span class="linenos"> 6</span>                (if (eq n &#39;invert)
-<span class="linenos"> 7</span>                  (setq this #&#39;self)
-<span class="linenos"> 8</span>                  (decf acc n))))
-<span class="linenos"> 9</span>        (incf acc n))))
-<span class="linenos">10</span>
-<span class="linenos">11</span>(LABELS ((SELF (N)
-<span class="linenos">12</span>          (IF (EQ N &#39;INVERT)
-<span class="linenos">13</span>            (SETQ THIS
-<span class="linenos">14</span>                  (LAMBDA (N)
-<span class="linenos">15</span>                    (IF (EQ N &#39;INVERT)
-<span class="linenos">16</span>                      (SETQ THIS #&#39;SELF)
-<span class="linenos">17</span>                      (DECF ACC N))))
-<span class="linenos">18</span>            (INCF ACC N))))
-<span class="linenos">19</span>  #&#39;SELF)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(alambda (n)
+      (if (eq n &#39;invert)
+        (setq this
+              (lambda (n)
+                (if (eq n &#39;invert)
+                  (setq this #&#39;self)
+                  (decf acc n))))
+        (incf acc n))))
+
+(LABELS ((SELF (N)
+          (IF (EQ N &#39;INVERT)
+            (SETQ THIS
+                  (LAMBDA (N)
+                    (IF (EQ N &#39;INVERT)
+                      (SETQ THIS #&#39;SELF)
+                      (DECF ACC N))))
+            (INCF ACC N))))
+  #&#39;SELF)
 </pre></div>
 </div>
 <p>如果稍微重构上面的展开，利用标签来创建多个函数绑定的事实，将会得到以下结果：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(alet ((acc 0))
-<span class="linenos"> 2</span>  (labels ((going-up (n)
-<span class="linenos"> 3</span>            (if (eq n &#39;invert)
-<span class="linenos"> 4</span>              (setq this #&#39;going-down)
-<span class="linenos"> 5</span>              (incf acc n)))
-<span class="linenos"> 6</span>          (going-down (n)
-<span class="linenos"> 7</span>            (if (eq n &#39;invert)
-<span class="linenos"> 8</span>            (setq this #&#39;going-up)
-<span class="linenos"> 9</span>            (incf acc (- n)))))
-<span class="linenos">10</span>  #&#39;going-up))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">alet</span><span class="w"> </span><span class="p">((</span><span class="nv">acc</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">((</span><span class="nv">going-up</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="ss">&#39;invert</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">going-down</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">acc</span><span class="w"> </span><span class="nv">n</span><span class="p">)))</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">going-down</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="ss">&#39;invert</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">going-up</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">acc</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">n</span><span class="p">)))))</span><span class="w"></span>
+<span class="w">  </span><span class="nf">#&#39;</span><span class="nv">going-up</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>通过这个例子，我们注意到 <strong>alambda</strong> 能使用 <strong>labels</strong> 这个特殊的结构让其所有绑定
 对它的函数主体都可用。还有就是，现在已经很完整的最终版宏的模版了。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro alet-fsm (&amp;rest states)
-<span class="linenos">2</span>  `(macrolet ((state (s)
-<span class="linenos">3</span>                `(setq this #&#39;,s)))
-<span class="linenos">4</span>      (labels (,@states) #&#39;,(caar states))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">alet-fsm</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">states</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">macrolet</span><span class="w"> </span><span class="p">((</span><span class="nv">state</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="o">`</span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nf">#&#39;</span><span class="o">,</span><span class="nv">s</span><span class="p">)))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">(</span><span class="o">,@</span><span class="nv">states</span><span class="p">)</span><span class="w"> </span><span class="nf">#&#39;</span><span class="o">,</span><span class="p">(</span><span class="nb">caar</span><span class="w"> </span><span class="nv">states</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>alet-fsm</strong> 提供了一种便携的语法，该语法可以用来表达闭包存在的多种可能状态。
 就像是在 <strong>labels</strong> 上的宏包裹了一层薄薄的糖衣，并结合了代码遍历 <strong>macrolet</strong>
 的变形，该变形可以假装有个 <strong>state</strong> 函数，用来改变闭包的当前状态，该函数通过
 <strong>alet</strong> 提供的 <strong>this</strong> 回指来访问。下面是可逆计数器的更简洁的版本的例子：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(alet ((acc 0))
-<span class="linenos"> 2</span>  (alet-fsm
-<span class="linenos"> 3</span>    (going-up (n)
-<span class="linenos"> 4</span>      (if (eq n &#39;invert)
-<span class="linenos"> 5</span>        (state going-down)
-<span class="linenos"> 6</span>        (incf acc n)))
-<span class="linenos"> 7</span>    (going-down (n)
-<span class="linenos"> 8</span>      (if (eq n &#39;invert)
-<span class="linenos"> 9</span>        (state going-up)
-<span class="linenos">10</span>        (decf acc n)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">alet</span><span class="w"> </span><span class="p">((</span><span class="nv">acc</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">alet-fsm</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">going-up</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="ss">&#39;invert</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">state</span><span class="w"> </span><span class="nv">going-down</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">acc</span><span class="w"> </span><span class="nv">n</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">going-down</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="ss">&#39;invert</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">state</span><span class="w"> </span><span class="nv">going-up</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">decf</span><span class="w"> </span><span class="nv">acc</span><span class="w"> </span><span class="nv">n</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>alet-fsm</strong> 是之前没有见过的例子：回指注入（anaphor injection）。使用这种
@@ -486,117 +482,117 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 调用转发给 <strong>this</strong> 所指向的真实闭包，所以可以随意的引用这个虚拟闭包，根据需要复制它。
 这样的间接方法很有用，因为可以更改调用这个虚拟闭包时发生的事情，而不必更改对虚拟
 闭包的引用。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! ichain -before (&amp;rest body)
-<span class="linenos">2</span>  `(let ((,g!indir-env this))
-<span class="linenos">3</span>    (setq this
-<span class="linenos">4</span>      (lambda (&amp;rest ,g!temp-args)
-<span class="linenos">5</span>        ,@body
-<span class="linenos">6</span>        (apply ,g!indir -env
-<span class="linenos">7</span>              ,g!temp-args)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">ichain</span><span class="w"> </span><span class="nv">-before</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!indir-env</span><span class="w"> </span><span class="nv">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="o">,@</span><span class="nv">body</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!indir</span><span class="w"> </span><span class="nv">-env</span><span class="w"></span>
+<span class="w">              </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>ichain-before</strong> 会展开成 <strong>alet</strong> 结构。添加了一个新的代码体，以便在调用主闭包之前执行。
 回到计数器例子，<strong>ichain-before</strong> 添加了个新的闭包，会在闭包 <strong>acc</strong> 变量增加前打印出它
 的值：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alet ((acc 0))
-<span class="linenos">2</span>    (ichain-before
-<span class="linenos">3</span>      (format t &quot;Changing from ~a~%&quot; acc))
-<span class="linenos">4</span>    (lambda (n)
-<span class="linenos">5</span>      (incf acc n)))
-<span class="linenos">6</span>
-<span class="linenos">7</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (ichain-before
+      (format t &quot;Changing from ~a~%&quot; acc))
+    (lambda (n)
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>和设想的一样：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall * 2)
-<span class="linenos">2</span>Changing from 0
-<span class="linenos">3</span>2
-<span class="linenos">4</span>* (funcall ** 2)
-<span class="linenos">5</span>Changing from 2
-<span class="linenos">6</span>4
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall * 2)
+Changing from 0
+2
+* (funcall ** 2)
+Changing from 2
+4
 </pre></div>
 </div>
 <p>不过，把 chain 放在 <strong>ichain-before</strong> 这个名字中是有原因的。让尽可能多的闭包来执行：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet ((acc 0))
-<span class="linenos"> 2</span>    (ichain-before
-<span class="linenos"> 3</span>      (format t &quot;A~%&quot;))
-<span class="linenos"> 4</span>    (ichain-before
-<span class="linenos"> 5</span>      (format t &quot;B~%&quot;))
-<span class="linenos"> 6</span>    (ichain-before
-<span class="linenos"> 7</span>      (format t &quot;C~%&quot;))
-<span class="linenos"> 8</span>    (lambda (n)
-<span class="linenos"> 9</span>      (incf acc n)))
-<span class="linenos">10</span>
-<span class="linenos">11</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (ichain-before
+      (format t &quot;A~%&quot;))
+    (ichain-before
+      (format t &quot;B~%&quot;))
+    (ichain-before
+      (format t &quot;C~%&quot;))
+    (lambda (n)
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>在链中每添加一个新链接都会将该链接添加到链的头部，导致访问链接的顺序与添加链接的顺序
 相反：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall * 2)
-<span class="linenos">2</span>C
-<span class="linenos">3</span>B
-<span class="linenos">4</span>A
-<span class="linenos">5</span>2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall * 2)
+C
+B
+A
+2
 </pre></div>
 </div>
 <p>在更改宏以避免通过添加新的周围代码来重新构造宏时，静态添加间接链有时很用的。但在动态
 添加间接链时，最有趣的可能性就会出现。因为可以在运行时创建新的闭包，还可以通过回指访
 问闭包的内部，所以可以重写函数在运行时的工作方式。下面是一个简单的例子，每个闭包调用
 都会添加另一段代码，在运行时输出 “Hello world”：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (alet ((acc 0))
-<span class="linenos">2</span>    (lambda (n)
-<span class="linenos">3</span>      (ichain-before
-<span class="linenos">4</span>        (format t &quot;Hello world~%&quot;))
-<span class="linenos">5</span>      (incf acc n)))
-<span class="linenos">6</span>
-<span class="linenos">7</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (lambda (n)
+      (ichain-before
+        (format t &quot;Hello world~%&quot;))
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>每次调用都会向间接链添加一个新的闭包：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (loop for i from 1 to 4
-<span class="linenos"> 2</span>    do
-<span class="linenos"> 3</span>      (format t &quot;~:r invocation:~%&quot; i)
-<span class="linenos"> 4</span>      (funcall * i))
-<span class="linenos"> 5</span>first invocation:
-<span class="linenos"> 6</span>second invocation:
-<span class="linenos"> 7</span>Hello world
-<span class="linenos"> 8</span>third invocation:
-<span class="linenos"> 9</span>Hello world
-<span class="linenos">10</span>Hello world
-<span class="linenos">11</span>fourth invocation:
-<span class="linenos">12</span>Hello world
-<span class="linenos">13</span>Hello world
-<span class="linenos">14</span>Hello world
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (loop for i from 1 to 4
+    do
+      (format t &quot;~:r invocation:~%&quot; i)
+      (funcall * i))
+first invocation:
+second invocation:
+Hello world
+third invocation:
+Hello world
+Hello world
+fourth invocation:
+Hello world
+Hello world
+Hello world
 </pre></div>
 </div>
 <p><strong>ichain-after</strong> 宏与 <strong>ichain-before</strong> 宏相似，不同之处是 <strong>ichain-after</strong> 将闭包
 添加到执行链的另一端：在主闭包被调用之后。<strong>ichain-after</strong> 用了 <strong>prog1</strong>， <strong>prog1</strong>
 连续执行里面的代码结构，然后返回第一个结构的求值结果。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! ichain -after (&amp;rest body)
-<span class="linenos">2</span>  `(let ((,g!indir-env this))
-<span class="linenos">3</span>      (setq this
-<span class="linenos">4</span>        (lambda (&amp;rest ,g!temp-args)
-<span class="linenos">5</span>          (prog1
-<span class="linenos">6</span>            (apply ,g!indir -env
-<span class="linenos">7</span>                  ,g!temp-args)
-<span class="linenos">8</span>            ,@body)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">ichain</span><span class="w"> </span><span class="nv">-after</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!indir-env</span><span class="w"> </span><span class="nv">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">prog1</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!indir</span><span class="w"> </span><span class="nv">-env</span><span class="w"></span>
+<span class="w">                  </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="o">,@</span><span class="nv">body</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>ichain-before</strong> 和 <strong>ichain-after</strong> 可以组合在一起，让 before 结构在主闭包计算之前执
 行，after 结构在主闭包计算之后执行:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet ((acc 0))
-<span class="linenos"> 2</span>    (ichain-before
-<span class="linenos"> 3</span>      (format t &quot;Changing from ~a~%&quot; acc))
-<span class="linenos"> 4</span>    (ichain-after
-<span class="linenos"> 5</span>      (format t &quot;Changed to ~a~%&quot; acc))
-<span class="linenos"> 6</span>    (lambda (n)
-<span class="linenos"> 7</span>      (incf acc n)))
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>#&lt;Interpreted Function&gt;
-<span class="linenos">10</span>* (funcall * 7)
-<span class="linenos">11</span>Changing from 0
-<span class="linenos">12</span>Changed to 7
-<span class="linenos">13</span>7
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (ichain-before
+      (format t &quot;Changing from ~a~%&quot; acc))
+    (ichain-after
+      (format t &quot;Changed to ~a~%&quot; acc))
+    (lambda (n)
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
+* (funcall * 7)
+Changing from 0
+Changed to 7
+7
 </pre></div>
 </div>
 <p><strong>ichain-before</strong> 和 <strong>ichain-after</strong> 是将自由变量插入其展开的宏。这两个宏插入了
@@ -609,80 +605,80 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 <p>在初始闭包表达式执行之前或之后对代码进行标记时，<strong>ichain-before</strong> 和 <strong>ichain-after</strong> 很
 有用的，但这绝不是 <strong>this</strong> 回指唯一能做的。另一个常见的任务是在调用闭包之后检查闭包数据的
 有效性。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! ichain -intercept% (&amp;rest body)
-<span class="linenos">2</span>  `(let ((,g!indir-env this))
-<span class="linenos">3</span>    (setq this
-<span class="linenos">4</span>        (lambda (&amp;rest ,g!temp-args)
-<span class="linenos">5</span>          (block intercept
-<span class="linenos">6</span>            (prog1
-<span class="linenos">7</span>              (apply ,g!indir -env
-<span class="linenos">8</span>                    ,g!temp-args)
-<span class="linenos">9</span>              ,@body))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">ichain</span><span class="w"> </span><span class="nv">-intercept%</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!indir-env</span><span class="w"> </span><span class="nv">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="k">block</span><span class="w"> </span><span class="nv">intercept</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nb">prog1</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!indir</span><span class="w"> </span><span class="nv">-env</span><span class="w"></span>
+<span class="w">                    </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="o">,@</span><span class="nv">body</span><span class="p">))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>ichain-intercept%</strong> 是另一个用在 <strong>alet</strong> 中的宏。设想是，希望能够拦截闭包的调用，并验
 证执行的操作没有导致闭包中的某种不一致状态。所以我们可以像这样在常规的计数器闭包中添加一个拦截：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet ((acc 0))
-<span class="linenos"> 2</span>    (ichain-intercept%
-<span class="linenos"> 3</span>      (when (&lt; acc 0)
-<span class="linenos"> 4</span>        (format t &quot;Acc went negative~%&quot;)
-<span class="linenos"> 5</span>        (setq acc 0)
-<span class="linenos"> 6</span>        (return-from intercept acc)))
-<span class="linenos"> 7</span>    (lambda (n)
-<span class="linenos"> 8</span>      (incf acc n)))
-<span class="linenos"> 9</span>
-<span class="linenos">10</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (ichain-intercept%
+      (when (&lt; acc 0)
+        (format t &quot;Acc went negative~%&quot;)
+        (setq acc 0)
+        (return-from intercept acc)))
+    (lambda (n)
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>当计数器低于 0 时，<strong>ichain-intercept%</strong> 插入的代码将告警：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall * -8)
-<span class="linenos">2</span>Acc went negative
-<span class="linenos">3</span>0
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall * -8)
+Acc went negative
+0
 </pre></div>
 </div>
 <p>计数器被重置为 0 ：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall ** 3)
-<span class="linenos">2</span>
-<span class="linenos">3</span>3
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall ** 3)
+
+3
 </pre></div>
 </div>
 <p><strong>ichain-intercept%</strong> 最有趣的地方是，引入了 <strong>intercept</strong> 的块回指（block anaphor）。
 可以用 <strong>return-from</strong> 来调用这个回指。代码块将从闭包调用中返回这个值，拦截原始值。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro! ichain -intercept (&amp;rest body)
-<span class="linenos"> 2</span>  `(let ((,g!indir-env this))
-<span class="linenos"> 3</span>    (setq this
-<span class="linenos"> 4</span>        (lambda (&amp;rest ,g!temp-args)
-<span class="linenos"> 5</span>          (block ,g!intercept
-<span class="linenos"> 6</span>            (macrolet ((intercept (v)
-<span class="linenos"> 7</span>                      `(return -from
-<span class="linenos"> 8</span>                      ,&#39;,g!intercept
-<span class="linenos"> 9</span>                      ,v)))
-<span class="linenos">10</span>              (prog1
-<span class="linenos">11</span>                (apply ,g!indir-env
-<span class="linenos">12</span>                      ,g!temp-args)
-<span class="linenos">13</span>                ,@body )))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">ichain</span><span class="w"> </span><span class="nv">-intercept</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!indir-env</span><span class="w"> </span><span class="nv">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="k">block</span><span class="w"> </span><span class="o">,</span><span class="nv">g!intercept</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">macrolet</span><span class="w"> </span><span class="p">((</span><span class="nv">intercept</span><span class="w"> </span><span class="p">(</span><span class="nv">v</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="o">`</span><span class="p">(</span><span class="nb">return</span><span class="w"> </span><span class="nv">-from</span><span class="w"></span>
+<span class="w">                      </span><span class="o">,</span><span class="ss">&#39;,g!intercept</span><span class="w"></span>
+<span class="w">                      </span><span class="o">,</span><span class="nv">v</span><span class="p">)))</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">prog1</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!indir-env</span><span class="w"></span>
+<span class="w">                      </span><span class="o">,</span><span class="nv">g!temp-args</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="o">,@</span><span class="nv">body</span><span class="w"> </span><span class="p">)))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>相反，<strong>ichain-intercept</strong> 创建了个本地宏，该宏允许 <strong>ichain-intercept</strong> 中的代码使用
 <strong>intercept</strong> 展开成一个由 gensym 指定的 <strong>return-from</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (alet ((acc 0))
-<span class="linenos"> 2</span>    (ichain-intercept
-<span class="linenos"> 3</span>      (when (&lt; acc 0)
-<span class="linenos"> 4</span>        (format t &quot;Acc went negative~%&quot;)
-<span class="linenos"> 5</span>      (setq acc 0)
-<span class="linenos"> 6</span>      (intercept acc)))
-<span class="linenos"> 7</span>    (lambda (n)
-<span class="linenos"> 8</span>      (incf acc n)))
-<span class="linenos"> 9</span>
-<span class="linenos">10</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (alet ((acc 0))
+    (ichain-intercept
+      (when (&lt; acc 0)
+        (format t &quot;Acc went negative~%&quot;)
+      (setq acc 0)
+      (intercept acc)))
+    (lambda (n)
+      (incf acc n)))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>这和 <strong>ichain-intercept%</strong> 工作原理一样：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (funcall * -8)
-<span class="linenos">2</span>Acc went negative
-<span class="linenos">3</span>0
-<span class="linenos">4</span>* (funcall ** 3)
-<span class="linenos">5</span>3
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (funcall * -8)
+Acc went negative
+0
+* (funcall ** 3)
+3
 </pre></div>
 </div>
 <p>当然，将所有这些闭包透明地引入操作会影响运行时性能。幸运的是，现代 lisp 编译器擅长优化闭包。
@@ -697,53 +693,53 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 要详细说明回指闭合，将不用 <strong>alet</strong> 宏，而是使用一个由内而外的展开。<strong>alet-hotpatch%</strong>
 是 <strong>alet</strong> 的拓展，有个一个特殊的 lambda 结构。该 <strong>lambda</strong> 结构检查第一个参数是否为关
 键字符号 <strong>:hotpatch</strong>，如果是，则用另一个参数替换间接闭包。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro alet-hotpatch% (letargs &amp;rest body)
-<span class="linenos">2</span>  `(let ((this) ,@letargs)
-<span class="linenos">3</span>      (setq this ,@(last body))
-<span class="linenos">4</span>      ,@(butlast body)
-<span class="linenos">5</span>      (lambda (&amp;rest args)
-<span class="linenos">6</span>        (if (eq (car args) &#39;:hotpatch)
-<span class="linenos">7</span>          (setq this (cadr args))
-<span class="linenos">8</span>          (apply this args)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro alet-hotpatch% (letargs &amp;rest body)
+  `(let ((this) ,@letargs)
+      (setq this ,@(last body))
+      ,@(butlast body)
+      (lambda (&amp;rest args)
+        (if (eq (car args) &#39;:hotpatch)
+          (setq this (cadr args))
+          (apply this args)))))
 </pre></div>
 </div>
 <p>在运行时更改另一个转发闭包中使用的闭包称为热补丁（ <em>hotpatching</em> ）。例如，这里我们创建
 了一个热补丁闭包，并将其存储在 <strong>hotpatch-test</strong> 的 <strong>symbol-function</strong> 单元格中，以便
 之后使用：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;hotpatch-test)
-<span class="linenos">2</span>    (alet-hotpatch% ((acc 0))
-<span class="linenos">3</span>      (lambda (n)
-<span class="linenos">4</span>        (incf acc n))))
-<span class="linenos">5</span>
-<span class="linenos">6</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;hotpatch-test)
+    (alet-hotpatch% ((acc 0))
+      (lambda (n)
+        (incf acc n))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>现在可以这样使用:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (hotpatch-test 3)
-<span class="linenos">2</span>
-<span class="linenos">3</span>3
-<span class="linenos">4</span>* (hotpatch-test 4)
-<span class="linenos">5</span>
-<span class="linenos">6</span>7
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (hotpatch-test 3)
+
+3
+* (hotpatch-test 4)
+
+7
 </pre></div>
 </div>
 <p>可以用 <strong>:hotpatch</strong> 和替换函数或闭包来替换 lambda 结构及其相关的环境:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (hotpatch-test
-<span class="linenos">2</span>    :hotpatch
-<span class="linenos">3</span>    (let ((acc 0))
-<span class="linenos">4</span>      (lambda (n)
-<span class="linenos">5</span>        (incf acc (* 2 n)))))
-<span class="linenos">6</span>
-<span class="linenos">7</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (hotpatch-test
+    :hotpatch
+    (let ((acc 0))
+      (lambda (n)
+        (incf acc (* 2 n)))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>现在闭包有了新的、热补丁的行为：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (hotpatch-test 2)
-<span class="linenos">2</span>
-<span class="linenos">3</span>4
-<span class="linenos">4</span>* (hotpatch-test 5)
-<span class="linenos">5</span>
-<span class="linenos">6</span>14
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (hotpatch-test 2)
+
+4
+* (hotpatch-test 5)
+
+14
 </pre></div>
 </div>
 <p>注意计数器的值是怎么置为 0 的，因为我们还用计数器的累加器 <strong>acc</strong> 的新值热补丁了闭包的环境。
@@ -752,15 +748,15 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 的情况下，在新的宏定义中会用到之前定义的宏，这就是宏组合（<em>macro combination</em> ）。使用精心设
 计的宏可以完全理解扩展，尽管在许多方面可能违背词汇透明性，但不会出现组合问题，因为所有组件都能有
 意义地组合在一起。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! alet-hotpatch (letargs &amp;rest body)
-<span class="linenos">2</span>  `(let ((,g!this) ,@letargs)
-<span class="linenos">3</span>    (setq ,g!this ,@(last body))
-<span class="linenos">4</span>    ,@(butlast body)
-<span class="linenos">5</span>    (dlambda
-<span class="linenos">6</span>        (:hotpatch (closure)
-<span class="linenos">7</span>          (setq ,g!this closure))
-<span class="linenos">8</span>        (t (&amp;rest args)
-<span class="linenos">9</span>          (apply ,g!this args)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">alet-hotpatch</span><span class="w"> </span><span class="p">(</span><span class="nv">letargs</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!this</span><span class="p">)</span><span class="w"> </span><span class="o">,@</span><span class="nv">letargs</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="o">,@</span><span class="p">(</span><span class="nb">last</span><span class="w"> </span><span class="nv">body</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="o">,@</span><span class="p">(</span><span class="nb">butlast</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">dlambda</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="ss">:hotpatch</span><span class="w"> </span><span class="p">(</span><span class="nv">closure</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="nv">closure</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="nv">args</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>alet-hotpatch</strong> 创建了个可热补的闭包，但在概念上有一个小缺陷。因为使用
@@ -771,15 +767,15 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 <strong>this</strong> 回指的创建。同时也因为 <strong>alet-hotpatch</strong> 中用了 <strong>this</strong> 回指实现
 <strong>hotpatch</strong> 代码，所以就可以关闭回指，这样 <strong>this</strong> 变量就不再被宏捕获了。通常该如何避免引
 入预期之外的绑定？当然，可以用 gensyms 来命名绑定。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! let-hotpatch (letargs &amp;rest body)
-<span class="linenos">2</span>  `(let ((,g!this) ,@letargs)
-<span class="linenos">3</span>    (setq ,g!this ,@(last body))
-<span class="linenos">4</span>    ,@(butlast body)
-<span class="linenos">5</span>    (dlambda
-<span class="linenos">6</span>      (:hotpatch (closure)
-<span class="linenos">7</span>        (setq ,g!this closure))
-<span class="linenos">8</span>      (t (&amp;rest args)
-<span class="linenos">9</span>        (apply ,g!this args)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">let-hotpatch</span><span class="w"> </span><span class="p">(</span><span class="nv">letargs</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="o">,</span><span class="nv">g!this</span><span class="p">)</span><span class="w"> </span><span class="o">,@</span><span class="nv">letargs</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="o">,@</span><span class="p">(</span><span class="nb">last</span><span class="w"> </span><span class="nv">body</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="o">,@</span><span class="p">(</span><span class="nb">butlast</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nv">dlambda</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="ss">:hotpatch</span><span class="w"> </span><span class="p">(</span><span class="nv">closure</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="nv">closure</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="o">,</span><span class="nv">g!this</span><span class="w"> </span><span class="nv">args</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>let-hotpatch</strong> 是将 <strong>this</strong> 回指闭合为一个更包含的版本的示例 —— 一个在只需要进行热补
@@ -814,113 +810,113 @@ alambda 的模式创建一对相互引用的函数。只要所有的状态都变
 <p>因为 <strong>defmacro!</strong> 对给出的代码进行预处理，并在代码展开之前创建所有 G-bang 的列表，所以
 G-bang 是子词法绑定。我们不能写一个在 <strong>defmacro!</strong> 中插入 G-bang 符号的的宏，因为
 G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defmacro! junk ()
-<span class="linenos">2</span>    `(let ((,g!var))
-<span class="linenos">3</span>      ,g!var))
-<span class="linenos">4</span>
-<span class="linenos">5</span>JUNK
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defmacro! junk ()
+    `(let ((,g!var))
+      ,g!var))
+
+JUNK
 </pre></div>
 </div>
 <p>两个 G-bang 变量在 <strong>defmacro!</strong> 的子词法作用域中，所以 <strong>junk</strong> 的展开不出意料是这样的:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand &#39;(junk))
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LET ()
-<span class="linenos">4</span>  (LET ((#:VAR1663))
-<span class="linenos">5</span>    #:VAR1663))
-<span class="linenos">6</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand &#39;(junk))
+
+(LET ()
+  (LET ((#:VAR1663))
+    #:VAR1663))
+T
 </pre></div>
 </div>
 <p>然而，为了探索子词法作用域的概念，我们将定义一个插入 G-bang 的宏：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defmacro injector-for-g!var ()
-<span class="linenos">2</span>    &#39;&#39;g!var)
-<span class="linenos">3</span>
-<span class="linenos">4</span>INJECTOR-FOR-G!VAR
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defmacro injector-for-g!var ()
+    &#39;&#39;g!var)
+
+INJECTOR-FOR-G!VAR
 </pre></div>
 </div>
 <p>现在可以编写 <strong>junk2</strong>。<strong>junk2</strong> 和 <strong>junk</strong> 基本一致，除了 <strong>junk2</strong> 中将 G-bang 替
 换了展开为 G-bang 的宏：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defmacro! junk2 ()
-<span class="linenos">2</span>    `(let ((,(injector-for-g!var)))
-<span class="linenos">3</span>      ,(injector-for-g!var)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>JUNK2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defmacro! junk2 ()
+    `(let ((,(injector-for-g!var)))
+      ,(injector-for-g!var)))
+
+JUNK2
 </pre></div>
 </div>
 <p>但是因为 G-bang 是子词法绑定的 —— 因此不考虑结构的宏展开 —— <strong>defmacro!</strong> 就不会将这些
 符号转换成自动 gensym：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand &#39;(junk2))
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LET ()
-<span class="linenos">4</span>  (LET ((G!VAR))
-<span class="linenos">5</span>G!VAR))
-<span class="linenos">6</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand &#39;(junk2))
+
+(LET ()
+  (LET ((G!VAR))
+G!VAR))
+T
 </pre></div>
 </div>
 <p>虽然上面的代码仍然可以用，但当有些变量引用在此法作用于中存在，有些不存在时，子词法作用域
 内的变量引用可能会破坏表达式：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (defmacro! junk3 ()
-<span class="linenos"> 2</span>  `(let ((,g!var))
-<span class="linenos"> 3</span>      ,(injector-for-g!var)))
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span>JUNK3
-<span class="linenos"> 6</span>* (macroexpand &#39;(junk3))
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span>(LET ()
-<span class="linenos"> 9</span>  (LET ((#:VAR1672))
-<span class="linenos">10</span>G!VAR))
-<span class="linenos">11</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defmacro! junk3 ()
+  `(let ((,g!var))
+      ,(injector-for-g!var)))
+
+JUNK3
+* (macroexpand &#39;(junk3))
+
+(LET ()
+  (LET ((#:VAR1672))
+G!VAR))
+T
 </pre></div>
 </div>
-<p>子词法作用域在复杂宏中出现的频率惊人。还有 <strong>defmacro!</strong> ，在 <span class="xref std std-ref">5-6-recursive-solution</span> 中的
+<p>子词法作用域在复杂宏中出现的频率惊人。还有 <strong>defmacro!</strong> ，在 <a class="reference internal" href="chapter05.html#recursive-solutions"><span class="std std-ref">5.6 递归方案</span></a> 中的
 <strong>with-all-cxrs</strong> 宏的子词法绑定列表访问器函数中就用到了这个宏。子词法绑定的结果是，不能从宏
 展开中引用这种绑定。有时这种访问限制很有用，有时不是。在 <strong>with-all-cxrs</strong> 中，子词法可能被
 认为是不可取的。当访问器在 <strong>with-all-cxrs</strong> 的子词法作用域中时，没有问题：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-all-cxrs
-<span class="linenos">2</span>    (cadadadr nil))
-<span class="linenos">3</span>
-<span class="linenos">4</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-all-cxrs
+    (cadadadr nil))
+
+NIL
 </pre></div>
 </div>
 <p>我们甚至可以编写扩展到这些访问器中的宏，只要宏定义在 <strong>with-all-cxrs</strong> 的子词法范围内:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-all-cxrs
-<span class="linenos">2</span>    (macrolet ((accessor (l)
-<span class="linenos">3</span>                `(cadadadr ,l)))
-<span class="linenos">4</span>      (accessor nil)))
-<span class="linenos">5</span>
-<span class="linenos">6</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-all-cxrs
+    (macrolet ((accessor (l)
+                `(cadadadr ,l)))
+      (accessor nil)))
+
+NIL
 </pre></div>
 </div>
 <p>但要注意，<strong>with-all-cxrs</strong> 是子词法绑定访问器函数的，所以不能定义宏来插入访问器：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macrolet ((accessor (l)
-<span class="linenos">2</span>              `(cadadadr ,l)))
-<span class="linenos">3</span>    (with-all-cxrs
-<span class="linenos">4</span>      (accessor nil)))
-<span class="linenos">5</span>
-<span class="linenos">6</span>This function is undefined: CADADADR
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macrolet ((accessor (l)
+              `(cadadadr ,l)))
+    (with-all-cxrs
+      (accessor nil)))
+
+This function is undefined: CADADADR
 </pre></div>
 </div>
 <p>既然已经熟悉了回指，并且也见过这么多复杂宏的例子 —— 包括一些使用子词汇范围的宏 ——
 我们可以讨论个有趣的理论宏：<strong>sublet</strong>。这个宏设计用来为代码创建子词法绑定，使用的
 语法类似于通常的 let 结构语法。与许多 lisp 宏一样，对 <strong>sublet</strong> 的讨论先从一个实用程序
 开始。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun let-binding-transform (bs)
-<span class="linenos"> 2</span>  (if bs
-<span class="linenos"> 3</span>    (cons
-<span class="linenos"> 4</span>      (cond ((symbolp (car bs))
-<span class="linenos"> 5</span>              (list (car bs)))
-<span class="linenos"> 6</span>            ((consp (car bs))
-<span class="linenos"> 7</span>              (car bs))
-<span class="linenos"> 8</span>            (t
-<span class="linenos"> 9</span>              (error &quot;Bad let bindings&quot;)))
-<span class="linenos">10</span>      (let-binding-transform (cdr bs)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">let-binding-transform</span><span class="w"> </span><span class="p">(</span><span class="nv">bs</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">bs</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">cons</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">cond</span><span class="w"> </span><span class="p">((</span><span class="nb">symbolp</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">bs</span><span class="p">))</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">bs</span><span class="p">)))</span><span class="w"></span>
+<span class="w">            </span><span class="p">((</span><span class="nb">consp</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">bs</span><span class="p">))</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">bs</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="no">t</span><span class="w"></span>
+<span class="w">              </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Bad let bindings&quot;</span><span class="p">)))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nv">let-binding-transform</span><span class="w"> </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">bs</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>let-binding-transform</strong> 是个简单的实用工具，用于处理 let 结构绑定单个符号的情况。
 在下面代码中，<strong>a</strong> 被归一化为 <strong>(a)</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (let-binding-transform
-<span class="linenos">2</span>    &#39;(a (b) (c nil)))
-<span class="linenos">3</span>
-<span class="linenos">4</span>((A) (B) (C NIL))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let-binding-transform
+    &#39;(a (b) (c nil)))
+
+((A) (B) (C NIL))
 </pre></div>
 </div>
 <p><strong>sublet</strong> 还需要用到 <a class="reference internal" href="chapter05.html#implicit-contexts"><span class="std std-ref">5.3 隐式上下文</span></a> 中的 <strong>tree-leaves</strong>。回想一下，
@@ -928,24 +924,24 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 的表达式，以及另一个用不同的 <strong>x</strong> 来确定应该更改哪些有效叶子的表达式。</p>
 <p>选择隐式化具有相同名称 <strong>x</strong> 的绑定是种有用的 <em>二元语法</em> （ <em>duality of syntax</em> ）。
 当不用通用的方式在表达式中分解公共代码时，有时可以用其他方式使用语法对偶来获得这种简洁的优势。
-<strong>sublet</strong> 的定义用到了 <span class="xref std std-ref">4-5-cycle-expressions</span> 中的自引用读宏。特别是对于像访问器
-这样在编写过程中可以多次更改的东西，读宏允许有且只有一种结构来表示访问器。幸亏使用了隐式的
-<strong>tree-leaves</strong> 宏，很容易找到和理解代码重复，因为代码紧密地结合在一起。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro sublet (bindings% &amp;rest body)
-<span class="linenos"> 2</span>  (let ((bindings (let-binding-transform
-<span class="linenos"> 3</span>                    bindings %)))
-<span class="linenos"> 4</span>    (setq bindings
-<span class="linenos"> 5</span>      (mapcar
-<span class="linenos"> 6</span>        (lambda (x)
-<span class="linenos"> 7</span>          (cons (gensym (symbol -name (car x))) x))
-<span class="linenos"> 8</span>        bindings ))
-<span class="linenos"> 9</span>    `(let (,@(mapcar #&#39;list
-<span class="linenos">10</span>                    (mapcar #&#39;car bindings)
-<span class="linenos">11</span>                    (mapcar #&#39;caddr bindings)))
-<span class="linenos">12</span>      ,@(tree-leaves
-<span class="linenos">13</span>          body
-<span class="linenos">14</span>          #1=(member x bindings :key #&#39;cadr)
-<span class="linenos">15</span>          (caar #1#)))))
+<strong>sublet</strong> 的定义用到了 <a class="reference internal" href="chapter04.html#cyclic-expressions"><span class="std std-ref">4.5 循环表达式</span></a> 中的自引用读宏。特别是对于像
+访问器这样在编写过程中可以多次更改的东西，读宏允许有且只有一种结构来表示访问器。幸亏使用了
+隐式的 <strong>tree-leaves</strong> 宏，很容易找到和理解代码重复，因为代码紧密地结合在一起。</p>
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">sublet</span><span class="w"> </span><span class="p">(</span><span class="nv">bindings%</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">bindings</span><span class="w"> </span><span class="p">(</span><span class="nv">let-binding-transform</span><span class="w"></span>
+<span class="w">                    </span><span class="nv">bindings</span><span class="w"> </span><span class="nv">%</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">bindings</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">(</span><span class="nb">gensym</span><span class="w"> </span><span class="p">(</span><span class="nc">symbol</span><span class="w"> </span><span class="nv">-name</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">x</span><span class="p">)))</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="nv">bindings</span><span class="w"> </span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">(</span><span class="o">,@</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">list</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">car</span><span class="w"> </span><span class="nv">bindings</span><span class="p">)</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">caddr</span><span class="w"> </span><span class="nv">bindings</span><span class="p">)))</span><span class="w"></span>
+<span class="w">      </span><span class="o">,@</span><span class="p">(</span><span class="nv">tree-leaves</span><span class="w"></span>
+<span class="w">          </span><span class="nv">body</span><span class="w"></span>
+<span class="w">          </span><span class="o">#1=</span><span class="p">(</span><span class="nb">member</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="nv">bindings</span><span class="w"> </span><span class="ss">:key</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">cadr</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">caar</span><span class="w"> </span><span class="o">#1#</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>sublet</strong> 接受表示let绑定的结构，并应用 <strong>let-binding-transform</strong>，在这个过程中生成新的
@@ -954,24 +950,24 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 <strong>tree-leaves</strong> 将代码中所有出现的绑定名称符号替换为对应的 gensym。<strong>sublet</strong> 不会展开任
 何宏或解析主体中的任何特殊结构来查找这些绑定名称符号的出现，因为 <strong>sublet</strong> 会创建子词法绑
 定。例如，如果所有 <strong>a</strong> 的引用都是子词法的，将用 gensym 替换它们:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>    &#39;(sublet ((a 0))
-<span class="linenos">3</span>          (list a)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>(LET ((#:A1657 0))
-<span class="linenos">6</span>  (LIST #:A1657))
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(sublet ((a 0))
+          (list a)))
+
+(LET ((#:A1657 0))
+  (LIST #:A1657))
+T
 </pre></div>
 </div>
 <p>但是，由于子词法作用域不涉及展开宏，因此不一定会解析 <strong>quote</strong> 这样的特殊结构，不是变量的
 符号 <strong>a</strong> 也会被改掉：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>  &#39;(sublet ((a 0))
-<span class="linenos">3</span>      (list &#39;a)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>(LET ((#:A1658 0))
-<span class="linenos">6</span>  (LIST &#39;#:A1658))
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(sublet ((a 0))
+      (list &#39;a)))
+
+(LET ((#:A1658 0))
+  (LIST &#39;#:A1658))
+T
 </pre></div>
 </div>
 <p>子词法作用域在列表结构被系统代码遍历程序解释为 lisp 代码之前生效。这是个重要的观测结果，
@@ -979,10 +975,10 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 <p>这里，我们处于宏理解的众多边缘之一。在未扩展的子词法作用域和完全扩展的词法作用域之间有哪些
 有趣的作用域类型？因为没有更好的名称，我们将这个无限大的范围称为 <em>超子词法作用域</em> （<em>super_
 _sub-lexical scope</em>）。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro sublet*
-<span class="linenos">2</span>  (bindings &amp;rest body)
-<span class="linenos">3</span>  `(sublet ,bindings
-<span class="linenos">4</span>    ,@(mapcar #&#39;macroexpand -1 body)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">sublet*</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">bindings</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="nv">sublet</span><span class="w"> </span><span class="o">,</span><span class="nv">bindings</span><span class="w"></span>
+<span class="w">    </span><span class="o">,@</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">macroexpand</span><span class="w"> </span><span class="mi">-1</span><span class="w"> </span><span class="nv">body</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>超子词法作用域显然用到了 <strong>sublet*</strong>。<strong>sublet*</strong> 宏中用了 <strong>sublet</strong>，但是用
@@ -990,56 +986,56 @@ _sub-lexical scope</em>）。</p>
 一步之后，而不是出现在原始列表结构中。这种类型的超子词法作用域允许每个 let 结构主体中的宏从作用
 域中插入或删除引用。如果宏没有做这两件事 —— 或者如果结构根本不是宏 —— 这种超子词法作用域的行为
 就像子词法作用域：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>  &#39;(sublet* ((a 0))
-<span class="linenos">3</span>      (list a)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>(LET ((#:A1659 0))
-<span class="linenos">6</span>  (LIST #:A1659))
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(sublet* ((a 0))
+      (list a)))
+
+(LET ((#:A1659 0))
+  (LIST #:A1659))
+T
 </pre></div>
 </div>
 <p>但我们可以定义另一个插入宏来测试这个超子词法作用域：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defmacro injector-for-a ()
-<span class="linenos">2</span>    &#39;a)
-<span class="linenos">3</span>
-<span class="linenos">4</span>INJECTOR-FOR-A
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defmacro injector-for-a ()
+    &#39;a)
+
+INJECTOR-FOR-A
 </pre></div>
 </div>
 <p><strong>sublet*</strong> 将展开这个插入宏:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand-1
-<span class="linenos">2</span>  &#39;(sublet* ((a 0))
-<span class="linenos">3</span>      (injector-for-a)))
-<span class="linenos">4</span>
-<span class="linenos">5</span>(SUBLET ((A 0))
-<span class="linenos">6</span>  A)
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand-1
+  &#39;(sublet* ((a 0))
+      (injector-for-a)))
+
+(SUBLET ((A 0))
+  A)
+T
 </pre></div>
 </div>
 <p>然后，<strong>sublet</strong> 将对其进行子词法解释，这意味着插入的变量 <strong>a</strong> 存在于 <strong>sublet*</strong> 提供的
 超子词法作用域类型中：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand-1 *)
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LET ((#:A1663 0))
-<span class="linenos">4</span>  #:A1663)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand-1 *)
+
+(LET ((#:A1663 0))
+  #:A1663)
 </pre></div>
 </div>
 <p>但是表达式中的嵌套宏不会被 <strong>macroexpand-1</strong> 展开，所以 <strong>sublet*</strong> 不会把嵌套宏放到
 <strong>sublet</strong> 的子词法作用域中：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand-1
-<span class="linenos">2</span>  &#39;(sublet* ((a 0))
-<span class="linenos">3</span>      (list (injector-for-a))))
-<span class="linenos">4</span>
-<span class="linenos">5</span>(SUBLET ((A 0))
-<span class="linenos">6</span>  (LIST (INJECTOR-FOR-A)))
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand-1
+  &#39;(sublet* ((a 0))
+      (list (injector-for-a))))
+
+(SUBLET ((A 0))
+  (LIST (INJECTOR-FOR-A)))
+T
 </pre></div>
 </div>
 <p>所以 <strong>a</strong> 不会被子词法捕获：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (walker:macroexpand-all *)
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LET ((#:A1666 0))
-<span class="linenos">4</span>  (LIST A))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (walker:macroexpand-all *)
+
+(LET ((#:A1666 0))
+  (LIST A))
 </pre></div>
 </div>
 <p>通过 <strong>sublet</strong> 和 <strong>sublet*</strong>，可以用词法作用域或超词法作用域来控制在什么级别的宏展开中变
@@ -1072,17 +1068,17 @@ Queinnec 是一位广受尊敬的 lisp 专家，对 lisp 知识做出了很大�
 假设 <strong>Point</strong> 实例的字段 —— 是通过像 <strong>Point-x</strong> 或 <strong>set-Point-y!</strong> 这样的读和写函数
 来处理的。在定义方法的上下文中，直接通过字段的名称(例如 <strong>x</strong> 或 <strong>y</strong> )来处理会更简单。</p>
 <p>下面是 Queinnec 预想的接口（他称之为 <strong>define-handy-method</strong> ）定义新方法 <strong>double</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(define-handy-method (double (o Point))
-<span class="linenos">2</span>  (set! x (* 2 x))
-<span class="linenos">3</span>  (set! y (* 2 y))
-<span class="linenos">4</span>  o)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">define-handy-method</span><span class="w"> </span><span class="p">(</span><span class="nv">double</span><span class="w"> </span><span class="p">(</span><span class="nv">o</span><span class="w"> </span><span class="nv">Point</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">set!</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">set!</span><span class="w"> </span><span class="nv">y</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="nv">y</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="nv">o</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>这比 MEROONET 语法更让程序员高兴:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(define-method (double (o Point))
-<span class="linenos">2</span>  (set-Point-x! o (* 2 (Point-x o)))
-<span class="linenos">3</span>  (set-Point-y! o (* 2 (Point-y o)))
-<span class="linenos">4</span>  o)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">define-method</span><span class="w"> </span><span class="p">(</span><span class="nv">double</span><span class="w"> </span><span class="p">(</span><span class="nv">o</span><span class="w"> </span><span class="nv">Point</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">set-Point-x!</span><span class="w"> </span><span class="nv">o</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">(</span><span class="nv">Point-x</span><span class="w"> </span><span class="nv">o</span><span class="p">)))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">set-Point-y!</span><span class="w"> </span><span class="nv">o</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">(</span><span class="nv">Point-y</span><span class="w"> </span><span class="nv">o</span><span class="p">)))</span><span class="w"></span>
+<span class="w">  </span><span class="nv">o</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>换句话说，如果可以使用宏来访问外部绑定（在本例中是对象槽），像是词法绑定一样，那就
@@ -1100,21 +1096,21 @@ Queinnec 是一位广受尊敬的 lisp 专家，对 lisp 知识做出了很大�
 variables</em> 和 <em>符号宏（symbol macro</em>。本节就借此机会展示  COMMON LISP  特性的奇妙组合，
 并将我们迄今为止见过所有关于回指宏的内容集合在一起，在这个过程中发现了一个有趣的宏类，称为
 <em>pandoric</em> 宏。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro pandoriclet (letargs &amp;rest body)
-<span class="linenos"> 2</span>  (let ((letargs (cons
-<span class="linenos"> 3</span>                  &#39;(this)
-<span class="linenos"> 4</span>                  (let-binding-transform
-<span class="linenos"> 5</span>                    letargs))))
-<span class="linenos"> 6</span>    `(let (,@letargs)
-<span class="linenos"> 7</span>        (setq this ,@(last body))
-<span class="linenos"> 8</span>        ,@(butlast body)
-<span class="linenos"> 9</span>        (dlambda
-<span class="linenos">10</span>          (:pandoric-get (sym)
-<span class="linenos">11</span>            ,(pandoriclet-get letargs))
-<span class="linenos">12</span>          (:pandoric-set (sym val)
-<span class="linenos">13</span>            ,(pandoriclet-set letargs))
-<span class="linenos">14</span>          (t (&amp;rest args)
-<span class="linenos">15</span>            (apply this args))))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro pandoriclet (letargs &amp;rest body)
+  (let ((letargs (cons
+                  &#39;(this)
+                  (let-binding-transform
+                    letargs))))
+    `(let (,@letargs)
+        (setq this ,@(last body))
+        ,@(butlast body)
+        (dlambda
+          (:pandoric-get (sym)
+            ,(pandoriclet-get letargs))
+          (:pandoric-set (sym val)
+            ,(pandoriclet-set letargs))
+          (t (&amp;rest args)
+            (apply this args))))))
 </pre></div>
 </div>
 <p><strong>pandoriclet</strong> 背后的思想是打开闭包，允许外部访问它们本来封闭的词法变量。与之前的一些宏
@@ -1139,55 +1135,55 @@ variables</em> 和 <em>符号宏（symbol macro</em>。本节就借此机会展�
 量，则返回它所引用的绑定的当前值。如果没找到，则抛出异常。<strong>pandoriclet-set</strong> 差不多一样，除
 了 <strong>dlambda</strong> 为它绑定了一个额外的变量：<strong>val</strong> 。<strong>pandoriclet-set</strong> 用 <strong>setq</strong>
 将 <strong>sym</strong> 引用的绑定更改为 <strong>val</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun pandoriclet-get (letargs)
-<span class="linenos"> 2</span>  `(case sym
-<span class="linenos"> 3</span>    ,@(mapcar #`((,(car a1)) ,(car a1))
-<span class="linenos"> 4</span>              letargs)
-<span class="linenos"> 5</span>    (t (error
-<span class="linenos"> 6</span>          &quot;Unknown pandoric get: ~a&quot;
-<span class="linenos"> 7</span>          sym))))
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>(defun pandoriclet-set (letargs)
-<span class="linenos">10</span>  `(case sym
-<span class="linenos">11</span>    ,@(mapcar #`((,(car a1))
-<span class="linenos">12</span>                  (setq ,(car a1) val))
-<span class="linenos">13</span>              letargs)
-<span class="linenos">14</span>    (t (error
-<span class="linenos">15</span>        &quot;Unknown pandoric set: ~a&quot;
-<span class="linenos">16</span>        sym val))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun pandoriclet-get (letargs)
+  `(case sym
+    ,@(mapcar #`((,(car a1)) ,(car a1))
+              letargs)
+    (t (error
+          &quot;Unknown pandoric get: ~a&quot;
+          sym))))
+
+(defun pandoriclet-set (letargs)
+  `(case sym
+    ,@(mapcar #`((,(car a1))
+                  (setq ,(car a1) val))
+              letargs)
+    (t (error
+        &quot;Unknown pandoric set: ~a&quot;
+        sym val))))
 </pre></div>
 </div>
 <p><strong>prandoriclet</strong> 也有和回指 let 变体一样的接口，因此可以使用它来创建常见的 counter 闭包：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;pantest)
-<span class="linenos">2</span>    (pandoriclet ((acc 0))
-<span class="linenos">3</span>      (lambda (n) (incf acc n))))
-<span class="linenos">4</span>
-<span class="linenos">5</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;pantest)
+    (pandoriclet ((acc 0))
+      (lambda (n) (incf acc n))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>如预期般：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest 3)
-<span class="linenos">2</span>3
-<span class="linenos">3</span>* (pantest 5)
-<span class="linenos">4</span>8
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest 3)
+3
+* (pantest 5)
+8
 </pre></div>
 </div>
 <p>同时，现在在创建闭包时可以直接访问 <strong>acc</strong> 的绑定：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest :pandoric-get &#39;acc)
-<span class="linenos">2</span>8
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest :pandoric-get &#39;acc)
+8
 </pre></div>
 </div>
 <p>同样的也可以修改这个绑定的值：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest :pandoric-set &#39;acc 100)
-<span class="linenos">2</span>100
-<span class="linenos">3</span>* (pantest 3)
-<span class="linenos">4</span>103
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest :pandoric-set &#39;acc 100)
+100
+* (pantest 3)
+103
 </pre></div>
 </div>
 <p>甚至是 <strong>this</strong> 回指的值也能访问，因为我们特意将这个回指打开同时在宏展开时将 <strong>this</strong> 变量
 添加到 <strong>letargs</strong> 绑定列表中：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest :pandoric-get &#39;this)
-<span class="linenos">2</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest :pandoric-get &#39;this)
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>所以 <strong>pandoriclet</strong> 创建的这个闭包已经不再闭包了。这个闭包所使用的环境 —— 即使编译器
@@ -1205,15 +1201,15 @@ variables</em> 和 <em>符号宏（symbol macro</em>。本节就借此机会展�
 <strong>(car x)</strong>，也可以通过 <strong>(setf (car x) 5)</strong> 来设置其值。。这隐藏了个事实，机设置 cons 的
 实际方法是使用 <strong>rplaca</strong> 函数。通过实现这种二义性语法，我们将需要记住的访问器和设置其的数量
 减少了一半，更重要的是，为宏提供了的新方法。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(declaim (inline get-pandoric))
-<span class="linenos">2</span>
-<span class="linenos">3</span>(defun get-pandoric (box sym)
-<span class="linenos">4</span>  (funcall box :pandoric -get sym))
-<span class="linenos">5</span>
-<span class="linenos">6</span>(defsetf get-pandoric (box sym) (val)
-<span class="linenos">7</span>  `(progn
-<span class="linenos">8</span>      (funcall ,box :pandoric -set ,sym ,val)
-<span class="linenos">9</span>      ,val))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">declaim</span><span class="w"> </span><span class="p">(</span><span class="k">inline</span><span class="w"> </span><span class="nv">get-pandoric</span><span class="p">))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">get-pandoric</span><span class="w"> </span><span class="p">(</span><span class="nv">box</span><span class="w"> </span><span class="nv">sym</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">box</span><span class="w"> </span><span class="ss">:pandoric</span><span class="w"> </span><span class="nv">-get</span><span class="w"> </span><span class="nv">sym</span><span class="p">))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nb">defsetf</span><span class="w"> </span><span class="nv">get-pandoric</span><span class="w"> </span><span class="p">(</span><span class="nv">box</span><span class="w"> </span><span class="nv">sym</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">val</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">progn</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="o">,</span><span class="nv">box</span><span class="w"> </span><span class="ss">:pandoric</span><span class="w"> </span><span class="nv">-set</span><span class="w"> </span><span class="o">,</span><span class="nv">sym</span><span class="w"> </span><span class="o">,</span><span class="nv">val</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="o">,</span><span class="nv">val</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>get-pandoric</strong> 函数是对内部闭包协议 getter 语法的封装。它被定义为内联，以消除这种封装所造
@@ -1224,15 +1220,15 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 为宏，但这样做的唯一原因是为了内联。宏不是用来内联的，编译器是用来内联的。</p>
 <p>回到 <strong>pantest</strong> 中的符号函数中存储的 pandoric 计数器，我们可以用这个新的 getter 函数来获
 取 <strong>pantest</strong> 中 <strong>acc</strong> 当前绑定的值：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (get-pandoric #&#39;pantest &#39;acc)
-<span class="linenos">2</span>103
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (get-pandoric #&#39;pantest &#39;acc)
+103
 </pre></div>
 </div>
 <p>现在，多亏了泛型变量和 <strong>defsetf</strong>，可以用一个语法对偶来设置 <strong>acc</strong> 的值:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (get-pandoric #&#39;pantest &#39;acc) -10)
-<span class="linenos">2</span>-10
-<span class="linenos">3</span>* (pantest 3)
-<span class="linenos">4</span>-7
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (get-pandoric #&#39;pantest &#39;acc) -10)
+-10
+* (pantest 3)
+-7
 </pre></div>
 </div>
 <p>通过函数关闭的环境 —— 该函数是在 <em>let over lambda</em> 中调用的 let —— 开始看起来像常规可访问
@@ -1252,11 +1248,11 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 <strong>setq</strong> 也可以是个有用的安全快捷方式 —— <strong>setf</strong> 加上个检查符号是拼接的，而不是列表结构。
 在用 <strong>setq</strong> 时，记住只有在其拼接安全属性有用；正如我们所看到的，多亏了
 <strong>symbol-macrolet</strong>，符号可以引用任何泛型变量。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! with-pandoric (syms o!box &amp;rest body)
-<span class="linenos">2</span>  `(symbol -macrolet
-<span class="linenos">3</span>    (,@(mapcar #`(,a1 (get-pandoric ,g!box &#39;,a1))
-<span class="linenos">4</span>              syms ))
-<span class="linenos">5</span>    ,@body))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro! with-pandoric (syms o!box &amp;rest body)
+  `(symbol -macrolet
+    (,@(mapcar #`(,a1 (get-pandoric ,g!box &#39;,a1))
+              syms ))
+    ,@body))
 </pre></div>
 </div>
 <p><strong>with-pandoric</strong> 宏会展开成个 <strong>symbol-macrolet</strong>，<strong>symbol-macrolet</strong> 为
@@ -1264,19 +1260,19 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 用 <strong>get-pandoric</strong> 访问器/设置器 来访问宏的第二个参数的求值结果：<strong>o!box</strong> （保存在
 <strong>g!box</strong> 中）。</p>
 <p>因此 <strong>with-pandoric</strong> 让我们窥探到了闭包的闭变量绑定：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-pandoric (acc) #&#39;pantest
-<span class="linenos">2</span>    (format t &quot;Value of acc: ~a~%&quot; acc))
-<span class="linenos">3</span>Value of acc: -7
-<span class="linenos">4</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-pandoric (acc) #&#39;pantest
+    (format t &quot;Value of acc: ~a~%&quot; acc))
+Value of acc: -7
+NIL
 </pre></div>
 </div>
 <p>根据广义变量来形成 setting 和 getting 变量的语法对偶的设计，甚至可以假设它是个常规的词法变
 量，然后通过 setq 设置它：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-pandoric (acc) #&#39;pantest
-<span class="linenos">2</span>    (setq acc 5))
-<span class="linenos">3</span>5
-<span class="linenos">4</span>* (pantest 1)
-<span class="linenos">5</span>6
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-pandoric (acc) #&#39;pantest
+    (setq acc 5))
+5
+* (pantest 1)
+6
 </pre></div>
 </div>
 <p>现在，我们已经研究了构成 pandemic 宏的大多数部分组成。首先，用于创建闭包的宏：
@@ -1295,9 +1291,9 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 能够将 <strong>this</strong> 回指的词法绑定设置为它的新值。但是由于现在可以打开由 <strong>pandoriclet</strong> 定义
 的闭包并在外部运行这个 <strong>setter</strong> 代码，所以可以定义一个可以处理任何 pandoriclet 闭包的热补
 丁函数 <strong>pandoric-hotpatch</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun pandoric-hotpatch (box new)
-<span class="linenos">2</span>  (with-pandoric (this) box
-<span class="linenos">3</span>    (setq this new)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">pandoric-hotpatch</span><span class="w"> </span><span class="p">(</span><span class="nv">box</span><span class="w"> </span><span class="nv">new</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">with-pandoric</span><span class="w"> </span><span class="p">(</span><span class="nv">this</span><span class="p">)</span><span class="w"> </span><span class="nv">box</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nv">new</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>有时抽象在感觉很对，很难确切地说出为什么。也许是因为大多数编程都是不相关部分的不和谐
@@ -1306,35 +1302,35 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 然后使用 <strong>setq</strong> 将 <strong>this</strong> 设置为要热补丁的闭包 <strong>new</strong>。</p>
 <p>甚至在我们意识到我们需要个 pandoric 闭包热补丁前使用 <strong>pandoric-hotpatch</strong>。还记得
 本节中一直用的计数器闭包吗？它仍要绑定到 <strong>pantest</strong> 的符号函数。上次的结果是 6：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest 0)
-<span class="linenos">2</span>6
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest 0)
+6
 </pre></div>
 </div>
 <p>现在设置个新闭包 —— acc 有个新绑定，初始值为 100，之后就递减：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pandoric-hotpatch #&#39;pantest
-<span class="linenos">2</span>    (let ((acc 100))
-<span class="linenos">3</span>      (lambda (n) (decf acc n))))
-<span class="linenos">4</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pandoric-hotpatch #&#39;pantest
+    (let ((acc 100))
+      (lambda (n) (decf acc n))))
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>显然，热补丁成功了：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest 3)
-<span class="linenos">2</span>97
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest 3)
+97
 </pre></div>
 </div>
 <p>现在，counter 闭包中有个新值绑定到 <strong>this</strong> 上，用来执行计数。但这个 hotpatch
 改变了 <strong>acc</strong> 变量绑定的 pandoric 值吗?</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-pandoric (acc) #&#39;pantest
-<span class="linenos">2</span>    acc)
-<span class="linenos">3</span>6
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-pandoric (acc) #&#39;pantest
+    acc)
+6
 </pre></div>
 </div>
 <p>并没有。 <strong>acc</strong> 还是之前的值 6，因为这里只修改了 pandoric 环境中 <strong>this</strong> 的绑定因为
 我们在这个混乱的环境中更改的唯一绑定是这个，然后将其变成了个有自己绑定的 <strong>acc</strong>
 的新闭包。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro pandoric-recode (vars box new)
-<span class="linenos">2</span>  `(with-pandoric (this ,@vars) ,box
-<span class="linenos">3</span>    (setq this ,new)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">pandoric-recode</span><span class="w"> </span><span class="p">(</span><span class="nv">vars</span><span class="w"> </span><span class="nv">box</span><span class="w"> </span><span class="nv">new</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="nv">with-pandoric</span><span class="w"> </span><span class="p">(</span><span class="nv">this</span><span class="w"> </span><span class="o">,@</span><span class="nv">vars</span><span class="p">)</span><span class="w"> </span><span class="o">,</span><span class="nv">box</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">setq</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="o">,</span><span class="nv">new</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>pandoric-recode</strong> 宏采用种略微不同的 hotpatch 方法。其保留了代码的原始词法环境，
@@ -1342,37 +1338,37 @@ getter 可以表示为一个函数或宏，对其所有参数精确计算。注�
 难以置信？记住，在原来的 pandoric 环境中，<strong>acc</strong> 的值是 6，可以用
 <strong>pandoric-recode</strong> 设置个新函数来使用这个原始值，哦，或者说，将计数器的值
 减去 <strong>n/2</strong>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pandoric-recode (acc) #&#39;pantest
-<span class="linenos">2</span>    (lambda (n)
-<span class="linenos">3</span>      (decf acc (/ n 2))))
-<span class="linenos">4</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pandoric-recode (acc) #&#39;pantest
+    (lambda (n)
+      (decf acc (/ n 2))))
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>当然，就有了新的行为，会将 <strong>acc</strong> 减去 <strong>(* 1/2 2)</strong>，从 6 变为 5:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (pantest 2)
-<span class="linenos">2</span>5
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (pantest 2)
+5
 </pre></div>
 </div>
 <p>那这和最初的 pandoric 绑定有关联吗？</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-pandoric (acc) #&#39;pantest
-<span class="linenos">2</span>    acc)
-<span class="linenos">3</span>5
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-pandoric (acc) #&#39;pantest
+    acc)
+5
 </pre></div>
 </div>
 <p>对的，有关联。那 <strong>pandorc-code</strong> 是如何工作的呢？它在提供的 lambda 结构中关闭
 了原始闭包打开的绑定。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro plambda (largs pargs &amp;rest body)
-<span class="linenos"> 2</span>  (let ((pargs (mapcar #&#39;list pargs)))
-<span class="linenos"> 3</span>    `(let (this self)
-<span class="linenos"> 4</span>      (setq
-<span class="linenos"> 5</span>        this (lambda ,largs ,@body)
-<span class="linenos"> 6</span>        self (dlambda
-<span class="linenos"> 7</span>                (:pandoric-get (sym)
-<span class="linenos"> 8</span>                  ,(pandoriclet-get pargs
-<span class="linenos"> 9</span>                (:pandoric-set (sym val)
-<span class="linenos">10</span>                  ,(pandoriclet-set pargs))
-<span class="linenos">11</span>                (t (&amp;rest args)
-<span class="linenos">12</span>                  (apply this args)))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">plambda</span><span class="w"> </span><span class="p">(</span><span class="nv">largs</span><span class="w"> </span><span class="nv">pargs</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">pargs</span><span class="w"> </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">list</span><span class="w"> </span><span class="nv">pargs</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">(</span><span class="nv">this</span><span class="w"> </span><span class="nv">self</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">setq</span><span class="w"></span>
+<span class="w">        </span><span class="nv">this</span><span class="w"> </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="o">,</span><span class="nv">largs</span><span class="w"> </span><span class="o">,@</span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="nv">self</span><span class="w"> </span><span class="p">(</span><span class="nv">dlambda</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="ss">:pandoric-get</span><span class="w"> </span><span class="p">(</span><span class="nv">sym</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="o">,</span><span class="p">(</span><span class="nv">pandoriclet-get</span><span class="w"> </span><span class="nv">pargs</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="ss">:pandoric-set</span><span class="w"> </span><span class="p">(</span><span class="nv">sym</span><span class="w"> </span><span class="nv">val</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="o">,</span><span class="p">(</span><span class="nv">pandoriclet-set</span><span class="w"> </span><span class="nv">pargs</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nv">this</span><span class="w"> </span><span class="nv">args</span><span class="p">)))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>到目前为止，用来创建 pandoric 闭包的宏是 <strong>pandoriclet</strong>。<strong>plambda</strong> 是个由内到外
@@ -1388,26 +1384,26 @@ lambda 结构重写为 lambda 结构一样。用 <strong>plambda</strong> 导出
 等价的，它们根本就不是新变量。理解 pandoric 变量的一种更好的方法是，它们只是
 原始词法作用域的扩展。以 <strong>plambda</strong> 的使用做个简单示例，有个 pandoric 计数器，
 它从两个可能不同的词法环境导出变量：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;pantest)
-<span class="linenos">2</span>    (let ((a 0))
-<span class="linenos">3</span>      (let ((b 1))
-<span class="linenos">4</span>        (plambda (n) (a b)
-<span class="linenos">5</span>          (incf a n)
-<span class="linenos">6</span>          (setq b (* b n))))))
-<span class="linenos">7</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;pantest)
+    (let ((a 0))
+      (let ((b 1))
+        (plambda (n) (a b)
+          (incf a n)
+          (setq b (* b n))))))
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>请注意，导出这些词法引用是多么容易。让闭包 pandoric 就像在 <strong>lambda</strong> 之前添加个
 <strong>p</strong> 字符一样简单，或者是像在 <strong>lambda</strong> 参数后添加一个要导出的变量列表一样简单。
 我们可以打开这个闭包 —— 或者是任何导出 <strong>a</strong> 和 <strong>b</strong> 的 pandoric 闭包 —— 像这样
 使用 <strong>with-pandoric</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defun pantest-peek ()
-<span class="linenos">2</span>    (with-pandoric (a b) #&#39;pantest
-<span class="linenos">3</span>      (format t &quot;a=~a, b=~a~%&quot; a b)))
-<span class="linenos">4</span>PANTEST-PEEK
-<span class="linenos">5</span>* (pantest-peek)
-<span class="linenos">6</span>a=0, b=1
-<span class="linenos">7</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defun pantest-peek ()
+    (with-pandoric (a b) #&#39;pantest
+      (format t &quot;a=~a, b=~a~%&quot; a b)))
+PANTEST-PEEK
+* (pantest-peek)
+a=0, b=1
+NIL
 </pre></div>
 </div>
 <p><strong>plambda</strong> 就是个例子，说明了如何分解宏展开的一般组件。还记得编写 <strong>pandoriclet</strong>
@@ -1421,14 +1417,14 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 <p>pandoric 的宏很重要，因为它们在不需要脱离更自然的 let-lambda 组合编程风格的情况下，
 提供了 CLOS 等对象系统的主要优势。尤其是在不重新实力化已经创建了的对象实力的情
 况下，就可以为闭包添加功能或方法。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun make-stats-counter
-<span class="linenos">2</span>      (&amp;key (count 0)
-<span class="linenos">3</span>            (sum 0)
-<span class="linenos">4</span>            (sum-of-squares 0))
-<span class="linenos">5</span>  (plambda (n) (sum count sum-of-squares)
-<span class="linenos">6</span>    (incf sum-of-squares (expt n 2))
-<span class="linenos">7</span>    (incf sum n)
-<span class="linenos">8</span>    (incf count)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">make-stats-counter</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">&amp;key</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nv">sum</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nv">sum-of-squares</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">plambda</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">sum</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="nv">sum-of-squares</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">sum-of-squares</span><span class="w"> </span><span class="p">(</span><span class="nb">expt</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">sum</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nb">count</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>make-stats-counter</strong> 是个 lambda over let over dlambda，用来创建计数器，只不过
@@ -1437,12 +1433,12 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 是不可访问的。这样就被卡住了，因为这些变量是关闭。</p>
 <p>那么要怎么写 <strong>pandoric</strong> 方法？可以像上面演示的那样简单地使用 <strong>with-pandoric</strong>
 访问变量，或者，既然是 lisp，那么就设计个更具体的接口。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro defpan (name args &amp;rest body)
-<span class="linenos">2</span>  `(defun ,name (self)
-<span class="linenos">3</span>    ,(if args
-<span class="linenos">4</span>      `(with-pandoric ,args self
-<span class="linenos">5</span>        ,@body)
-<span class="linenos">6</span>    `(progn ,@body))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">defpan</span><span class="w"> </span><span class="p">(</span><span class="nv">name</span><span class="w"> </span><span class="nv">args</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="o">,</span><span class="nv">name</span><span class="w"> </span><span class="p">(</span><span class="nv">self</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">,</span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">args</span><span class="w"></span>
+<span class="w">      </span><span class="o">`</span><span class="p">(</span><span class="nv">with-pandoric</span><span class="w"> </span><span class="o">,</span><span class="nv">args</span><span class="w"> </span><span class="nv">self</span><span class="w"></span>
+<span class="w">        </span><span class="o">,@</span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="k">progn</span><span class="w"> </span><span class="o">,@</span><span class="nv">body</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>defpan</strong> 是 <strong>defun</strong> 和 <strong>with-pandoric</strong> 两个宏的组合。<strong>defpan</strong> 的主要目的是在
@@ -1455,20 +1451,20 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 <p><strong>defpan</strong> 还有个 <strong>self</strong> 的回指，可以执行一种叫做 <em>回指链（anophor chaining）</em> 的有用
 技术。通过在 pandoric 函数之间隐式地传递 <strong>self</strong> 的值，就可以在整个函数调用链中维护
 这个回指的值。与所有的链接结构一样，要确保这个链不会以无限循环结束。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defpan stats-counter-mean (sum count)
-<span class="linenos"> 2</span>  (/ sum count ))
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span>(defpan stats-counter-variance
-<span class="linenos"> 5</span>        (sum-of-squares sum count)
-<span class="linenos"> 6</span>  (if (&lt; count 2)
-<span class="linenos"> 7</span>  0
-<span class="linenos"> 8</span>  (/ (- sum-of-squares
-<span class="linenos"> 9</span>        (* sum
-<span class="linenos">10</span>          (stats-counter-mean self)))
-<span class="linenos">11</span>    (- count 1))))
-<span class="linenos">12</span>
-<span class="linenos">13</span>(defpan stats-counter-stddev ()
-<span class="linenos">14</span>  (sqrt (stats-counter-variance self)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defpan</span><span class="w"> </span><span class="nv">stats-counter-mean</span><span class="w"> </span><span class="p">(</span><span class="nv">sum</span><span class="w"> </span><span class="nb">count</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="nv">sum</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="p">))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nv">defpan</span><span class="w"> </span><span class="nv">stats-counter-variance</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">sum-of-squares</span><span class="w"> </span><span class="nv">sum</span><span class="w"> </span><span class="nb">count</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="mi">0</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">sum-of-squares</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">sum</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">stats-counter-mean</span><span class="w"> </span><span class="nv">self</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="mi">1</span><span class="p">))))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nv">defpan</span><span class="w"> </span><span class="nv">stats-counter-stddev</span><span class="w"> </span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">sqrt</span><span class="w"> </span><span class="p">(</span><span class="nv">stats-counter-variance</span><span class="w"> </span><span class="nv">self</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>本文给出了三种方法，它们可以用于 <strong>make-stats-counter</strong> 创建的闭包或任何其他导出
@@ -1481,19 +1477,19 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 <strong>self</strong> 指的是调用这个闭包的间接环境。虽然听起来有点奇怪，但 <strong>plambda</strong> 内部的代码
 可以用 <strong>self</strong> 来大规模访问它自己的词法环境，而不是直接访问它。到目前为止，这似乎
 只对为在词法作用域内工作而编写的 <strong>defpan</strong> 方法有用。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun make-noisy-stats-counter
-<span class="linenos"> 2</span>      (&amp;key (count 0)
-<span class="linenos"> 3</span>            (sum 0)
-<span class="linenos"> 4</span>            (sum-of-squares 0))
-<span class="linenos"> 5</span>  (plambda (n) (sum count sum-of-squares)
-<span class="linenos"> 6</span>    (incf sum-of-squares (expt n 2))
-<span class="linenos"> 7</span>    (incf sum n)
-<span class="linenos"> 8</span>    (incf count)
-<span class="linenos"> 9</span>    (format t
-<span class="linenos">10</span>      &quot;~&amp;MEAN=~a~%VAR=~a~%STDDEV=~a~%&quot;
-<span class="linenos">11</span>          (stats-counter-mean self)
-<span class="linenos">12</span>          (stats-counter-variance self)
-<span class="linenos">13</span>          (stats-counter-stddev self))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">make-noisy-stats-counter</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">&amp;key</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nv">sum</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nv">sum-of-squares</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">plambda</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">sum</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="nv">sum-of-squares</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">sum-of-squares</span><span class="w"> </span><span class="p">(</span><span class="nb">expt</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">sum</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nb">count</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="no">t</span><span class="w"></span>
+<span class="w">      </span><span class="s">&quot;~&amp;MEAN=~a~%VAR=~a~%STDDEV=~a~%&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">stats-counter-mean</span><span class="w"> </span><span class="nv">self</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">stats-counter-variance</span><span class="w"> </span><span class="nv">self</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">stats-counter-stddev</span><span class="w"> </span><span class="nv">self</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>make-noise-stats-counter</strong> 和 <strong>make-stats-counter</strong> 类似，不同之处是
@@ -1503,10 +1499,10 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 词法作用域的一个局限性有时令人遗憾，即当 COMMON LISP 函数 <strong>eval</strong> 计算传递给
 它的结构时，它会丢弃当前的词法环境。换句话说，<strong>eval</strong> 在空词法环境中计算结构。
 在 COMMON LISP 中没有其他方法：<strong>eval</strong> 是一个函数。那么问题就来了:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (let ((x 1))
-<span class="linenos">2</span>    (eval
-<span class="linenos">3</span>      &#39;(+ x 1)))
-<span class="linenos">4</span>Error: The variable X is unbound.
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((x 1))
+    (eval
+      &#39;(+ x 1)))
+Error: The variable X is unbound.
 </pre></div>
 </div>
 <p>有时，将词法环境扩展到 <strong>eval</strong> 显然是可取的。但是要小心。经常有人说，如果正在
@@ -1515,14 +1511,14 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 假如在编程时突然发现需要 <strong>eval</strong>，问一下自己，为什么不能早点做想做的事情。
 如果答案是不能，比如说因为刚刚读取了结构，那么恭喜，你找到了 <strong>eval</strong> 的一个
 罕见的合法用法。其他任何答案都将直接导致可能一开始就应该使用的方法：使用宏。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defvar pandoric-eval-tunnel)
-<span class="linenos">2</span>
-<span class="linenos">3</span>(defmacro pandoric-eval (vars expr)
-<span class="linenos">4</span>  `(let ((pandoric-eval-tunnel
-<span class="linenos">5</span>          (plambda () ,vars t)))
-<span class="linenos">6</span>    (eval `(with-pandoric
-<span class="linenos">7</span>              ,&#39;,vars pandoric-eval-tunnel
-<span class="linenos">8</span>              ,,expr))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defvar</span><span class="w"> </span><span class="nv">pandoric-eval-tunnel</span><span class="p">)</span><span class="w"></span>
+
+<span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">pandoric-eval</span><span class="w"> </span><span class="p">(</span><span class="nv">vars</span><span class="w"> </span><span class="nv">expr</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">pandoric-eval-tunnel</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nv">plambda</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">,</span><span class="nv">vars</span><span class="w"> </span><span class="no">t</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">eval</span><span class="w"> </span><span class="o">`</span><span class="p">(</span><span class="nv">with-pandoric</span><span class="w"></span>
+<span class="w">              </span><span class="o">,</span><span class="ss">&#39;,vars</span><span class="w"> </span><span class="nv">pandoric-eval-tunnel</span><span class="w"></span>
+<span class="w">              </span><span class="o">,,</span><span class="nv">expr</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>但是假设你真的想要 <strong>eval</strong> 计算某样东西，只要你能使用那个讨厌的词法上下文。
@@ -1531,19 +1527,19 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
 <strong>pandoric</strong> 闭包可以通过动态环境提供给 <strong>eval</strong> 函数。通过提供所有符号的列表
 作为 <strong>pandoric-eval</strong> 的第一个参数，可以精确地选择要在动态环境中使用的词法
 变量。这里我们将它应用到前面的例子中:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (let ((x 1))
-<span class="linenos">2</span>    (pandoric-eval (x)
-<span class="linenos">3</span>      &#39;(+ 1 x)))
-<span class="linenos">4</span>2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((x 1))
+    (pandoric-eval (x)
+      &#39;(+ 1 x)))
+2
 </pre></div>
 </div>
 <p>同时 <strong>pandoric-eval</strong> 计算的表达式会改变原有的词汇环境；<strong>pandoric-eval</strong>
 是一个双向隧道:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (let ((x 1))
-<span class="linenos">2</span>    (pandoric-eval (x)
-<span class="linenos">3</span>      &#39;(incf x))
-<span class="linenos">4</span>    x)
-<span class="linenos">5</span>2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((x 1))
+    (pandoric-eval (x)
+      &#39;(incf x))
+    x)
+2
 </pre></div>
 </div>
 <p>这一节虽然很长，但仍然只触及了 <strong>pandoric</strong> 宏及其许多可能的变体的皮毛。
@@ -1568,7 +1564,7 @@ COMMON LISP 语言特性的美丽融合：回指宏、泛型变量和符号宏�
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang.</p>
+    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang, Chuangxiu Chen.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

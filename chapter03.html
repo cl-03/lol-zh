@@ -58,6 +58,10 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendices.html">附录</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specification.html">术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original-code.html">源代码</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production-code.html">生产代码</a></li>
 </ul>
 
         </div>
@@ -86,14 +90,6 @@
              
   <section id="chapter03">
 <span id="id1"></span><h1>第三章：宏基础<a class="headerlink" href="#chapter03" title="Permalink to this heading"></a></h1>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>Doug Hoyte</p>
-</dd>
-<dt class="field-even">Translator</dt>
-<dd class="field-even"><p>Yuqi Liu</p>
-</dd>
-</dl>
 <section id="iterative">
 <span id="id2"></span><h2>3.1 迭代开发<a class="headerlink" href="#iterative" title="Permalink to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Lisp has assisted a number of our most gifted fellow humans in thinking
@@ -116,17 +112,17 @@ previously impossible thoughts. -—Edsger Dijkstra
 <p>COMMON LISP 与大多数其他编程环境一样，也有 <strong>sleep</strong> 函数 ，<strong>sleep</strong> 函数会让进程
 休眠 <strong>n</strong> 秒，其中 <strong>n</strong> 是一个非负数、非复杂的数字。 例如，想要休眠 3 分钟（180 秒
 的话），可以执行下面的语句：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep 180)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep 180)
 </pre></div>
 </div>
 <p>或者，如果喜欢以分钟为单位进行休眠的话，可以改为：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep (* 3 60))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep (* 3 60))
 </pre></div>
 </div>
 <p>因为编译器知道如何折叠常量，所以上面两个调用都能正常执行。为了更明确地说明我们在做什
 么，可以定义个 <strong>sleep-minutes</strong> 函数:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun sleep-minutes (m)
-<span class="linenos">2</span>  (sleep (* m 60)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun sleep-minutes (m)
+  (sleep (* m 60)))
 </pre></div>
 </div>
 <p>为想要使用的每个时间单位定义新函数既笨重又不方便。 我们需要的是某种抽象，可以指定时间单位和
@@ -135,94 +131,94 @@ previously impossible thoughts. -—Edsger Dijkstra
 位，并返回该值乘以与给定单位相关的某个常数。 但是当我们考虑代表这个单元的选项时，一个 lispy 改
 进变得很明显。 在像 C 这样的语言中，习惯上使用像 int 这样的底层数据类型并分配对应于不同单位的
 任意值：</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#define UNIT_SECONDS 1</span>
-<span class="linenos"> 2</span><span class="cp">#define UNIT_MINUTES 2</span>
-<span class="linenos"> 3</span><span class="cp">#define UNIT_HOURS 3</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kt">int</span><span class="w"> </span><span class="nf">sleep_units</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 6</span><span class="w">  </span><span class="k">switch</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_SECONDS</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 8</span><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_MINUTES</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="o">*</span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_HOURS</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="o">*</span><span class="mi">3600</span><span class="p">;</span><span class="w"></span>
-<span class="linenos">10</span><span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="linenos">11</span><span class="p">}</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define UNIT_SECONDS 1</span>
+<span class="cp">#define UNIT_MINUTES 2</span>
+<span class="cp">#define UNIT_HOURS 3</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">sleep_units</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">switch</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_SECONDS</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_MINUTES</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="o">*</span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">UNIT_HOURS</span><span class="p">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="o">*</span><span class="mi">3600</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun sleep-units% (value unit)
-<span class="linenos"> 2</span>  (sleep
-<span class="linenos"> 3</span>    (* value
-<span class="linenos"> 4</span>      (case unit
-<span class="linenos"> 5</span>        ((s) 1)
-<span class="linenos"> 6</span>        ((m) 60)
-<span class="linenos"> 7</span>        ((h) 3600)
-<span class="linenos"> 8</span>        ((d) 86400)
-<span class="linenos"> 9</span>        ((ms) 1/1000)
-<span class="linenos">10</span>        ((us) 1/1000000)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun sleep-units% (value unit)
+  (sleep
+    (* value
+      (case unit
+        ((s) 1)
+        ((m) 60)
+        ((h) 3600)
+        ((d) 86400)
+        ((ms) 1/1000)
+        ((us) 1/1000000)))))
 </pre></div>
 </div>
 <p>但在 lisp 中，最明显的方法就是使用符号来代表所需单元。 lisp 中的符号大部分与其他符号不相
 等。<strong>Eq</strong> 是最快的 lisp 比较运算符，大致对应于指针比较。 由于可以非常快速地比较指针，因此符
 号提供了一种非常快速和方便的方法来让两个或多个不同的 lisp 表达式知道指向同一个值。 在 lisp
 中，可以定义 <strong>sleep-units%</strong> 函数，这样就能指定单位：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep-units% 2 &#39;m)
-<span class="linenos">2</span>(sleep-units% 500 &#39;us)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep-units% 2 &#39;m)
+(sleep-units% 500 &#39;us)
 </pre></div>
 </div>
 <p>因为比较符号只需要一个指针比较，<strong>sleep-units%</strong> 会编译成一个很快的运行时调度：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>524:       CMP     ESI, [#x586FC4D0]    ; &#39;S
-<span class="linenos">2</span>52A:       JEQ     L11
-<span class="linenos">3</span>530:       CMP     ESI, [#x586FC4D4]    ; &#39;M
-<span class="linenos">4</span>536:       JEQ     L10
-<span class="linenos">5</span>538:       CMP     ESI, [#x586FC4D8]    ; &#39;H
-<span class="linenos">6</span>53E:       JEQ     L9
-<span class="linenos">7</span>540:       CMP     ESI, [#x586FC4DC]    ; &#39;D
-<span class="linenos">8</span>546:       JEQ     L8
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>524:       CMP     ESI, [#x586FC4D0]    ; &#39;S
+52A:       JEQ     L11
+530:       CMP     ESI, [#x586FC4D4]    ; &#39;M
+536:       JEQ     L10
+538:       CMP     ESI, [#x586FC4D8]    ; &#39;H
+53E:       JEQ     L9
+540:       CMP     ESI, [#x586FC4DC]    ; &#39;D
+546:       JEQ     L8
 </pre></div>
 </div>
 <p>注意 <strong>sleep-units%</strong> 参数中的 uint 必须要引用。 因为当 lisp 执行函数时，它首先执行计算所
 有参数，然后将结果绑定到变量后再在函数内部使用。 数字和字符串以及其他原语会自动执行计算，这就是
 为什么不需要引用赋予 <strong>sleep-units%</strong> 的数值的原因。 但请注意，它们已被计算，因此只要愿意的
 话，都可以进行引用：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep-units% &#39;.5 &#39;h)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep-units% &#39;.5 &#39;h)
 </pre></div>
 </div>
 <p>然而，符号通常不会对自己进行计算。当 lisp 计算执行符号时，会假定正在引用一个变量并尝试在给定的
 词法上下文的情况下查找与该变量关联的值（除非该变量被声明为特殊的，在这种情况下是动态环境）。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro sleep-units (value unit)
-<span class="linenos"> 2</span>  `(sleep
-<span class="linenos"> 3</span>    (* ,value
-<span class="linenos"> 4</span>        ,(case unit
-<span class="linenos"> 5</span>          ((s) 1)
-<span class="linenos"> 6</span>          ((m) 60)
-<span class="linenos"> 7</span>          ((h) 3600)
-<span class="linenos"> 8</span>          ((d) 86400)
-<span class="linenos"> 9</span>          ((ms) 1/1000)
-<span class="linenos">10</span>          ((us) 1/1000000)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro sleep-units (value unit)
+  `(sleep
+    (* ,value
+        ,(case unit
+          ((s) 1)
+          ((m) 60)
+          ((h) 3600)
+          ((d) 86400)
+          ((ms) 1/1000)
+          ((us) 1/1000000)))))
 </pre></div>
 </div>
 <p>为了避免引用单位，我们需要一个宏。 与函数不同，宏不计算其参数。 利用这一事实，我们将
 <strong>sleep-units%</strong> 函数换成 <strong>sleep-units</strong> 宏。 现在就不需要引用单位：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep-units .5 h)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep-units .5 h)
 </pre></div>
 </div>
 <p>虽然这个宏的主要目的是避免引用 <strong>unit</strong> 参数，但这个宏甚至比函数更高效，因为根本没有运行时调
 度：单位和乘数在编译时是已知的。当然，每当发现这种好得令人难以置信的情况时，它可能真的好得令人难
 以置信。 这种效率提升并不是免费的。 通过前面的运行时调度，我们失去了在运行时确定时间单位的能
 力。 这让这个宏无法执行以下代码：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(sleep-units 1 (if super-slow-mode &#39;d &#39;h))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep-units 1 (if super-slow-mode &#39;d &#39;h))
 </pre></div>
 </div>
 <p>上面这段代码将无法执行，因为 <strong>sleep-units</strong> 第二个参数要是 case 语句中的符号，而是上面代码
 中是个列表，其中第一个元素是符号 <strong>if</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro unit-of-time (value unit)
-<span class="linenos">2</span>  `(* ,value
-<span class="linenos">3</span>      ,(case unit
-<span class="linenos">4</span>        ((s) 1)
-<span class="linenos">5</span>        ((m) 60)
-<span class="linenos">6</span>        ((h) 3600)
-<span class="linenos">7</span>        ((d) 86400)
-<span class="linenos">8</span>        ((ms) 1/1000)
-<span class="linenos">9</span>        ((us) 1/1000000))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro unit-of-time (value unit)
+  `(* ,value
+      ,(case unit
+        ((s) 1)
+        ((m) 60)
+        ((h) 3600)
+        ((d) 86400)
+        ((ms) 1/1000)
+        ((us) 1/1000000))))
 </pre></div>
 </div>
 <p>回想一下，大多数宏都是为了创建更方便和有用的编程抽象而编写的，而不是为了提高底层代码的效率。 是
@@ -231,9 +227,9 @@ previously impossible thoughts. -—Edsger Dijkstra
 <strong>sleep-units</strong> 宏中抽象出功能，返回一个值而不是对其调用 <strong>sleep</strong>。<strong>value</strong> 参数可以在
 运行时确定，因为它会被计算，但 <strong>unit</strong> 不能，因为在编译时需要这个信息，就像
 <strong>sleep-units</strong> 一样。 以下是示例：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (unit-of-time 1 d)
-<span class="linenos">2</span>
-<span class="linenos">3</span>86400
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (unit-of-time 1 d)
+
+86400
 </pre></div>
 </div>
 <p>像 <strong>unit-of-time</strong> 这样简单的宏为解决特定领域的问题提供了更好的语法，并且可以带来显著的生产
@@ -252,20 +248,20 @@ lisp 为创建编程环境的人提供了相同的工具。宏足以实现 COMMO
 支持一种 <em>命名的 let（named let）</em> 。在 Scheme 中，可以在 let 结构的绑定列表之前插入一个符
 号，Scheme 将在 <strong>let</strong> 主体周围绑定一个由提供的符号命名的函数。 此函数接受 <strong>let</strong> 绑定中
 提供的值的新参数，提供了一种非常方便的方式来表示循环。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro nlet (n letargs &amp;rest body)
-<span class="linenos">2</span>  `(labels ((,n ,(mapcar #&#39;car letargs)
-<span class="linenos">3</span>              ,@body))
-<span class="linenos">4</span>    (,n ,@(mapcar #&#39;cadr letargs))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro nlet (n letargs &amp;rest body)
+  `(labels ((,n ,(mapcar #&#39;car letargs)
+              ,@body))
+    (,n ,@(mapcar #&#39;cadr letargs))))
 </pre></div>
 </div>
 <p>幸运的是，我们可以用 <strong>nlet</strong> 宏在 Scheme 和 COMMON LISP 之间架起一座桥梁。 <strong>Nlet</strong> 通
 过模拟 Scheme 的命名然后以 Scheme 风格进行编码。在 <strong>nlet-fact</strong> 中，<strong>nlet</strong> 用于通过使
 用命名的 let 来定义阶乘函数：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun nlet-fact (n)
-<span class="linenos">2</span>  (nlet fact ((n n))
-<span class="linenos">3</span>    (if (zerop n)
-<span class="linenos">4</span>      1
-<span class="linenos">5</span>      (* n (fact (- n 1))))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun nlet-fact (n)
+  (nlet fact ((n n))
+    (if (zerop n)
+      1
+      (* n (fact (- n 1))))))
 </pre></div>
 </div>
 <p>因为 <strong>nlet</strong> 是我们的第一个宏，先放慢一下脚步，深入分析一下。 有时为了理解一个宏，展开一个宏
@@ -273,18 +269,18 @@ lisp 为创建编程环境的人提供了相同的工具。宏足以实现 COMMO
 <strong>macroexpand</strong> 只会展开其符号位于列表第一个元素中的宏，并且不会展开嵌套的宏调用。在下文中，
 我们直接从 <strong>nlet-fact</strong> 复制一个 <strong>nlet</strong> 调用，引用它，并将它传给 <strong>macroexpand</strong>
 宏：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
-<span class="linenos"> 2</span>    &#39;(nlet fact ((n n))
-<span class="linenos"> 3</span>      (if (zerop n)
-<span class="linenos"> 4</span>        1
-<span class="linenos"> 5</span>        (* n (fact (- n 1))))))
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span>(LABELS ((FACT (N)
-<span class="linenos"> 8</span>          (IF (ZEROP N)
-<span class="linenos"> 9</span>            1
-<span class="linenos">10</span>            (* N (FACT (- N 1))))))
-<span class="linenos">11</span>  (FACT N))
-<span class="linenos">12</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(nlet fact ((n n))
+      (if (zerop n)
+        1
+        (* n (fact (- n 1))))))
+
+(LABELS ((FACT (N)
+          (IF (ZEROP N)
+            1
+            (* N (FACT (- N 1))))))
+  (FACT N))
+T
 </pre></div>
 </div>
 <p>上面的展开中使用 <strong>labels</strong> 特殊结构在给定的主体周围绑定一个函数。 该函数根据命名 let 结构中
@@ -320,12 +316,12 @@ Scheme 中，命名 let 的尾调用保证不会占用额外的堆栈空间，�
 <span id="id5"></span><h2>3.4 自由变量<a class="headerlink" href="#free-variables" title="Permalink to this heading"></a></h2>
 <p><em>自由变量</em> 是在无全局绑定或词法闭包绑定的表达式中引用的变量或函数。 在下面的表达式中，<strong>x</strong> 是
 自由的：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(+ 1 x)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(+ 1 x)
 </pre></div>
 </div>
 <p>但下面的代码中，我们在捕获变量 <strong>x</strong> 的结构外面创建了一个绑定，从而剥夺了它的自由度：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((x 1))
-<span class="linenos">2</span>  (+ 1 x))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(let ((x 1))
+  (+ 1 x))
 </pre></div>
 </div>
 <p>自由和捕获的术语起初可能看起来很奇怪。毕竟，自由意味着意识和做出决定的能力——这显然是简单的表达
@@ -338,9 +334,9 @@ lisp 根本不需要在代码中保留对符号 <strong>x</strong> 的引用。�
 <p>尽管带有表达式的语言都可以有带有自由变量的表达式，但 lisp 的宏功能意味着自由变量在 lisp 中比
 在其他语言中更有用。在大多数语言中，我们被迫遵守 <em>引用透明性</em>。 如果 Blub 程序中没有定义全局或
 对象变量 <strong>x</strong>，则下面代码毫无疑问是错误的：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>some_function_or_method() {
-<span class="linenos">2</span>  anythind(1 + x);
-<span class="linenos">3</span>}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>some_function_or_method() {
+  anythind(1 + x);
+}
 </pre></div>
 </div>
 <p><strong>some_function_or_method</strong> 无法为 <strong>x</strong> 创建隐式绑定。 在 Blub 语言中，对变量的使用都
@@ -351,8 +347,8 @@ lisp 根本不需要在代码中保留对符号 <strong>x</strong> 的引用。�
 写表达式来减少自由变量（例如向上面一样将自由变量包在 let 结构中），或者通过修改表达式的方式来添
 加新的自由变量。 这种自由变量的添加与捕获变量相反，称为 <em>自由变量注入</em>。</p>
 <p>最简单的自由变量注入就是宏展开成一个符号的引用：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro x-injector ()
-<span class="linenos">2</span>  &#39;x)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro x-injector ()
+  &#39;x)
 </pre></div>
 </div>
 <p>因为宏只是一个函数，它以常规的 lisp 结构执行其主体。 上面的注入宏计算引用的符号，当然，返回一
@@ -386,16 +382,16 @@ On Lisp 中讨论过这种自由变量注入</p>
 子句。 <strong>Nif</strong>，或者更确切地说是 <strong>nif</strong> 展开的代码，计算第一个子句并假设结果是一个非复数。
 然后，它根据结果是正数（<strong>plusp</strong>）、零（<strong>zerop</strong>）还是负数（其他情况）来计算三个相应子句之
 一。 我们可以用 <strong>nif</strong> 测试变量 <strong>x</strong> ，如下所示：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(nif x &quot;positive&quot; &quot;zero&quot; &quot;negative&quot;)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(nif x &quot;positive&quot; &quot;zero&quot; &quot;negative&quot;)
 </pre></div>
 </div>
 <p><strong>Nif</strong> 是讨论变量捕获的理想函数，我们将使用它来说明几个关键点，并作为宏构造新符号的测试用
 例。 在展示 Graham 定义的 <strong>nif</strong> 版本之前，先自己定义个几乎正确但有一点问题的版本：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro nif-buggy (expr pos zero neg)
-<span class="linenos">2</span>  `(let ((obscure-name ,expr))
-<span class="linenos">3</span>    (cond ((plusp obscure-name) ,pos)
-<span class="linenos">4</span>          ((zerop obscure-name) ,zero)
-<span class="linenos">5</span>          (t ,neg))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro nif-buggy (expr pos zero neg)
+  `(let ((obscure-name ,expr))
+    (cond ((plusp obscure-name) ,pos)
+          ((zerop obscure-name) ,zero)
+          (t ,neg))))
 </pre></div>
 </div>
 <p><strong>Nif-buggy</strong> 展开成一段代码，用 <strong>let</strong> 绑定计算用户传入的 <strong>expr</strong> 结构的结果。 我们需
@@ -405,24 +401,24 @@ On Lisp 中讨论过这种自由变量注入</p>
 <p>几乎所有情况下，<strong>Nif-buggy</strong> 都会像 <strong>nif</strong> 一样工作。 只要 <strong>nif-buggy</strong> 的参数中没有
 用到符号 <strong>obscure-name</strong>，就不可能有异常捕获变量。 但如果 <strong>obscure-name</strong> 确实出现在参
 数中会发生什么呢？在多数情况下，仍然没有错误：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(nif-buggy
-<span class="linenos">2</span>  x
-<span class="linenos">3</span>  (let ((obscure-name &#39;pos))
-<span class="linenos">4</span>    obscure-name)
-<span class="linenos">5</span>  &#39;zero
-<span class="linenos">6</span>  &#39;neg)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(nif-buggy
+  x
+  (let ((obscure-name &#39;pos))
+    obscure-name)
+  &#39;zero
+  &#39;neg)
 </pre></div>
 </div>
 <p>即使 <strong>x</strong> 输出的结果是正数，即使将禁止符号注入到 <strong>nif-buggy</strong> 的宏展开中，这段代码仍然可
 以按预期工作。当一个新的绑定被创建，并且该绑定内的引用总是引用创建的绑定时，不会发生异常变量捕
 获。 只有在对 <strong>obscure-name</strong> 的使用超出了其展开中的使用时，才会出现问题。 这是异常变量捕获
 的示例：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((obscure-name &#39;pos))
-<span class="linenos">2</span>  (nif-buggy
-<span class="linenos">3</span>    x
-<span class="linenos">4</span>    obscure-name
-<span class="linenos">5</span>    &#39;zero
-<span class="linenos">6</span>    &#39;neg))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(let ((obscure-name &#39;pos))
+  (nif-buggy
+    x
+    obscure-name
+    &#39;zero
+    &#39;neg))
 </pre></div>
 </div>
 <p>在这种情况下，<strong>obscure-name</strong> 将绑定到 <strong>x</strong> 的计算结果中，因此符号 <strong>pos</strong> 不会返回预期
@@ -494,26 +490,26 @@ gensym 命名此函数或宏，除非你想从封装的代码中捕获它。 确
 <p>这本书介绍了一种新的 gensyms 语法，更适合那些有简洁意识的人，但仍然是传统 lisp 表达式的薄
 膜。 我们的新符号 gensyms 将用作本书中大多数宏的基础，通过剥开使用我们符号提供的功能的简单宏来
 清楚的描述这一语法。 继续上一节中的 <strong>nif</strong> 示例。以下是 Graham 定义的捕获安全的 <strong>nif</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro nif (expr pos zero neg)
-<span class="linenos">2</span>  (let ((g (gensym)))
-<span class="linenos">3</span>    `(let ((,g ,expr))
-<span class="linenos">4</span>      (cond ((plusp ,g) ,pos)
-<span class="linenos">5</span>            ((zerop ,g) ,zero)
-<span class="linenos">6</span>            (t ,neg)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro nif (expr pos zero neg)
+  (let ((g (gensym)))
+    `(let ((,g ,expr))
+      (cond ((plusp ,g) ,pos)
+            ((zerop ,g) ,zero)
+            (t ,neg)))))
 </pre></div>
 </div>
 <p>这是 <strong>gensym</strong> 的正确用法。 正如上一节中看到的，可以将用户输入展开为可能干扰其变量之一的宏必
 须注意变量捕获。 Graham 提出了一个缩写宏 <strong>with-gensyms</strong>，在需要创建多个 <strong>gensyms</strong> 的
 情况下更加简洁：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(with-gensyms (a b c)
-<span class="linenos">2</span>  ...)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(with-gensyms (a b c)
+  ...)
 </pre></div>
 </div>
 <p>展开成</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((a (gensym))
-<span class="linenos">2</span>      (b (gensym))
-<span class="linenos">3</span>      (c (gensym)))
-<span class="linenos">4</span>  ...)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(let ((a (gensym))
+      (b (gensym))
+      (c (gensym)))
+  ...)
 </pre></div>
 </div>
 <p>因为在 <strong>defmacro</strong> 结构中需要 <strong>gensym</strong> 非常普遍，我们决定进一步改写缩写。 特别要注意的
@@ -524,13 +520,13 @@ gensym 命名此函数或宏，除非你想从封装的代码中捕获它。 确
 道它永远不会捕获意外引用。 但是仍需要在宏的定义中命名这个 <strong>gensym</strong>，以便能够将它拼接到正确
 位置的展开中。 对于 <strong>nif</strong> 宏定义的范围，Graham 将这个 <strong>gensym</strong> 命名为 <strong>g</strong>。 注意，
 此名称实际上从未出现在 <strong>nif</strong> 的宏展开中：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand &#39;(nif x &#39;pos &#39;zero &#39;neg))
-<span class="linenos">2</span>
-<span class="linenos">3</span>(LET ((#:G1605 X))
-<span class="linenos">4</span>  (COND ((PLUSP #:G1605) &#39;POS)
-<span class="linenos">5</span>        ((ZEROP #:G1605) &#39;ZERO)
-<span class="linenos">6</span>        (T &#39;NEG)))
-<span class="linenos">7</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand &#39;(nif x &#39;pos &#39;zero &#39;neg))
+
+(LET ((#:G1605 X))
+  (COND ((PLUSP #:G1605) &#39;POS)
+        ((ZEROP #:G1605) &#39;ZERO)
+        (T &#39;NEG)))
+T
 </pre></div>
 </div>
 <p>变量名 <strong>g</strong> 在宏展开中消失了。因为 <strong>g</strong> 只绑定在展开环境中，所以给这样一个变量的名称与展开
@@ -543,29 +539,29 @@ lisp 中断，是因为我们无法通过查看两个 gensym 的打印名称来�
 绑定，所以 lisp 认为表达式有一个自由变量，向我们表明一个带有 gensyms 的结构被再次读入。</p>
 <p>尽管此类非内部符号的默认打印行为，仍然可以保存和重新加载宏展开。 为了更准确地打印带有 gensyms
 的结构，可以在打印结果时打开 <em>print-circle</em> 模式：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (let ((*print-circle* t))
-<span class="linenos"> 2</span>    (print
-<span class="linenos"> 3</span>      (macroexpand &#39;(nif x &#39;pos &#39;zero &#39;neg)))
-<span class="linenos"> 4</span>    t)
-<span class="linenos"> 5</span>
-<span class="linenos"> 6</span>(LET ((#1=#:G1606 X))
-<span class="linenos"> 7</span>  (COND ((PLUSP #1#) &#39;POS)
-<span class="linenos"> 8</span>        ((ZEROP #1#) &#39;ZERO)
-<span class="linenos"> 9</span>        (T &#39;NEG)))
-<span class="linenos">10</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((*print-circle* t))
+    (print
+      (macroexpand &#39;(nif x &#39;pos &#39;zero &#39;neg)))
+    t)
+
+(LET ((#1=#:G1606 X))
+  (COND ((PLUSP #1#) &#39;POS)
+        ((ZEROP #1#) &#39;ZERO)
+        (T &#39;NEG)))
+T
 </pre></div>
 </div>
 <p>在上面的代码中，lisp 输出使用 <strong>#=</strong> 和 <strong>##</strong> 读取宏。 这些读取宏可以让我们创建自引用结
 构，这将在 <a class="reference internal" href="chapter04.html#cyclic-expressions"><span class="std std-ref">4.5 循环表达式</span></a> 中深入地讨论。 如果我们阅读上面的代码，里面使用
 的符号实际上与 <strong>let</strong> 绑定中使用的符号相同，展开仍然有效。 似乎上述定义避免了双重命名冗余。
 有没有办法可以让其使用一个宏编写宏模板？</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun g!-symbol-p (s)
-<span class="linenos">2</span>  (and (symbolp s)
-<span class="linenos">3</span>      (&gt; (length (symbol-name s)) 2)
-<span class="linenos">4</span>      (string= (symbol-name s)
-<span class="linenos">5</span>                &quot;G!&quot;
-<span class="linenos">6</span>                :start1 0
-<span class="linenos">7</span>                :end1 2)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun g!-symbol-p (s)
+  (and (symbolp s)
+      (&gt; (length (symbol-name s)) 2)
+      (string= (symbol-name s)
+                &quot;G!&quot;
+                :start1 0
+                :end1 2)))
 </pre></div>
 </div>
 <p>记住，我们可以在宏定义中给 gensyms 任意的名字，甚至像 Graham 所做的那样，像 <strong>g</strong> 这样的简
@@ -573,18 +569,18 @@ lisp 中断，是因为我们无法通过查看两个 gensym 的打印名称来�
 和唯一性之间的折衷，任何以两个字符 G! 开头且后面至少跟一个其他字符的符号都被认为是一种特殊的
 gensym 引用符号，称为 G-bang 符号。 我们定义了一个谓词 <strong>g!-symbol-p</strong>，一个用于确定给定
 原子是否是 G-bang 符号的谓词。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro defmacro/g! (name args &amp;rest body)
-<span class="linenos"> 2</span>  (let ((syms (remove-duplicates
-<span class="linenos"> 3</span>                (remove-if-not #&#39;g!-symbol-p
-<span class="linenos"> 4</span>                              (flatten body)))))
-<span class="linenos"> 5</span>    `(defmacro ,name ,args
-<span class="linenos"> 6</span>      (let ,(mapcar
-<span class="linenos"> 7</span>              (lambda (s)
-<span class="linenos"> 8</span>                `(,s (gensym ,(subseq
-<span class="linenos"> 9</span>                                (symbol-name s)
-<span class="linenos">10</span>                                2))))
-<span class="linenos">11</span>              syms)
-<span class="linenos">12</span>        ,@body))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro defmacro/g! (name args &amp;rest body)
+  (let ((syms (remove-duplicates
+                (remove-if-not #&#39;g!-symbol-p
+                              (flatten body)))))
+    `(defmacro ,name ,args
+      (let ,(mapcar
+              (lambda (s)
+                `(,s (gensym ,(subseq
+                                (symbol-name s)
+                                2))))
+              syms)
+        ,@body))))
 </pre></div>
 </div>
 <p>现在我们已经标准化 G-bang 符号，可以创建一个宏来编写宏的定义并利宏编写叫做自动 gensyms 的快
@@ -615,11 +611,11 @@ g!</strong> 和 <strong>defmacro</strong> 完全一样。 但对出现在宏展�
 </pre></div>
 </div>
 <p>可以用 <strong>defmacro/g!</strong> 在重新定义 <strong>nif</strong> 时避免显式创建 <strong>gensym</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro/g! nif (expr pos zero neg)
-<span class="linenos">2</span>  `(let ((,g!result ,expr))
-<span class="linenos">3</span>    (cond ((plusp ,g!result) ,pos)
-<span class="linenos">4</span>          ((zerop ,g!result) ,zero)
-<span class="linenos">5</span>            (t ,neg))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro/g! nif (expr pos zero neg)
+  `(let ((,g!result ,expr))
+    (cond ((plusp ,g!result) ,pos)
+          ((zerop ,g!result) ,zero)
+            (t ,neg))))
 </pre></div>
 </div>
 <p>当需要 <strong>gensym</strong> 时，直接就使用它。 当然，我们需要小心，所有对 G-bang 符号的引用仅由宏展开
@@ -627,20 +623,20 @@ g!</strong> 和 <strong>defmacro</strong> 完全一样。 但对出现在宏展�
 号是最明显的方法，可以看到这与 Graham 的 <strong>nif</strong> 原始定义中符号 <strong>g</strong> 的取消引用直接平行。</p>
 <p>现在，我们定义了宏 <strong>nif</strong>，其的功能与 Graham 的相同，但这种改进似乎好得令人难以置信。 它真
 的有效吗？ 在做出决定之前，看一下宏展开：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand-1
-<span class="linenos"> 2</span>    &#39;(defmacro/g! nif (expr pos zero neg)
-<span class="linenos"> 3</span>      `(let ((,g!result ,expr))
-<span class="linenos"> 4</span>          (cond ((plusp ,g!result) ,pos)
-<span class="linenos"> 5</span>                ((zerop ,g!result) ,zero)
-<span class="linenos"> 6</span>                (t ,neg)))))
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span>(DEFMACRO NIF (EXPR POS ZERO NEG)
-<span class="linenos"> 9</span>  (LET ((G!RESULT (GENSYM &quot;RESULT&quot;)))
-<span class="linenos">10</span>    `(LET ((,G!RESULT ,EXPR))
-<span class="linenos">11</span>      (COND ((PLUSP ,G!RESULT) ,POS)
-<span class="linenos">12</span>            ((ZEROP ,G!RESULT) ,ZERO)
-<span class="linenos">13</span>            (T ,NEG)))))
-<span class="linenos">14</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand-1
+    &#39;(defmacro/g! nif (expr pos zero neg)
+      `(let ((,g!result ,expr))
+          (cond ((plusp ,g!result) ,pos)
+                ((zerop ,g!result) ,zero)
+                (t ,neg)))))
+
+(DEFMACRO NIF (EXPR POS ZERO NEG)
+  (LET ((G!RESULT (GENSYM &quot;RESULT&quot;)))
+    `(LET ((,G!RESULT ,EXPR))
+      (COND ((PLUSP ,G!RESULT) ,POS)
+            ((ZEROP ,G!RESULT) ,ZERO)
+            (T ,NEG)))))
+T
 </pre></div>
 </div>
 <p>但因为 <strong>defmacro/g!</strong> 本身也是个宏，宏展开环境中是否可能存在异常捕获或替换问题？ 与复杂的抽
@@ -651,10 +647,10 @@ g!</strong> 的某些属性可能看起来是缺陷，可能只是其设计固�
 所做的是将一组绑定引入展开环境，如果需要，每个绑定都绑定到宏可以使用的 <strong>gensym</strong>。 在有多种
 可能绑定 gensym 的情况下，因为有上下文，它们总是可以区分的。 换句话说，始终可以根据处在的环境
 中计算它来指定应该使用哪个环境的 <strong>gensym</strong>。看下以下一个认为制造的示例：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro/g! junk-outer ()
-<span class="linenos">2</span>  `(defmacro/g! junk-inner ()
-<span class="linenos">3</span>    `(let ((,g!abc))
-<span class="linenos">4</span>        ,g!abc)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro/g! junk-outer ()
+  `(defmacro/g! junk-inner ()
+    `(let ((,g!abc))
+        ,g!abc)))
 </pre></div>
 </div>
 <p>这里创建了两个 gensyms。 <strong>g!abc</strong> 的用法前面只有一个非引号（逗号），因此我们知道展开是指由
@@ -693,8 +689,8 @@ Norvig，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐�
 数。 作为参数传递给宏的结构仅且总是执行一次。 仅此一次。</p>
 <p>Norvig 用 <strong>square</strong> 宏做为 <strong>once-only</strong> 的示例。 <strong>square</strong> 表达式接受一个参数并返回
 该参数与自身的乘积：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro square (x)
-<span class="linenos">2</span>  `(* ,x ,x))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro square (x)
+  `(* ,x ,x))
 </pre></div>
 </div>
 <p>当传给 <strong>square</strong> 宏许类型都能正常运行，这些类型可以是大部分变量、数字和其他可以根据需要自由
@@ -703,8 +699,8 @@ Norvig，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐�
 这些事情很快变得复杂，在一般情况下，所有的预想都没了。 避免这些不必要的副作用变得方便和容易是
 once-only 的重点。 注意，如果用的是函数，将自由获得此行为。 在离开人为的教科书示例的范畴后，
 到这一步，将 <strong>square</strong> 定义为一个函数，最终看起来像这样：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun square (x)
-<span class="linenos">2</span>  (* x x))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun square (x)
+  (* x x))
 </pre></div>
 </div>
 <p>由于 lambda 的工作原理，可以用任何结构作为这个 <strong>square</strong> 函数定义的参数。 因为这个参数将只
@@ -714,9 +710,9 @@ once-only 的重点。 注意，如果用的是函数，将自由获得此行为
 执行结果以外的东西。</p>
 <p><strong>once-only</strong> 可以在宏展开中指定希望只被执行一次的特定参数，且它们的执行顺序是从左到右的，就
 像 lambda。 以下是如何使用传统的 <strong>once-only</strong> 宏来完成此操作：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro square (x)
-<span class="linenos">2</span>  (once-only (x)
-<span class="linenos">3</span>    `(* ,x ,x)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">square</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">once-only</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="o">,</span><span class="nv">x</span><span class="w"> </span><span class="o">,</span><span class="nv">x</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>当然，如果只想一次执行宏的所有参数，可以使用函数 (lambda)。 稍后会回到这一点，但是因为本书没
@@ -725,29 +721,29 @@ once-only 的重点。 注意，如果用的是函数，将自由获得此行为
 g!</strong> 组合的新技术。</p>
 <p>我们 <strong>once-only</strong> 实现的第一步是创建一些新的谓词和实用函数。 再次独特和简洁之间进行拖鞋，保
 留另一组符号供自己使用。 所有以字符 O! 开头的符号且其后接一个或多个字符称为 O-bang 符号。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun o!-symbol-p (s)
-<span class="linenos"> 2</span>  (and (symbolp s)
-<span class="linenos"> 3</span>      (&gt; (length (symbol-name s)) 2)
-<span class="linenos"> 4</span>      (string= (symbol-name s)
-<span class="linenos"> 5</span>                &quot;O!&quot;
-<span class="linenos"> 6</span>                :start1 0
-<span class="linenos"> 7</span>                :end1 2)))
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>(defun o!-symbol-to-g!-symbol (s)
-<span class="linenos">10</span>  (symb &quot;G!&quot;
-<span class="linenos">11</span>        (subseq (symbol-name s) 2)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">o!-symbol-p</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nb">symbolp</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="p">(</span><span class="nb">symbol-name</span><span class="w"> </span><span class="nv">s</span><span class="p">))</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">string=</span><span class="w"> </span><span class="p">(</span><span class="nb">symbol-name</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;O!&quot;</span><span class="w"></span>
+<span class="w">                </span><span class="ss">:start1</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">                </span><span class="ss">:end1</span><span class="w"> </span><span class="mi">2</span><span class="p">)))</span><span class="w"></span>
+
+<span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">o!-symbol-to-g!-symbol</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">symb</span><span class="w"> </span><span class="s">&quot;G!&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">subseq</span><span class="w"> </span><span class="p">(</span><span class="nb">symbol-name</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"> </span><span class="mi">2</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>定义个区分 O-bang 符号和其他对象的谓词：<strong>o!-symbol-p</strong>。 这个定义几乎与
 <strong>g!-symbol-p</strong> 的定义相同。 我们还引入了一个方便的实用函数，将 O-bang 变成 G-bang，其保
 留 bang 之后的字符：<strong>o!-symbol-to-g!-symbol</strong>。 此实用函数使用 Graham的实用函数
 <strong>symb</strong> 来创建新符号。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro defmacro! (name args &amp;rest body)
-<span class="linenos">2</span>  (let* ((os (remove-if-not #&#39;o!-symbol-p args))
-<span class="linenos">3</span>        (gs (mapcar #&#39;o!-symbol-to-g!-symbol os)))
-<span class="linenos">4</span>    `(defmacro/g! ,name ,args
-<span class="linenos">5</span>      `(let ,(mapcar #&#39;list (list ,@gs) (list ,@os))
-<span class="linenos">6</span>          ,(progn ,@body)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">defmacro!</span><span class="w"> </span><span class="p">(</span><span class="nv">name</span><span class="w"> </span><span class="nv">args</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">let*</span><span class="w"> </span><span class="p">((</span><span class="nv">os</span><span class="w"> </span><span class="p">(</span><span class="nb">remove-if-not</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">o!-symbol-p</span><span class="w"> </span><span class="nv">args</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">gs</span><span class="w"> </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nv">o!-symbol-to-g!-symbol</span><span class="w"> </span><span class="nv">os</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="nv">defmacro/g!</span><span class="w"> </span><span class="o">,</span><span class="nv">name</span><span class="w"> </span><span class="o">,</span><span class="nv">args</span><span class="w"></span>
+<span class="w">      </span><span class="o">`</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="o">,</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">list</span><span class="w"> </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="o">,@</span><span class="nv">gs</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="o">,@</span><span class="nv">os</span><span class="p">))</span><span class="w"></span>
+<span class="w">          </span><span class="o">,</span><span class="p">(</span><span class="k">progn</span><span class="w"> </span><span class="o">,@</span><span class="nv">body</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>defmacro!</strong> 代表我们的宏定义语言的最后一步——增加了个 <strong>once-only</strong> 的特性。
@@ -765,17 +761,17 @@ gensym 呢？通过调用上面由 <strong>o!-symbol-to-g!-symbol</strong> 定�
 的 G-bang 符号以添加到 <strong>defmacro/g!</strong> 结构。 一旦有了自动生成符号，就很容易实现
 <strong>once-only</strong> ，正如 <strong>defmacro!</strong> 定义那样简洁。</p>
 <p>暂时回到人为的教科书示例，我们将重新实现 <strong>square</strong> 宏，这次使用 <strong>defmacro!</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! square (o!x)
-<span class="linenos">2</span>  `(* ,g!x ,g!x))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro! square (o!x)
+  `(* ,g!x ,g!x))
 </pre></div>
 </div>
 <p>可以使用 <cite>macroexpand</cite> 展开：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>    &#39;(square (incf x)))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(LET ((#:X1633 (INCF X)))
-<span class="linenos">5</span>  (* #:X1633 #:X1633))
-<span class="linenos">6</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(square (incf x)))
+
+(LET ((#:X1633 (INCF X)))
+  (* #:X1633 #:X1633))
+T
 </pre></div>
 </div>
 <p>上一节中，我提到我们将所有 G-bang 符号的字符串值传递给 <strong>gensym</strong>。 这使得检查这些结构的展开
@@ -788,20 +784,20 @@ gensym 呢？通过调用上面由 <strong>o!-symbol-to-g!-symbol</strong> 定�
 予与宏展开的参数相同的名称，这会隐藏宏参数，因此宏定义无法访问它。因为 <strong>defmacro!</strong> 将其分为
 两种不同类型的符号，G-bang 和 O-bang ，我们可以编写使用这两个值的宏展开。 为了展示这一点，这
 里 <strong>square</strong> 宏的另一个定义：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! square (o!x)
-<span class="linenos">2</span>  `(progn
-<span class="linenos">3</span>    (format t &quot;[~a gave ~a]~%&quot;
-<span class="linenos">4</span>                &#39;,o!x   ,g!x)
-<span class="linenos">5</span>    (* ,g!x ,g!x)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro! square (o!x)
+  `(progn
+    (format t &quot;[~a gave ~a]~%&quot;
+                &#39;,o!x   ,g!x)
+    (* ,g!x ,g!x)))
 </pre></div>
 </div>
 <p>可以像以下的方式调用：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defvar x 4)
-<span class="linenos">2</span>
-<span class="linenos">3</span>X
-<span class="linenos">4</span>* (square (incf x))
-<span class="linenos">5</span>[(INCF X) gave 5]
-<span class="linenos">6</span>25
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defvar x 4)
+
+X
+* (square (incf x))
+[(INCF X) gave 5]
+25
 </pre></div>
 </div>
 <p>注意，上面的 <strong>square</strong> 定义中引用了未引用的 O-bang 符号（<strong>’,o!x</strong>）。 这样做是因为不想再
@@ -816,10 +812,10 @@ gensym 呢？通过调用上面由 <strong>o!-symbol-to-g!-symbol</strong> 定�
 一件简单的事情，并用 gensyms 就像编写它们一样简单，可以立即改变对这些决定的看法。
 <strong>defmacro!</strong> 感觉像是比  <strong>defmacro</strong> 更贴合 <strong>lambda</strong> 的手套。 正是出于这个原因，迭
 代开发，我们将使用 <strong>defmacro!</strong> 作为本书其余部分的主要宏定义接口。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! nif (o!expr pos zero neg)
-<span class="linenos">2</span>  `(cond ((plusp ,g!expr) ,pos)
-<span class="linenos">3</span>        ((zerop ,g!expr) ,zero)
-<span class="linenos">4</span>          (t ,neg)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro! nif (o!expr pos zero neg)
+  `(cond ((plusp ,g!expr) ,pos)
+        ((zerop ,g!expr) ,zero)
+          (t ,neg)))
 </pre></div>
 </div>
 <p>回到 Graham 的 <strong>nif</strong> 宏。 当用 <strong>defmacro!</strong> 更新这个宏时，注意到 <strong>expr</strong> 参数，我们
@@ -851,10 +847,10 @@ lisp 表达式。幸运的是，COMMON LISP 为此定义的语法与用于访问
 lisp 程序员对此表示欢迎，因为就像无法在没有上下文的情况下区分表达式一样，宏也不能。先考虑以下这
 个想法。首先，先明确为动态变量创建绑定不会创建词法闭包。例如，重新绑定之前声明的变量
 <strong>temp-special</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (let ((temp-special &#39;whatever))
-<span class="linenos">2</span>    (lambda () temp-special))
-<span class="linenos">3</span>
-<span class="linenos">4</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (let ((temp-special &#39;whatever))
+    (lambda () temp-special))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>尽管上面是一个 let over lambda，但这不是一个词法闭包。 这是在某些动态上下文中对 lambda 宏结
@@ -903,7 +899,7 @@ gensyms，这是个超越符号上的打印名称的概念。</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang.</p>
+    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang, Chuangxiu Chen.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

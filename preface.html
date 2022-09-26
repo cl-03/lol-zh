@@ -55,6 +55,10 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendices.html">附录</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specification.html">术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original-code.html">源代码</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production-code.html">生产代码</a></li>
 </ul>
 
         </div>
@@ -120,8 +124,8 @@ Lisp 的宏和其他语言的宏完全不是一个性质 —— 其他语言的�
 <h2>关于本书<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
 <p>关于这本书名，我目前还找不到很确切的中文来表达，因为 Let Over Lambda 是 Doug 对闭包的描述，
 这种说法很生动形象，所谓闭包就是函数和变量的绑定，用 Lisp 的代码写出来就是这样的：</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">counter</span> <span class="mi">0</span><span class="p">))</span>
-<span class="linenos">2</span>  <span class="p">(</span><span class="k">lambda</span> <span class="p">()</span> <span class="p">(</span><span class="n">incf</span> <span class="n">counter</span><span class="p">)))</span>
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">counter</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nv">counter</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>上面代码返回的是里面的 lambda 函数，但是每次调用这个函数时，这个函数都会修改 <cite>counter</cite> 这个
@@ -137,31 +141,31 @@ Lisp 的宏和其他语言的宏完全不是一个性质 —— 其他语言的�
 <ul class="simple">
 <li><p>将 lambda 函数绑定到一个变量上：</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="o">*</span> <span class="p">(</span><span class="n">defvar</span> <span class="n">counter</span>
-<span class="linenos"> 2</span>    <span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">counter</span> <span class="mi">0</span><span class="p">))</span>
-<span class="linenos"> 3</span>      <span class="p">(</span><span class="k">lambda</span> <span class="p">()</span> <span class="p">(</span><span class="n">incf</span> <span class="n">counter</span><span class="p">))))</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
-<span class="linenos"> 6</span><span class="mi">1</span>
-<span class="linenos"> 7</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
-<span class="linenos"> 8</span><span class="mi">2</span>
-<span class="linenos"> 9</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
-<span class="linenos">10</span><span class="mi">3</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="p">(</span><span class="n">defvar</span> <span class="n">counter</span>
+    <span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">counter</span> <span class="mi">0</span><span class="p">))</span>
+      <span class="p">(</span><span class="k">lambda</span> <span class="p">()</span> <span class="p">(</span><span class="n">incf</span> <span class="n">counter</span><span class="p">))))</span>
+
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
+<span class="mi">2</span>
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="n">counter</span><span class="p">)</span>
+<span class="mi">3</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>使用内置的 <cite>*</cite> 符号，其中 <cite>*</cite> 表示上个表达式的结果，<cite>**</cite> 表示上上个表达式的结果，
 <cite>***</cite> 表示上上上个表达式的结果，目前 sbcl 只支持三个 <cite>*</cite> 。</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="o">*</span> <span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">counter</span> <span class="mi">0</span><span class="p">))</span>
-<span class="linenos">2</span>    <span class="p">(</span><span class="k">lambda</span> <span class="p">()</span> <span class="p">(</span><span class="n">incf</span> <span class="n">counter</span><span class="p">))))</span>
-<span class="linenos">3</span><span class="c1">#&lt;FUNCTION (LAMBDA ()) {70051DA5EB}&gt;</span>
-<span class="linenos">4</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">*</span><span class="p">)</span>
-<span class="linenos">5</span><span class="mi">1</span>
-<span class="linenos">6</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">**</span><span class="p">)</span>
-<span class="linenos">7</span><span class="mi">2</span>
-<span class="linenos">8</span><span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">***</span><span class="p">)</span>
-<span class="linenos">9</span><span class="mi">3</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="p">(</span><span class="n">let</span> <span class="p">((</span><span class="n">counter</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="p">(</span><span class="k">lambda</span> <span class="p">()</span> <span class="p">(</span><span class="n">incf</span> <span class="n">counter</span><span class="p">))))</span>
+<span class="c1">#&lt;FUNCTION (LAMBDA ()) {70051DA5EB}&gt;</span>
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">*</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">**</span><span class="p">)</span>
+<span class="mi">2</span>
+<span class="o">*</span> <span class="p">(</span><span class="n">funcall</span> <span class="o">***</span><span class="p">)</span>
+<span class="mi">3</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -212,7 +216,7 @@ Lisp 的宏和其他语言的宏完全不是一个性质 —— 其他语言的�
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang.</p>
+    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang, Chuangxiu Chen.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

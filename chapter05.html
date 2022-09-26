@@ -58,6 +58,10 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendices.html">附录</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specification.html">术语表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original-code.html">源代码</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production-code.html">生产代码</a></li>
 </ul>
 
         </div>
@@ -86,14 +90,6 @@
              
   <section id="programs-that-program">
 <span id="chapter05"></span><h1>第五章：Programs that program<a class="headerlink" href="#programs-that-program" title="Permalink to this heading"></a></h1>
-<dl class="field-list simple">
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p>Doug Hoyte</p>
-</dd>
-<dt class="field-even">Translator</dt>
-<dd class="field-even"><p>Yuqi Liu</p>
-</dd>
-</dl>
 <section id="lisp-is-not-funcitonal">
 <span id="id1"></span><h2>5.1 非函数式编程<a class="headerlink" href="#lisp-is-not-funcitonal" title="Permalink to this heading"></a></h2>
 <p>对 Lisp 常见的一种偏见是将其叫做函数式编程语言。但 lisp 不是函数式语言。事实上，
@@ -109,14 +105,14 @@ lisp 是有史以来最不像函数式的语言。这个误解的根源很有趣
 </div></blockquote>
 <p>在 lisp 中，我们使用 <strong>defun</strong> 来定义新函数。例如，下面的函数使用求和将所有数字
 的集合映射到一个新集合，这个新集合也包括所有数字：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun adder (x)
-<span class="linenos">2</span>  (+ x 1))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun adder (x)
+  (+ x 1))
 </pre></div>
 </div>
 <p>显然，我们可以将这段代码应用于任意数字，获得映射后得到的返回值，但 <strong>adder</strong>
 真的是个函数吗？好吧，令人困惑的是，lisp 认为它是：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (describe #&#39;adder)
-<span class="linenos">2</span>#&lt;Interpreted Function&gt; is a function.
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (describe #&#39;adder)
+#&lt;Interpreted Function&gt; is a function.
 </pre></div>
 </div>
 <div class="admonition note">
@@ -183,9 +179,9 @@ Lisp 更好的实现函数式语言的平台或工具。</p>
 <p>在 <a class="reference internal" href="chapter03.html#domain-specific"><span class="std std-ref">3.2 领域特定语言</span></a> 中，当我们第一次考虑特定域语言时，我们创建了个简单
 的宏 <strong>unit-of-time</strong> 。这个宏允许我们用一种直观的、基于符号的语法，可以方便地以不
 同的单位指定时间段：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (unit-of-time 1 d)
-<span class="linenos">2</span>
-<span class="linenos">3</span>86400
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (unit-of-time 1 d)
+
+86400
 </pre></div>
 </div>
 <p><strong>unit-of-time</strong> 是个很方便的特定域语言，因为程序员不必去记住一些东西，比如说，一天
@@ -203,12 +199,12 @@ Lisp 更好的实现函数式语言的平台或工具。</p>
 简单的方法，用来定义这类帮助转换单位的工具。以下这个示例中，我们希望使用一种单位类
 型——时间，其基本单位为：秒，用 <strong>s</strong> 来指代，以及一组单位和这个单位到基本单位的转换
 因子：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defunits% time s
-<span class="linenos">2</span>  m 60
-<span class="linenos">3</span>  h 3600
-<span class="linenos">4</span>  d 86400
-<span class="linenos">5</span>  ms 1/1000
-<span class="linenos">6</span>  us 1/1000000)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defunits% time s
+  m 60
+  h 3600
+  d 86400
+  ms 1/1000
+  us 1/1000000)
 </pre></div>
 </div>
 <p><strong>defunits%</strong> 会展开成定义宏的代码，就像在 <a class="reference internal" href="chapter03.html#domain-specific"><span class="std std-ref">3.2 领域特定语言</span></a> 中编写的
@@ -219,12 +215,12 @@ Lisp 更好的实现函数式语言的平台或工具。</p>
 强它。当我们输入多种不同的单位是，用来指定对应的单位就会很有用。现在，让我们定义
 个因子，这个因子用来增加单位的种类，可以是一个列表，该列表中的值与单位相对应，如
 下所示：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defunits%% time s
-<span class="linenos">2</span>  m 60
-<span class="linenos">3</span>  h (60 m)
-<span class="linenos">4</span>  d (24 h)
-<span class="linenos">5</span>  ms (1/1000 s)
-<span class="linenos">6</span>  us (1/1000 ms))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defunits%% time s
+  m 60
+  h (60 m)
+  d (24 h)
+  ms (1/1000 s)
+  us (1/1000 ms))
 </pre></div>
 </div>
 <p>上面这个单位的列表看起来就比较自然了。我们以分钟为基础单位，秒、时基于分钟，天基
@@ -246,14 +242,14 @@ Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字�
 <p class="admonition-title">Note</p>
 <p>Graham 是 On Lisp 的作者，会经常出现一些上面的内容，如果有时间的话，推荐去看一下这本书。</p>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! defunits% (quantity base-unit &amp;rest units)
-<span class="linenos">2</span>  `(defmacro ,(symb &#39;unit-of-quantity) (,g!val ,g!un)
-<span class="linenos">3</span>    `(* ,,g!val
-<span class="linenos">4</span>        ,(case ,g!un
-<span class="linenos">5</span>          ((,base-unit) 1)
-<span class="linenos">6</span>          ,@(mapcar (lambda (x)
-<span class="linenos">7</span>                      `((,(car x)) ,(cadr x)))
-<span class="linenos">8</span>                    (group units 2))))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro! defunits% (quantity base-unit &amp;rest units)
+  `(defmacro ,(symb &#39;unit-of-quantity) (,g!val ,g!un)
+    `(* ,,g!val
+        ,(case ,g!un
+          ((,base-unit) 1)
+          ,@(mapcar (lambda (x)
+                      `((,(car x)) ,(cadr x)))
+                    (group units 2))))))
 </pre></div>
 </div>
 <p><strong>defunits%</strong> 用了反引号（<strong>`</strong>）嵌套：一个非常难以理解的结构。用反引号编程就像在代码
@@ -276,17 +272,17 @@ Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字�
 这个实用函数接收一个单位，例如像 <strong>S</strong>、<strong>M</strong> 或是 <strong>H</strong> 这样的符号，同时接收该单位规格
 列表。这个单位规格既可以是单个数字，这个数字被解释为基础单位，如 <strong>(M 60)</strong>，
 也可以是一个列表，该列表内部链式地指向另一个单位，如 <strong>(H (60 M))</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun defunits-chaining% (u units)
-<span class="linenos"> 2</span>  (let ((spec (find a units :key #&#39;car)))
-<span class="linenos"> 3</span>    (if (null spec)
-<span class="linenos"> 4</span>      (error &quot;Unknown unit ~a&quot; u)
-<span class="linenos"> 5</span>      (let ((chain (cadr spec)))
-<span class="linenos"> 6</span>        (if (listp chain)
-<span class="linenos"> 7</span>          (* (car chain)
-<span class="linenos"> 8</span>              (defunits-chaining%
-<span class="linenos"> 9</span>                (cadr chain)
-<span class="linenos">10</span>                units))
-<span class="linenos">11</span>          chain)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun defunits-chaining% (u units)
+  (let ((spec (find a units :key #&#39;car)))
+    (if (null spec)
+      (error &quot;Unknown unit ~a&quot; u)
+      (let ((chain (cadr spec)))
+        (if (listp chain)
+          (* (car chain)
+              (defunits-chaining%
+                (cadr chain)
+                units))
+          chain)))))
 </pre></div>
 </div>
 <p>这个实用函数是递归的。为了求基本单位的乘数，我们将链中的每一步乘以另一个实用
@@ -304,43 +300,43 @@ Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字�
 错误检查。专业的宏编写人员总是小心地处理任何可能出现的错误条件。在无限循环或是
 在 REPL 中难以调试的情况中，错误检查尤为重要。</p>
 <p><strong>defunits%%</strong> 的问题实际上是我们设计的语言的一个属性：可以编写有环的程序。如：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defunits time s
-<span class="linenos">2</span>  m (1/60 h)
-<span class="linenos">3</span>  h (60 m))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defunits time s
+  m (1/60 h)
+  h (60 m))
 </pre></div>
 </div>
 <p>为了提供适当的调试输出，需要稍微增强实现。最终的版本，<strong>defunits</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun defunits-chaining (u units prev)
-<span class="linenos"> 2</span>  (if (member u prev)
-<span class="linenos"> 3</span>    (error &quot;~{ ~a~~ depends on ~}&quot;
-<span class="linenos"> 4</span>      (cons u prev)))
-<span class="linenos"> 5</span>  (let ((spec (find u units :key #&#39;car)))
-<span class="linenos"> 6</span>    (if (null spec)
-<span class="linenos"> 7</span>      (error &quot;Unknown unit ~a&quot; u)
-<span class="linenos"> 8</span>      (let ((chain (cadr spec)))
-<span class="linenos"> 9</span>        (if (listp chain)
-<span class="linenos">10</span>          (* (car chain)
-<span class="linenos">11</span>            (defunits-chaining
-<span class="linenos">12</span>              (cadr chain)
-<span class="linenos">13</span>              units
-<span class="linenos">14</span>              (cons u prev)))
-<span class="linenos">15</span>          chain)))))
-<span class="linenos">16</span>
-<span class="linenos">17</span>(defmacro! defunits (quantity base-unit &amp;rest units)
-<span class="linenos">18</span>  `(defmacro ,(symb &#39;unit-of- quantity)
-<span class="linenos">19</span>            (,g!var ,g!un)
-<span class="linenos">20</span>    `(* ,,g!val
-<span class="linenos">21</span>        ,(case ,g!un
-<span class="linenos">22</span>          ((,base-unit) 1)
-<span class="linenos">23</span>          ,@(mapcar (lambda (x)
-<span class="linenos">24</span>                      `((,(car x))
-<span class="linenos">25</span>                          ,(defunits-chaining
-<span class="linenos">26</span>                              (car x)
-<span class="linenos">27</span>                              (cons
-<span class="linenos">28</span>                                `(,base-unit 1)
-<span class="linenos">29</span>                                (group units 2))
-<span class="linenos">30</span>                              nil)))
-<span class="linenos">31</span>                      (group units 2))))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun defunits-chaining (u units prev)
+  (if (member u prev)
+    (error &quot;~{ ~a~~ depends on ~}&quot;
+      (cons u prev)))
+  (let ((spec (find u units :key #&#39;car)))
+    (if (null spec)
+      (error &quot;Unknown unit ~a&quot; u)
+      (let ((chain (cadr spec)))
+        (if (listp chain)
+          (* (car chain)
+            (defunits-chaining
+              (cadr chain)
+              units
+              (cons u prev)))
+          chain)))))
+
+(defmacro! defunits (quantity base-unit &amp;rest units)
+  `(defmacro ,(symb &#39;unit-of- quantity)
+            (,g!var ,g!un)
+    `(* ,,g!val
+        ,(case ,g!un
+          ((,base-unit) 1)
+          ,@(mapcar (lambda (x)
+                      `((,(car x))
+                          ,(defunits-chaining
+                              (car x)
+                              (cons
+                                `(,base-unit 1)
+                                (group units 2))
+                              nil)))
+                      (group units 2))))))
 </pre></div>
 </div>
 <p><strong>defunits</strong> 不但支持链式，而且如果该语言的用户指定了具有这种循环依赖关系的程序，
@@ -348,12 +344,12 @@ Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字�
 <strong>defunits-chaining%</strong> 的升级版，<strong>defunits-chaining%</strong> 维护了以前访问过的所
 有单元的列表。这样，当再次通过链式访问同一个单位时，就会抛出异常来简明的描述
 这个问题:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (defunits time s
-<span class="linenos">2</span>    m (1/60 h)
-<span class="linenos">3</span>    h (60 m))
-<span class="linenos">4</span>
-<span class="linenos">5</span>Error in function DEFUNITS-CHAINING:
-<span class="linenos">6</span>  M depends on H depends on M
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (defunits time s
+    m (1/60 h)
+    h (60 m))
+
+Error in function DEFUNITS-CHAINING:
+  M depends on H depends on M
 </pre></div>
 </div>
 <p><strong>defunits</strong> 宏与 <strong>defunits%%</strong> 完全相同，除了传递了个额外的参数 <strong>nil</strong> 给
@@ -366,39 +362,39 @@ Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字�
 lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到一个域中。相反，
 它们只是使语言越来越精确到问题领域，直到问题变得很细致。</p>
 <p>使用 <strong>defunits</strong> 的例子是 <strong>unit-of-distance</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defunits distance m
-<span class="linenos"> 2</span>  km 1000
-<span class="linenos"> 3</span>  cm 1/100
-<span class="linenos"> 4</span>  mm (1/10 cm)
-<span class="linenos"> 5</span>  nm (1/1000 mm)
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span>  yard 9144/10000  ; Defined in 1956
-<span class="linenos"> 8</span>  foot (1/3 yard)
-<span class="linenos"> 9</span>  inch (1/12 foot)
-<span class="linenos">10</span>  mile (1760 yard)
-<span class="linenos">11</span>  furlong (1/8 mile)
-<span class="linenos">12</span>
-<span class="linenos">13</span>  fathom (2 yard)  ; Defined in 1929
-<span class="linenos">14</span>  nautical-mile 1852
-<span class="linenos">15</span>  cable (1/10 nautical-mile)
-<span class="linenos">16</span>
-<span class="linenos">17</span>  old-brit-nautical-mile  ; Dropped in 1970
-<span class="linenos">18</span>    (6080/3 yard)
-<span class="linenos">19</span>  old-brit-cable
-<span class="linenos">20</span>    (1/10 old-brit-nautical-mile)
-<span class="linenos">21</span>  old-brit-fathom
-<span class="linenos">22</span>    (1/100 old-brit-cable))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defunits</span><span class="w"> </span><span class="nv">distance</span><span class="w"> </span><span class="nv">m</span><span class="w"></span>
+<span class="w">  </span><span class="nv">km</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">  </span><span class="nv">cm</span><span class="w"> </span><span class="m">1/100</span><span class="w"></span>
+<span class="w">  </span><span class="nv">mm</span><span class="w"> </span><span class="p">(</span><span class="m">1/10</span><span class="w"> </span><span class="nv">cm</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">nm</span><span class="w"> </span><span class="p">(</span><span class="m">1/1000</span><span class="w"> </span><span class="nv">mm</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="nv">yard</span><span class="w"> </span><span class="m">9144/10000</span><span class="w">  </span><span class="c1">; Defined in 1956</span><span class="w"></span>
+<span class="w">  </span><span class="nv">foot</span><span class="w"> </span><span class="p">(</span><span class="m">1/3</span><span class="w"> </span><span class="nv">yard</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">inch</span><span class="w"> </span><span class="p">(</span><span class="m">1/12</span><span class="w"> </span><span class="nv">foot</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">mile</span><span class="w"> </span><span class="p">(</span><span class="mi">1760</span><span class="w"> </span><span class="nv">yard</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">furlong</span><span class="w"> </span><span class="p">(</span><span class="m">1/8</span><span class="w"> </span><span class="nv">mile</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="nv">fathom</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="nv">yard</span><span class="p">)</span><span class="w">  </span><span class="c1">; Defined in 1929</span><span class="w"></span>
+<span class="w">  </span><span class="nv">nautical-mile</span><span class="w"> </span><span class="mi">1852</span><span class="w"></span>
+<span class="w">  </span><span class="nv">cable</span><span class="w"> </span><span class="p">(</span><span class="m">1/10</span><span class="w"> </span><span class="nv">nautical-mile</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="nv">old-brit-nautical-mile</span><span class="w">  </span><span class="c1">; Dropped in 1970</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="m">6080/3</span><span class="w"> </span><span class="nv">yard</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">old-brit-cable</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="m">1/10</span><span class="w"> </span><span class="nv">old-brit-nautical-mile</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">old-brit-fathom</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="m">1/100</span><span class="w"> </span><span class="nv">old-brit-cable</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>如果你想知道的话，1970 年采用国际海里制缩短了英寻（至少对英国水手而言）
 的 1/76，也就 2 厘米多一点：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (/ (unit-of-distance 1 fathom)
-<span class="linenos">2</span>    (unit-of-distance 1 old-brit-fathom))
-<span class="linenos">3</span>* (coerce
-<span class="linenos">4</span>    (unit-of-distance 1/76 old-brit-fathom)
-<span class="linenos">5</span>    &#39;float)
-<span class="linenos">6</span>
-<span class="linenos">7</span>0.024384
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (/ (unit-of-distance 1 fathom)
+    (unit-of-distance 1 old-brit-fathom))
+* (coerce
+    (unit-of-distance 1/76 old-brit-fathom)
+    &#39;float)
+
+0.024384
 </pre></div>
 </div>
 </section>
@@ -422,15 +418,15 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 具体参考: <a class="reference external" href="https://www.gnu.org/software/emacs/manual/html_node/eintr/Lisp-Atoms.html">https://www.gnu.org/software/emacs/manual/html_node/eintr/Lisp-Atoms.html</a></p>
 </div>
 <p>现在，先从简单的初稿开始吧。<strong>tree-leaves%</strong> 是个函数，</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun tree-leaves% (tree result)
-<span class="linenos">2</span>  (if tree
-<span class="linenos">3</span>    (if (listp tree)
-<span class="linenos">4</span>      (cons
-<span class="linenos">5</span>        (tree-leaves% (car tree)
-<span class="linenos">6</span>                      result)
-<span class="linenos">7</span>        (tree-leaves% (cdr tree)
-<span class="linenos">8</span>                      result))
-<span class="linenos">9</span>      result)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">tree-leaves%</span><span class="w"> </span><span class="p">(</span><span class="nv">tree</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">tree</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">listp</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">cons</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">tree-leaves%</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="nv">result</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">tree-leaves%</span><span class="w"> </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="nv">result</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="nv">result</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>该函数会递归的去遍历提供的 <strong>tree</strong> 表达式参数，然后将同类型的构造成列表结构。
@@ -440,11 +436,11 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 <p>在 <strong>if</strong> 结构中，如果 <strong>else</strong> 部分没有的话，那么 <strong>else</strong> 的部分就返回 <strong>nil</strong>，
 即空列表。</p>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (tree-leaves%
-<span class="linenos">2</span>    &#39;(2 (nil t (a . b)))
-<span class="linenos">3</span>    &#39;leaf)
-<span class="linenos">4</span>
-<span class="linenos">5</span>(LEAF (NIL LEAF (LEAF . LEAF)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (tree-leaves%
+    &#39;(2 (nil t (a . b)))
+    &#39;leaf)
+
+(LEAF (NIL LEAF (LEAF . LEAF)))
 </pre></div>
 </div>
 <p>所以，<strong>tree-leaves%</strong> 返回了个新的树结构，其中所有的原语都被转换成了提供的
@@ -455,8 +451,8 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 的就不用去管他了。在 lisp 中，编写个可自定义的使用函数的最直接的方法就是有插
 件——即用户可以使用自定义的代码来控制实用程序的功能。<strong>COMMON LISP</strong> 内置的
 <strong>sort</strong> 函数就是典型的代表。以下的代码中，小于函数对 <strong>sort</strong> 来说就是个插件：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (sort &#39;(5 1 2 4 3 8 9 6 7) #&#39;&lt;)
-<span class="linenos">2</span>(1 2 3 4 5 6 7 8 9)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (sort &#39;(5 1 2 4 3 8 9 6 7) #&#39;&lt;)
+(1 2 3 4 5 6 7 8 9)
 </pre></div>
 </div>
 <p>使用函数作为参数来控制程序的行为的这个理念很方便，因为这样就可以创建写适合
@@ -465,52 +461,52 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 有宏组合（<strong>macro composition</strong>）那么有趣，但这仍是个很有用的技术，且这个
 技术是专业 lisp 程序员必须掌握的。</p>
 <p>有个关于函数组合的简单示例是 —— <strong>predicate-splitter</strong>。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun predicate-splitter (orderp splitp)
-<span class="linenos">2</span>  (lambda (a b)
-<span class="linenos">3</span>    (let ((s (funcall splitp a)))
-<span class="linenos">4</span>      (if (eq s (funcall splitp b))
-<span class="linenos">5</span>        (funcall orderp a b)
-<span class="linenos">6</span>        a))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">predicate-splitter</span><span class="w"> </span><span class="p">(</span><span class="nv">orderp</span><span class="w"> </span><span class="nv">splitp</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">a</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">s</span><span class="w"> </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">splitp</span><span class="w"> </span><span class="nv">a</span><span class="p">)))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">splitp</span><span class="w"> </span><span class="nv">b</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">orderp</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">b</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="nv">a</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>该函数是将两个断言函数组合成一个新的断言。第一个断言函数接收两个参数，用来
 排序。第二个断言接收一个参数，并确定元素是否符合需要分割的断言的特殊类别。
 例如，下面这个例子就是用 <strong>predicate-splitter</strong> 来创建个新的断言，该断言
 和小于判断工作原理是一致的，只不过该断言认为偶数要小于奇数：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (sort &#39;(5 1 2 4 3 8 9 6 7)
-<span class="linenos">2</span>        (predicate-splitter #&#39;&lt; #&#39;evenp))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(2 4 6 8 1 3 5 7 9)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (sort &#39;(5 1 2 4 3 8 9 6 7)
+        (predicate-splitter #&#39;&lt; #&#39;evenp))
+
+(2 4 6 8 1 3 5 7 9)
 </pre></div>
 </div>
 <p>所以，要怎么样才能将函数作为插件来控制 <strong>tree-leaves%</strong> 工作呢？在
 <strong>tree-leaves%</strong> 的更新版本 —— <strong>tree-leaves%%</strong> 中，添加了两个不同的函数
 插件，一个用来控制哪些元素需要改变，另一个用来指明怎么将旧元素转换成新元
 素，这两个函数分别称为测试（<strong>test</strong>）和结果（<strong>result</strong>）。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun tree-leaves%% (tree test result)
-<span class="linenos">2</span>  (if tree
-<span class="linenos">3</span>    (if (listp tree)
-<span class="linenos">4</span>      (cons
-<span class="linenos">5</span>        (tree-leaves%% (car tree) test result)
-<span class="linenos">6</span>        (tree-leaves%% (cdr tree) test result))
-<span class="linenos">7</span>      (if (funcall test tree)
-<span class="linenos">8</span>        (funcall result tree)
-<span class="linenos">9</span>        tree))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">tree-leaves%%</span><span class="w"> </span><span class="p">(</span><span class="nv">tree</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">tree</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">listp</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">cons</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">tree-leaves%%</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nv">tree-leaves%%</span><span class="w"> </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">result</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">funcall</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="nv">tree</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="nv">tree</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>我们可以传给 <strong>tree-leaves%%</strong> 两个 lambda 表达式，这两个表达式都只接受单个
 参数 —— <strong>x</strong>。在这种情况中，我们想要这么这样的新的树结构：该树的结构与传入
 的参数 <strong>tree</strong> 相同，但是会将所有的偶数都变成 <strong>even-number</strong> 的符号：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (tree-leaves%%
-<span class="linenos"> 2</span>    &#39;(1 2 (3 4 (5 6)))
-<span class="linenos"> 3</span>    (lambda (x)
-<span class="linenos"> 4</span>      (and (numberp x) (evenp x)))
-<span class="linenos"> 5</span>    (lambda (x)
-<span class="linenos"> 6</span>      &#39;even-number))
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span>; Note: Variable X defined but never used.
-<span class="linenos"> 9</span>
-<span class="linenos">10</span>(1 EVEN-NUMBER (3 EVEN-NUMBER (5 EVEN-NUMBER)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (tree-leaves%%
+    &#39;(1 2 (3 4 (5 6)))
+    (lambda (x)
+      (and (numberp x) (evenp x)))
+    (lambda (x)
+      &#39;even-number))
+
+; Note: Variable X defined but never used.
+
+(1 EVEN-NUMBER (3 EVEN-NUMBER (5 EVEN-NUMBER)))
 </pre></div>
 </div>
 <p>除了有个纠正的提示 <strong>x</strong> 变量在第二个函数插件中没有用到外，函数看起来很正常。
@@ -521,16 +517,16 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 通常时在编写灵活的宏时会遇到。解决办法就是像编译器声明可以忽略变量 <strong>x</strong>。因为
 声明一个变量是可忽略后再使用这个变量并没有什么危害，因此可以将两个变量 <strong>x</strong>
 都声明为可忽略：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (tree-leaves%%
-<span class="linenos"> 2</span>    &#39;(1 2 (3 4 (5 6)))
-<span class="linenos"> 3</span>    (lambda (x)
-<span class="linenos"> 4</span>      (declare (ignorable x))
-<span class="linenos"> 5</span>      (and (numberp x) (evenp x)))
-<span class="linenos"> 6</span>    (lambda (x)
-<span class="linenos"> 7</span>      (declare (ignorable x))
-<span class="linenos"> 8</span>      &#39;even-number))
-<span class="linenos"> 9</span>
-<span class="linenos">10</span>(1 EVEN-NUMBER (3 EVEN-NUMBER (5 EVEN-NUMBER)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (tree-leaves%%
+    &#39;(1 2 (3 4 (5 6)))
+    (lambda (x)
+      (declare (ignorable x))
+      (and (numberp x) (evenp x)))
+    (lambda (x)
+      (declare (ignorable x))
+      &#39;even-number))
+
+(1 EVEN-NUMBER (3 EVEN-NUMBER (5 EVEN-NUMBER)))
 </pre></div>
 </div>
 <p>这就是这个教程的有趣之处。看起来 <strong>tree-leaves%%</strong> 刚刚好，我们可以修改树结构
@@ -544,15 +540,15 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 <p>但我们需要的不是像隐式的 <strong>progn</strong> 或 <strong>lambda</strong> 那么简单，而是完整的隐式词法
 上下文，用来节省创建这些插件函数的开销，并在运行转换树这样的常见任务时只需
 要输入最少量的代码。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro tree-leaves (tree test result)
-<span class="linenos">2</span>  &#39;(tree-leaves%%
-<span class="linenos">3</span>    ,tree
-<span class="linenos">4</span>    (lambda (x)
-<span class="linenos">5</span>      (declare (ignorable x))
-<span class="linenos">6</span>      ,test)
-<span class="linenos">7</span>    (lambda (x)
-<span class="linenos">8</span>      (declare (ignoreable x))
-<span class="linenos">9</span>      ,result)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">tree-leaves</span><span class="w"> </span><span class="p">(</span><span class="nv">tree</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">result</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">tree-leaves%%</span><span class="w"></span>
+<span class="w">    </span><span class="o">,</span><span class="nv">tree</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">declare</span><span class="w"> </span><span class="p">(</span><span class="k">ignorable</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="o">,</span><span class="nv">test</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="k">declare</span><span class="w"> </span><span class="p">(</span><span class="nv">ignoreable</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="o">,</span><span class="nv">result</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>该词法隐式上下文不像简单的隐式上下文，因为我们并没有找到通用隐式模式的另一
@@ -565,12 +561,12 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 然而，这似乎是最直观的、最不臃肿的方法，至少就我们目前所设想的用途而言。宏
 允许我们以一种简单、直接的方式创建个高效的程序员接口，这在其他语言中是不可
 能的。下面是我们如何使用这个宏的例子：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (tree-leaves
-<span class="linenos">2</span>    &#39;(1 2 (3 4 (5 6)))
-<span class="linenos">3</span>    (and (numberp x) (evenp x))
-<span class="linenos">4</span>    &#39;even-number)
-<span class="linenos">5</span>
-<span class="linenos">6</span>(1 EVEN-NUMBER (3 EVEN-NUMBER (5 . EVEN-NUMBER)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (tree-leaves
+    &#39;(1 2 (3 4 (5 6)))
+    (and (numberp x) (evenp x))
+    &#39;even-number)
+
+(1 EVEN-NUMBER (3 EVEN-NUMBER (5 . EVEN-NUMBER)))
 </pre></div>
 </div>
 <p>注意，变量 <strong>x</strong> 实际上是在没有定义的情况下就使用了。这是因为后面两个表达式都有
@@ -603,20 +599,20 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 <p>很简单，对吧？难点在于，很多正常的 lisp 代码段会破坏原生的代码遍历的实现。假设我们想
 要对一个函数执行的特定符号（ <strong>blah</strong> ）进行替换，当给出以下表达式时，就很容易看出替
 换位置：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(blah t)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">blah</span><span class="w"> </span><span class="no">t</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>blah</strong> 所在的位置是表达式的函数位置，当表达式计算时，<strong>blah</strong> 会被调用，显然，我们需要
 在这个时候对 <strong>blah</strong> 进行替换。目前来说还不错，但如果传入下面这个结构会怎么样呢？</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>&#39;(blah t)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;(blah t)
 </pre></div>
 </div>
 <p>因为表达式是被引用的，所以上面的代码的意思是直接返回一个列表。这里进行替换的话就会
 出错。所以我们的代码遍历器在遇到引号（<strong>’</strong>）时，必须停止，同时不会去替换引用的结构中
 的内容。很好，这也很简单。但考虑一下其他无法展开 blah 的场景。假如 <strong>blah</strong> 是个词法
 变量的变量名呢？</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((blah t))
-<span class="linenos">2</span>  blah)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">blah</span><span class="w"> </span><span class="no">t</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="nv">blah</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>尽管 <strong>blah</strong> 是列表中的第一个位置，但这里它是 <strong>let</strong> 结构中的本地绑定，而这种绑定是不
@@ -625,8 +621,8 @@ lisp 中却很容易，所以lisp程序员通常不会把所有东西都塞到�
 23 个这种的特殊结构，这些结构也需要添加特定的逻辑。更重要的是，许多特殊结构很复杂，
 不能正确的进行遍历。 正如上面所见的 <strong>let</strong>，比较棘手，而且还有更糟的情况。下面一段
 合规的 COMMON LISP 代码结构中有个 <strong>blah</strong> 需要展开。但是具体是哪一个呢？</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let (blah (blah (blah blah)))
-<span class="linenos">2</span>  blah)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">(</span><span class="nv">blah</span><span class="w"> </span><span class="p">(</span><span class="nv">blah</span><span class="w"> </span><span class="p">(</span><span class="nv">blah</span><span class="w"> </span><span class="nv">blah</span><span class="p">)))</span><span class="w"></span>
+<span class="w">  </span><span class="nv">blah</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>所以说遍历代码是很难的，因为要正确地处理特殊结构很难（见 [special-forms] 和
@@ -666,24 +662,24 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 <p>即使大部分像样的 COMMON LISP 编译器都会执行适当的尾部调用优化，有时我们需要
 确认优化已经进行了。最简单的、可移植的实现方法是修改 <strong>nlet</strong> 宏，这样它生成展开
 时就不会使用不必要的堆栈空间。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro! nlet-tail (n letargs &amp;rest body)
-<span class="linenos"> 2</span>  (let ((gs (loop for i in letargs
-<span class="linenos"> 3</span>                  collect (gensym))))
-<span class="linenos"> 4</span>    `(macrolet
-<span class="linenos"> 5</span>      ((,n ,gs
-<span class="linenos"> 6</span>          `(progn
-<span class="linenos"> 7</span>            (psetq
-<span class="linenos"> 8</span>              ,@(apply #&#39;nconc
-<span class="linenos"> 9</span>                      (mapcar
-<span class="linenos">10</span>                        #&#39;list
-<span class="linenos">11</span>                        &#39;,(mapcar #&#39;car letargs)
-<span class="linenos">12</span>                        (list ,@gs))))
-<span class="linenos">13</span>            (go ,&#39;,g!n))))
-<span class="linenos">14</span>        (block ,g!b
-<span class="linenos">15</span>          (let ,letargs
-<span class="linenos">16</span>            (tagbody
-<span class="linenos">17</span>              ,g!n (return-from
-<span class="linenos">18</span>                    ,g!b (progn ,@body))))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">nlet-tail</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="w"> </span><span class="nv">letargs</span><span class="w"> </span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">gs</span><span class="w"> </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">letargs</span><span class="w"></span>
+<span class="w">                  </span><span class="nv">collect</span><span class="w"> </span><span class="p">(</span><span class="nb">gensym</span><span class="p">))))</span><span class="w"></span>
+<span class="w">    </span><span class="o">`</span><span class="p">(</span><span class="k">macrolet</span><span class="w"></span>
+<span class="w">      </span><span class="p">((</span><span class="o">,</span><span class="nv">n</span><span class="w"> </span><span class="o">,</span><span class="nv">gs</span><span class="w"></span>
+<span class="w">          </span><span class="o">`</span><span class="p">(</span><span class="k">progn</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nb">psetq</span><span class="w"></span>
+<span class="w">              </span><span class="o">,@</span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">nconc</span><span class="w"></span>
+<span class="w">                      </span><span class="p">(</span><span class="nb">mapcar</span><span class="w"></span>
+<span class="w">                        </span><span class="nf">#&#39;</span><span class="nb">list</span><span class="w"></span>
+<span class="w">                        </span><span class="ss">&#39;,</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"> </span><span class="nf">#&#39;</span><span class="nb">car</span><span class="w"> </span><span class="nv">letargs</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="o">,@</span><span class="nv">gs</span><span class="p">))))</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">go</span><span class="w"> </span><span class="o">,</span><span class="ss">&#39;,g!n</span><span class="p">))))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">block</span><span class="w"> </span><span class="o">,</span><span class="nv">g!b</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="o">,</span><span class="nv">letargs</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">tagbody</span><span class="w"></span>
+<span class="w">              </span><span class="o">,</span><span class="nv">g!n</span><span class="w"> </span><span class="p">(</span><span class="k">return-from</span><span class="w"></span>
+<span class="w">                    </span><span class="o">,</span><span class="nv">g!b</span><span class="w"> </span><span class="p">(</span><span class="k">progn</span><span class="w"> </span><span class="o">,@</span><span class="nv">body</span><span class="p">))))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>在 <strong>nlet-tail</strong> 中，我们将宏的主体嵌在了一些其他的结构中。我们用 <strong>block</strong> 和
@@ -695,11 +691,11 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 禁用，因为这些 <strong>let</strong> 结构会展开成尾部调用。下面是个和介绍 <strong>nlet</strong> 是使用一样无趣
 的例子，不同的是这个例子中可以保证，即使在不执行尾部调用优化的 lisp 中，也不会
 消耗额外的堆栈空间。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun nlet-tail-fact (n)
-<span class="linenos">2</span>  (nlet-tail fact ((n n) (acc 1))
-<span class="linenos">3</span>    (if (zerop n)
-<span class="linenos">4</span>      acc
-<span class="linenos">5</span>      (fact (- n 1) (* acc n)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">nlet-tail-fact</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">nlet-tail</span><span class="w"> </span><span class="nv">fact</span><span class="w"> </span><span class="p">((</span><span class="nv">n</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">acc</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zerop</span><span class="w"> </span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="nv">acc</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nv">fact</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="nv">n</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">acc</span><span class="w"> </span><span class="nv">n</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>因为这是本节的示例，注意，我们用 <strong>macrolet</strong> 对提供的内容进行代码遍历，来查找
@@ -757,20 +753,20 @@ LISP 要求必须定义长度不大于 4 的 <strong>car</strong> 和 <strong>cd
 但可以使用 <strong>cadadr</strong> 达到这个效果。</p>
 <p>这些预定义的 <strong>car</strong> 和 <strong>cdr</strong> 的组合用在函数的 <strong>:key</strong> 访问参数上真的很方便，像
 <strong>find</strong> ：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (find &#39;a
-<span class="linenos">2</span>    &#39;(((a b) (c d)) ((c d) (b a)))
-<span class="linenos">3</span>    :key #&#39;cadadr)
-<span class="linenos">4</span>
-<span class="linenos">5</span>((C D) (B A))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (find &#39;a
+    &#39;(((a b) (c d)) ((c d) (b a)))
+    :key #&#39;cadadr)
+
+((C D) (B A))
 </pre></div>
 </div>
 <p>使用预定义的 <strong>cadadr</strong> 访问器比构建个等价的英文访问器组合的 lambda 表达式要更精确。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (find &#39;a
-<span class="linenos">2</span>    &#39;(((a b) (c d)) ((c d) (b a)))
-<span class="linenos">3</span>    :key (lambda (e)
-<span class="linenos">4</span>          (second (second e))))
-<span class="linenos">5</span>
-<span class="linenos">6</span>((C D) (B A))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (find &#39;a
+    &#39;(((a b) (c d)) ((c d) (b a)))
+    :key (lambda (e)
+          (second (second e))))
+
+((C D) (B A))
 </pre></div>
 </div>
 <p>COMMON LISP 也提供了函数 <strong>nth</strong> 和 <strong>nthcdr</strong>，他们可以用作通用访问器，比如说，
@@ -784,17 +780,17 @@ LISP 要求必须定义长度不大于 4 的 <strong>car</strong> 和 <strong>cd
 <p>既然 <strong>car</strong> 和 <strong>cdr</strong> 是基础操作符，我们的语言应该有完全通用的方式组合这两个访问器。因为
 有无数种这样的组合，为每个可能的访问器定义函数来继续组合显然是不可行的。 我们真正想要
 的是一个可以扩展为高效列表遍历代码的宏。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro cxr% (x tree)
-<span class="linenos"> 2</span>  (if (null x)
-<span class="linenos"> 3</span>    tree
-<span class="linenos"> 4</span>    `(,(cond
-<span class="linenos"> 5</span>          ((eq &#39;a (cadr x)) &#39;car)
-<span class="linenos"> 6</span>          ((eq &#39;d (cadr x)) &#39;cdr)
-<span class="linenos"> 7</span>          (t (error &quot;Non A/D symbol&quot;)))
-<span class="linenos"> 8</span>      ,(if (= 1 (car x))
-<span class="linenos"> 9</span>        `(cxr% ,(cddr x) ,tree)
-<span class="linenos">10</span>        `(cxr% ,(cons (- (car x) 1) (cdr x))
-<span class="linenos">11</span>                ,tree)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro cxr% (x tree)
+  (if (null x)
+    tree
+    `(,(cond
+          ((eq &#39;a (cadr x)) &#39;car)
+          ((eq &#39;d (cadr x)) &#39;cdr)
+          (t (error &quot;Non A/D symbol&quot;)))
+      ,(if (= 1 (car x))
+        `(cxr% ,(cddr x) ,tree)
+        `(cxr% ,(cons (- (car x) 1) (cdr x))
+                ,tree)))))
 </pre></div>
 </div>
 <p>以 C 开头，后面跟着一个或多个 A 或 D 字符，以 R 结尾，指定列表访问器函数的语法非常直观，
@@ -803,50 +799,50 @@ A 或 D 字符被替换为 X。 在 <strong>cxr%</strong> 中，第一个参数�
 列表是数字和符号 A 或 D 的交替组合。</p>
 <p>例如，即使 COMMON LISP 没有提供个英文单词的函数来访问列表的第十一个元素，我们也可以
 简单地定义出来：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun eleventh (x)
-<span class="linenos">2</span>  (cxr% (1 a 10 d) x))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">eleventh</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">cxr%</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="nv">d</span><span class="p">)</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>本节的重点是说明递归展开的实际用途。当宏将一个结构展开为一个新的结构时，递归展开就会出现，
 该结构也包含所讨论的宏的使用。 与所有递归一样，此过程必须有个基本的终止条件。宏最终会展开
 为不包含使用相关宏的结构，然后这个展开就会结束。</p>
 <p>下面我们将 <strong>cxr%</strong> 宏的实例宏展开（<strong>macroexpand</strong>）成一个同样使用 <strong>cxr%</strong> 的结构：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>    &#39;(cxr% (1 a 2 d) some-list))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(CAR (CXR% (2 D) SOME-LIST))
-<span class="linenos">5</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(cxr% (1 a 2 d) some-list))
+
+(CAR (CXR% (2 D) SOME-LIST))
+T
 </pre></div>
 </div>
 <p>当我们拷贝这个新的递归结构，然后宏展开它，又会得到一个递归：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>    &#39;(CXR% (2 D) SOME-LIST))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(CDR (CXR% (1 D) SOME-LIST))
-<span class="linenos">5</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(CXR% (2 D) SOME-LIST))
+
+(CDR (CXR% (1 D) SOME-LIST))
+T
 </pre></div>
 </div>
 <p>下面这个递归的结果展示了 <strong>xcr%</strong> 另一种可能的用法：空列表访问器：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpnad
-<span class="linenos">2</span>    &#39;(CXR% (1 D) SOME-LIST))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(CDR (CXR% NIL SOME-LIST))
-<span class="linenos">5</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpnad
+    &#39;(CXR% (1 D) SOME-LIST))
+
+(CDR (CXR% NIL SOME-LIST))
+T
 </pre></div>
 </div>
 <p>空列表访问器就是基本终止条件，然后直接展开被访问的列表：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
-<span class="linenos">2</span>    &#39;(CXR% NIL SOME-LIST))
-<span class="linenos">3</span>
-<span class="linenos">4</span>SOME-LIST
-<span class="linenos">5</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+    &#39;(CXR% NIL SOME-LIST))
+
+SOME-LIST
+T
 </pre></div>
 </div>
 <p>用 CMUCL 的拓展 <strong>macroexpand-all</strong> （一个完成的代码遍历器组件），可以看到
 <strong>cxr%</strong> 结构的完整展开：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (walker:macroexpand-all
-<span class="linenos">2</span>    &#39;(cxr% (1 a 2 d) some-list))
-<span class="linenos">3</span>(CAR (CDR (CDR SOME-LIST)))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (walker:macroexpand-all
+    &#39;(cxr% (1 a 2 d) some-list))
+(CAR (CDR (CDR SOME-LIST)))
 </pre></div>
 </div>
 <p>多亏了我们出色的 lisp 编译器，就意图和目的而言，<strong>cxr%</strong> 的使用和 <strong>caddr</strong> 与 <strong>third</strong> 一样。</p>
@@ -861,39 +857,39 @@ A 或 D 字符被替换为 X。 在 <strong>cxr%</strong> 中，第一个参数�
 <p>为了解决这两个问题，我们添加了个替代展开。如果 A 或 D 前面的参数不是整型的话，就会调用
 新的操作，而且，如果我们不想内联大量的 <strong>car</strong> 或 <strong>cdr</strong>，也可以选择调用新的操作。任选内联
 阈值为 10，这个新的操作由 <strong>cxr</strong> 宏提供。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defvar cxr-inline-thresh 10)
-<span class="linenos"> 2</span>
-<span class="linenos"> 3</span>(defmacro! cxr (x tree)
-<span class="linenos"> 4</span>  (if (null x)
-<span class="linenos"> 5</span>    tree
-<span class="linenos"> 6</span>    (let ((op (cond
-<span class="linenos"> 7</span>                ((eq &#39;a (cadr x)) &#39;car)
-<span class="linenos"> 8</span>                ((eq &#39;d (cadr x)) &#39;cdr)
-<span class="linenos"> 9</span>                (t (error &quot;Non A/D symbol&quot;)))))
-<span class="linenos">10</span>      (if (and (integerp (car x))
-<span class="linenos">11</span>              (&lt;= 1 (car x) cxr-inline-thresh))
-<span class="linenos">12</span>        (if (= 1 (car x))
-<span class="linenos">13</span>          `(,op (cxr ,(cddr x) ,tree))
-<span class="linenos">14</span>          `(,op (cxr ,(cons (- (car x) 1) (cdr x))
-<span class="linenos">15</span>                    ,tree)))
-<span class="linenos">16</span>        `(nlet-tail
-<span class="linenos">17</span>          ,g!name ((,g!count ,(car x))
-<span class="linenos">18</span>                  (,g!val (cxr ,(cddr x) ,tree)))
-<span class="linenos">19</span>          (if (&gt;= 0 ,g!count)
-<span class="linenos">20</span>            ,g!val
-<span class="linenos">21</span>            ;; Will be a tail:
-<span class="linenos">22</span>            (,g!name (- ,g!count 1)
-<span class="linenos">23</span>                    (,op ,g!val))))))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defvar cxr-inline-thresh 10)
+
+(defmacro! cxr (x tree)
+  (if (null x)
+    tree
+    (let ((op (cond
+                ((eq &#39;a (cadr x)) &#39;car)
+                ((eq &#39;d (cadr x)) &#39;cdr)
+                (t (error &quot;Non A/D symbol&quot;)))))
+      (if (and (integerp (car x))
+              (&lt;= 1 (car x) cxr-inline-thresh))
+        (if (= 1 (car x))
+          `(,op (cxr ,(cddr x) ,tree))
+          `(,op (cxr ,(cons (- (car x) 1) (cdr x))
+                    ,tree)))
+        `(nlet-tail
+          ,g!name ((,g!count ,(car x))
+                  (,g!val (cxr ,(cddr x) ,tree)))
+          (if (&gt;= 0 ,g!count)
+            ,g!val
+            ;; Will be a tail:
+            (,g!name (- ,g!count 1)
+                    (,op ,g!val))))))))
 </pre></div>
 </div>
 <p>使用 <strong>cxr</strong>，我们可以直接根据 <strong>car</strong> 和 <strong>cdr</strong> 的显示指定来设计 <strong>nthcdr</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun nthcdr% (n list)
-<span class="linenos">2</span>  (cxr (n d) list))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun nthcdr% (n list)
+  (cxr (n d) list))
 </pre></div>
 </div>
 <p>同样的，<strong>nth</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun nth% (n list)
-<span class="linenos">2</span>  (cxr (1 a n d) list))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defun nth% (n list)
+  (cxr (1 a n d) list))
 </pre></div>
 </div>
 <p>因为编写宏是个迭代的、分层次的过程，我们经常驱使自己使用组合或结合之前实现的宏。
@@ -901,16 +897,16 @@ A 或 D 字符被替换为 X。 在 <strong>cxr%</strong> 中，第一个参数�
 <strong>nlet-tail</strong> 很方便，因为它可以给迭代构造命名，同时，因为我们只计划将迭代作为
 尾调用，就能保证使用它而避免不必要的堆栈消耗。</p>
 <p>下面是 <strong>xcr</strong> 在 <strong>nthcdr%</strong> 中的展开：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
-<span class="linenos"> 2</span>  &#39;(cxr (n d) list))
-<span class="linenos"> 3</span>(LET ()
-<span class="linenos"> 4</span>  (NLET-TAIL #:NAME1632
-<span class="linenos"> 5</span>            ((#:COUNT1633 N)
-<span class="linenos"> 6</span>              (#:VAL1634 (CXR NIL LIST)))
-<span class="linenos"> 7</span>    (IF (&gt;= 0 #:COUNT1633)
-<span class="linenos"> 8</span>      #:VAL1634
-<span class="linenos"> 9</span>      (#:NAME1632 (- #:COUNT1633 1)
-<span class="linenos">10</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(cxr (n d) list))
+(LET ()
+  (NLET-TAIL #:NAME1632
+            ((#:COUNT1633 N)
+              (#:VAL1634 (CXR NIL LIST)))
+    (IF (&gt;= 0 #:COUNT1633)
+      #:VAL1634
+      (#:NAME1632 (- #:COUNT1633 1)
+T
 </pre></div>
 </div>
 <p>注意，复杂的宏展开的代码通常是程序员从不会去写的。特别要注意 <strong>nil cxrs</strong> 的使用
@@ -918,24 +914,24 @@ A 或 D 字符被替换为 X。 在 <strong>cxr%</strong> 中，第一个参数�
 <p>因为宏可以让用户看到更多的展开，所以显示定义在其他语言中是不可能实现的。例如，
 根据 <strong>cxr</strong> 的设计，当 A 和 D 前面的整数小于 <strong>cxr-inline-thresh</strong> 的参数时，
 <strong>car</strong> 和 <strong>cdr</strong> 的调用会被内联：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand &#39;(cxr (9 d) list))
-<span class="linenos">2</span>(LET ()
-<span class="linenos">3</span>  (CDR (CXR (8 D) LIST)))
-<span class="linenos">4</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand &#39;(cxr (9 d) list))
+(LET ()
+  (CDR (CXR (8 D) LIST)))
+T
 </pre></div>
 </div>
 <p>但多亏了 <strong>cxr</strong> 的显示定义，我们可以传递一个值，尽管它本身不是整数，但在计算时将
 成为整数。当我们这么做时，我们知道不会有内联，因为这个宏会变成 <strong>nlet-tail</strong> 展开。
 计算一个整数最简单的结构就是将那个整数引起来：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand &#39;(cxr (&#39;9 d) list))
-<span class="linenos">2</span>(LET ()
-<span class="linenos">3</span>  (NLET-TAIL #:NAME1638
-<span class="linenos">4</span>            ((#:COUNT1639 &#39;9)
-<span class="linenos">5</span>              (#:VAL1640 (CXR NIL LIST)))
-<span class="linenos">6</span>    (IF (&gt;= 0 #:COUNT1639)
-<span class="linenos">7</span>      #:VAL1640
-<span class="linenos">8</span>      (#:NAME1638 (- #:COUNT1639 1)
-<span class="linenos">9</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand &#39;(cxr (&#39;9 d) list))
+(LET ()
+  (NLET-TAIL #:NAME1638
+            ((#:COUNT1639 &#39;9)
+              (#:VAL1640 (CXR NIL LIST)))
+    (IF (&gt;= 0 #:COUNT1639)
+      #:VAL1640
+      (#:NAME1638 (- #:COUNT1639 1)
+T
 </pre></div>
 </div>
 <p>通常我们会发现将宏组合起来很有用：<strong>cxr</strong> 可以展开成之前写的宏 <strong>nlet-tail</strong>。同样的，
@@ -954,21 +950,21 @@ A 或 D 字符被替换为 X。 在 <strong>cxr%</strong> 中，第一个参数�
 就能做到，就像之前展示的那样。用 <strong>defun</strong> 定义的 <strong>eleventh</strong> 函数与 ANSI 中定义的
 <strong>first</strong> 和 <strong>tenth</strong> 访问器没有差别。因为没有原语，我们可以在宏定义中使用所有的
 lisp，所以我们可以在宏定义中使用像 <strong>loop</strong> 和 <strong>format</strong> 这样的高级特性。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro def-english-list-accessors (start end)
-<span class="linenos"> 2</span>  (if (not (&lt;= 1 start end))
-<span class="linenos"> 3</span>    (error &quot;Bad start/end range&quot;))
-<span class="linenos"> 4</span>  `(progn
-<span class="linenos"> 5</span>    ,@(loop for i from start to end collect
-<span class="linenos"> 6</span>        `(defun
-<span class="linenos"> 7</span>          ,(symb
-<span class="linenos"> 8</span>            (map &#39;string
-<span class="linenos"> 9</span>                (lambda (c)
-<span class="linenos">10</span>                    (if (alpha -char -p c)
-<span class="linenos">11</span>                      (char-upcase c)
-<span class="linenos">12</span>                      #\ -))
-<span class="linenos">13</span>                (format nil &quot;~:r&quot; i)))
-<span class="linenos">14</span>          (arg)
-<span class="linenos">15</span>          (cxr (1 a ,(- i 1) d) arg)))))
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(defmacro def-english-list-accessors (start end)
+  (if (not (&lt;= 1 start end))
+    (error &quot;Bad start/end range&quot;))
+  `(progn
+    ,@(loop for i from start to end collect
+        `(defun
+          ,(symb
+            (map &#39;string
+                (lambda (c)
+                    (if (alpha -char -p c)
+                      (char-upcase c)
+                      #\ -))
+                (format nil &quot;~:r&quot; i)))
+          (arg)
+          (cxr (1 a ,(- i 1) d) arg)))))
 </pre></div>
 </div>
 <p>宏 <strong>def-english-list-accessors</strong> 使用格式字符串 <strong>“~:r”</strong> 将数字 <strong>i</strong> 转换为
@@ -981,20 +977,20 @@ lisp，所以我们可以在宏定义中使用像 <strong>loop</strong> 和 <str
 <p>终于，我们可以自定义缺少的必要的访问器了。在其他语言中，这通常意味着大量的
 复制粘贴，或者可能是一些特殊情况下的代码生成脚本，而这两者都不是特别优雅。
 但在 lisp 中，我们有宏：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
-<span class="linenos"> 2</span>  &#39;(def-english-list-accessors 11 20))
-<span class="linenos"> 3</span>(PROGN
-<span class="linenos"> 4</span>  (DEFUN ELEVENTH (ARG) (CXR (1 A 10 D) ARG))
-<span class="linenos"> 5</span>  (DEFUN TWELFTH (ARG) (CXR (1 A 11 D) ARG))
-<span class="linenos"> 6</span>  (DEFUN THIRTEENTH (ARG) (CXR (1 A 12 D) ARG))
-<span class="linenos"> 7</span>  (DEFUN FOURTEENTH (ARG) (CXR (1 A 13 D) ARG))
-<span class="linenos"> 8</span>  (DEFUN FIFTEENTH (ARG) (CXR (1 A 14 D) ARG))
-<span class="linenos"> 9</span>  (DEFUN SIXTEENTH (ARG) (CXR (1 A 15 D) ARG))
-<span class="linenos">10</span>  (DEFUN SEVENTEENTH (ARG) (CXR (1 A 16 D) ARG))
-<span class="linenos">11</span>  (DEFUN EIGHTEENTH (ARG) (CXR (1 A 17 D) ARG))
-<span class="linenos">12</span>  (DEFUN NINETEENTH (ARG) (CXR (1 A 18 D) ARG))
-<span class="linenos">13</span>  (DEFUN TWENTIETH (ARG) (CXR (1 A 19 D) ARG)))
-<span class="linenos">14</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(def-english-list-accessors 11 20))
+(PROGN
+  (DEFUN ELEVENTH (ARG) (CXR (1 A 10 D) ARG))
+  (DEFUN TWELFTH (ARG) (CXR (1 A 11 D) ARG))
+  (DEFUN THIRTEENTH (ARG) (CXR (1 A 12 D) ARG))
+  (DEFUN FOURTEENTH (ARG) (CXR (1 A 13 D) ARG))
+  (DEFUN FIFTEENTH (ARG) (CXR (1 A 14 D) ARG))
+  (DEFUN SIXTEENTH (ARG) (CXR (1 A 15 D) ARG))
+  (DEFUN SEVENTEENTH (ARG) (CXR (1 A 16 D) ARG))
+  (DEFUN EIGHTEENTH (ARG) (CXR (1 A 17 D) ARG))
+  (DEFUN NINETEENTH (ARG) (CXR (1 A 18 D) ARG))
+  (DEFUN TWENTIETH (ARG) (CXR (1 A 19 D) ARG)))
+T
 </pre></div>
 </div>
 <p>能够创建这些英语访问器降低了 ANSI COMMON LISP 中只有十个访问器限制的影响。
@@ -1009,42 +1005,42 @@ lisp，所以我们可以在宏定义中使用像 <strong>loop</strong> 和 <str
 问题在于，与英文访问器不同，像 <strong>caddr</strong> 这样的组合函数，其深度的增加会导致
 需要定义的函数数量呈指数级增加。具体来说，可以使用函数 <strong>cxr-calculator</strong>
 找到需要定义的深度为 n 访问器数量。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun cxr-calculator (n)
-<span class="linenos">2</span>  (loop for i from 1 to n
-<span class="linenos">3</span>        sum (expt 2 i)))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">cxr-calculator</span><span class="w"> </span><span class="p">(</span><span class="nv">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">n</span><span class="w"></span>
+<span class="w">        </span><span class="nv">sum</span><span class="w"> </span><span class="p">(</span><span class="nb">expt</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="nv">i</span><span class="p">)))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>这里我们可以看到深度为 4 的组合需要有 30 种：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (cxr-calculator 4)
-<span class="linenos">2</span>
-<span class="linenos">3</span>30
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (cxr-calculator 4)
+
+30
 </pre></div>
 </div>
 <p>为了让你了解所需函数的数量增长有多快，参考下面这段代码：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (loop for i from 1 to 16
-<span class="linenos">2</span>        collect (cxr-calculator i))
-<span class="linenos">3</span>
-<span class="linenos">4</span>(2 6 14 30 62 126 254 510 1022 2046
-<span class="linenos">5</span>4094 8190 16382 32766 65534 131070)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (loop for i from 1 to 16
+        collect (cxr-calculator i))
+
+(2 6 14 30 62 126 254 510 1022 2046
+4094 8190 16382 32766 65534 131070)
 </pre></div>
 </div>
 <p>显然，要想 <strong>cxr</strong> 函数在深度上包含 <strong>car</strong> 和 <strong>cdr</strong> 的所有组合，我们需要一种
 不同于处理英文访问器问题的方法。定义 <strong>car</strong> 和 <strong>cdr</strong> 的所有组合到某个可行
 的深度是不行的。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun cxr-symbol-p (s)
-<span class="linenos"> 2</span>  (if (symbolp s)
-<span class="linenos"> 3</span>    (let ((chars (coerce
-<span class="linenos"> 4</span>                    (symbol -name s)
-<span class="linenos"> 5</span>                    &#39;list)))
-<span class="linenos"> 6</span>      (and
-<span class="linenos"> 7</span>        (&lt; 6 (length chars))
-<span class="linenos"> 8</span>        (char= #\C (car chars))
-<span class="linenos"> 9</span>        (char= #\R (car (last chars)))
-<span class="linenos">10</span>        (null (remove -if
-<span class="linenos">11</span>                (lambda (c)
-<span class="linenos">12</span>                  (or (char= c #\A)
-<span class="linenos">13</span>                      (char= c #\D)))
-<span class="linenos">14</span>                (cdr (butlast chars))))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">cxr-symbol-p</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">symbolp</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">chars</span><span class="w"> </span><span class="p">(</span><span class="nb">coerce</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="nc">symbol</span><span class="w"> </span><span class="nv">-name</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">                    </span><span class="ss">&#39;list</span><span class="p">)))</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">and</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">chars</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="sc">#\C</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">chars</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="sc">#\R</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="p">(</span><span class="nb">last</span><span class="w"> </span><span class="nv">chars</span><span class="p">)))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">null</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="nv">-if</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">c</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="nv">c</span><span class="w"> </span><span class="sc">#\A</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="nv">c</span><span class="w"> </span><span class="sc">#\D</span><span class="p">)))</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="p">(</span><span class="nb">butlast</span><span class="w"> </span><span class="nv">chars</span><span class="p">))))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>首先，我们应该对 <strong>cxr</strong> 符号定义有个明确的说明。<strong>cxr-symbol-p</strong> 是个简洁
@@ -1053,27 +1049,27 @@ lisp，所以我们可以在宏定义中使用像 <strong>loop</strong> 和 <str
 LISP 中定义了。</p>
 <p>接下来，因为我们打算用 <strong>cxr</strong> 来实现任意 <strong>car</strong> 和 <strong>cdr</strong> 组合的功能，所以创建了
 函数 <strong>cxr-symbol-to-cxr-list</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun cxr-symbol-to-cxr-list (s)
-<span class="linenos"> 2</span>  (labels ((collect (l)
-<span class="linenos"> 3</span>            (if l (list*
-<span class="linenos"> 4</span>                    1
-<span class="linenos"> 5</span>                    (if (char= (car l) #\A)
-<span class="linenos"> 6</span>                      &#39;A
-<span class="linenos"> 7</span>                      &#39;D)
-<span class="linenos"> 8</span>                    (collect (cdr l))))))
-<span class="linenos"> 9</span>  (collect
-<span class="linenos">10</span>    (cdr       ; chop off C
-<span class="linenos">11</span>      (butlast ; chop off R
-<span class="linenos">12</span>        (coerce
-<span class="linenos">13</span>            (symbol -name s)
-<span class="linenos">14</span>            &#39;list))))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">cxr-symbol-to-cxr-list</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">labels</span><span class="w"> </span><span class="p">((</span><span class="nv">collect</span><span class="w"> </span><span class="p">(</span><span class="nv">l</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nv">l</span><span class="w"> </span><span class="p">(</span><span class="nb">list*</span><span class="w"></span>
+<span class="w">                    </span><span class="mi">1</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">l</span><span class="p">)</span><span class="w"> </span><span class="sc">#\A</span><span class="p">)</span><span class="w"></span>
+<span class="w">                      </span><span class="ss">&#39;A</span><span class="w"></span>
+<span class="w">                      </span><span class="ss">&#39;D</span><span class="p">)</span><span class="w"></span>
+<span class="w">                    </span><span class="p">(</span><span class="nv">collect</span><span class="w"> </span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">l</span><span class="p">))))))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="nv">collect</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">cdr</span><span class="w">       </span><span class="c1">; chop off C</span><span class="w"></span>
+<span class="w">      </span><span class="p">(</span><span class="nb">butlast</span><span class="w"> </span><span class="c1">; chop off R</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">coerce</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nc">symbol</span><span class="w"> </span><span class="nv">-name</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="ss">&#39;list</span><span class="p">))))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>cxr-symbol-to-cxr-list</strong> 函数用来将 <strong>cxr</strong> 符号（由 <strong>cxr-symbol-p</strong> 定义）
 转换为一个可以用作 <strong>cxr</strong> 第一个参数的列表。下面是它的用法：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (cxr-symbol-to-cxr-list
-<span class="linenos">2</span>    &#39;caddadr)
-<span class="linenos">3</span>(1 A 1 D 1 D 1 A 1 D)
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (cxr-symbol-to-cxr-list
+    &#39;caddadr)
+(1 A 1 D 1 D 1 A 1 D)
 </pre></div>
 </div>
 <p>注意 <strong>cxr-symbol-to-cxr-list</strong> 中 <strong>list*</strong> 函数的用法。<strong>list*</strong> 基本和 <strong>list</strong>
@@ -1086,41 +1082,41 @@ LISP 中定义了。</p>
 程序对所提供的表达式进行代码遍历，方法与 [3.5 异常捕获]中的 <strong>defmacro/g!</strong> 宏一样。
 <strong>with -all-cxrs</strong> 找到所有满足 <strong>cxr-symbol-p</strong> 的符号，用 <strong>cxr</strong> 宏创建它们引用的函
 数，然后用标签形式将这些函数绑定到提供的代码周围。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro with-all-cxrs (&amp;rest forms)
-<span class="linenos"> 2</span>  `(labels
-<span class="linenos"> 3</span>    (,@(mapcar
-<span class="linenos"> 4</span>        (lambda (s)
-<span class="linenos"> 5</span>          `(,s (l)
-<span class="linenos"> 6</span>            (cxr ,(cxr-symbol-to-cxr-list s)
-<span class="linenos"> 7</span>                  l)))
-<span class="linenos"> 8</span>        (remove -duplicates
-<span class="linenos"> 9</span>          (remove-if-not
-<span class="linenos">10</span>            #&#39;cxr-symbol-p
-<span class="linenos">11</span>      ,@forms))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">defmacro</span><span class="w"> </span><span class="nv">with-all-cxrs</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">forms</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">labels</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="o">,@</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="o">`</span><span class="p">(</span><span class="o">,</span><span class="nv">s</span><span class="w"> </span><span class="p">(</span><span class="nv">l</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nv">cxr</span><span class="w"> </span><span class="o">,</span><span class="p">(</span><span class="nv">cxr-symbol-to-cxr-list</span><span class="w"> </span><span class="nv">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="nv">l</span><span class="p">)))</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="nv">-duplicates</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="nb">remove-if-not</span><span class="w"></span>
+<span class="w">            </span><span class="nf">#&#39;</span><span class="nv">cxr-symbol-p</span><span class="w"></span>
+<span class="w">      </span><span class="o">,@</span><span class="nv">forms</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>现在可以在传给 <strong>with-all-cxrs</strong> 的结构中封装表达式，并假定这些表达式可以访问任何
 可能的 <strong>cxr</strong> 函数。如果我们想的话，我们可以很简单的返回这些函数然后用在别处：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (with-all-cxrs #&#39;cadadadadadr)
-<span class="linenos">2</span>
-<span class="linenos">3</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (with-all-cxrs #&#39;cadadadadadr)
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>或者，如下面的宏展开所示，我们可以用这个无限类嵌入任意复杂的 lisp 代码:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
-<span class="linenos"> 2</span>  &#39;(with-all-cxrs
-<span class="linenos"> 3</span>      (cons
-<span class="linenos"> 4</span>        (cadadadr list)
-<span class="linenos"> 5</span>        (caaaaaaaar list))))
-<span class="linenos"> 6</span>(LABELS
-<span class="linenos"> 7</span>  ((CADADADR (L)
-<span class="linenos"> 8</span>    (CXR (1 A 1 D 1 A 1 D 1 A 1 D) L))
-<span class="linenos"> 9</span>  (CAAAAAAAAR (L)
-<span class="linenos">10</span>    (CXR (1 A 1 A 1 A 1 A 1 A 1 A 1 A 1 A) L)))
-<span class="linenos">11</span>  (CONS
-<span class="linenos">12</span>    (CADADADR LIST)
-<span class="linenos">13</span>    (CAAAAAAAAR LIST)))
-<span class="linenos">14</span>T
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (macroexpand
+  &#39;(with-all-cxrs
+      (cons
+        (cadadadr list)
+        (caaaaaaaar list))))
+(LABELS
+  ((CADADADR (L)
+    (CXR (1 A 1 D 1 A 1 D 1 A 1 D) L))
+  (CAAAAAAAAR (L)
+    (CXR (1 A 1 A 1 A 1 A 1 A 1 A 1 A 1 A) L)))
+  (CONS
+    (CADADADR LIST)
+    (CAAAAAAAAR LIST)))
+T
 </pre></div>
 </div>
 <p>通常，一个听起来很难的任务，如定义无限个英文列表访问器和 <strong>car-cdr</strong> 组合，
@@ -1138,13 +1134,13 @@ LISP 中定义了。</p>
 来设计个方法，使其具有不同的行为。例如，如果我们将第一个参数指定为表示所传递消息
 的符号，则可以基于第一个参数用简单的 <strong>case</strong> 语句提供多个行为。</p>
 <p>为实现一个具有增加和减少方法的计数器，可能会这样写：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((count 0))
-<span class="linenos">2</span>  (lambda (msg)
-<span class="linenos">3</span>    (case msg
-<span class="linenos">4</span>      ((:inc)
-<span class="linenos">5</span>        (incf count))
-<span class="linenos">6</span>      ((:dec)
-<span class="linenos">7</span>        (decf count)))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nb">count</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"></span>
+<span class="w">  </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">msg</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">case</span><span class="w"> </span><span class="nv">msg</span><span class="w"></span>
+<span class="w">      </span><span class="p">((</span><span class="ss">:inc</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">incf</span><span class="w"> </span><span class="nb">count</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="p">((</span><span class="ss">:dec</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="nb">decf</span><span class="w"> </span><span class="nb">count</span><span class="p">)))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p>注意，上述例子中使用了关键字符号，也就是冒号 <strong>:</strong> 开头的符号，通常计算这些符号用来
@@ -1153,93 +1149,93 @@ LISP 中定义了。</p>
 在运行时不会被解构。但是由于我们正在实现一个消息传递系统，这个系统会在运行时解构，
 所以我们将关键字处理操作留在运行时执行。如前所述，符号的解构是个高效的操作（仅仅
 是指针比较）。计数器例子在编译时，可能会被缩减为以下机器码：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>2FC:       MOV  EAX, [#x582701E4]  ; :INC
-<span class="linenos">2</span>302:       CMP  [EBP-12], EAX
-<span class="linenos">3</span>305:       JEQ  L3
-<span class="linenos">4</span>307:       MOV  EAX, [#x582701E8]  ; :DEC
-<span class="linenos">5</span>30D:       CMP  [EBP-12], EAX
-<span class="linenos">6</span>310:       JEQ  L2
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>2FC:       MOV  EAX, [#x582701E4]  ; :INC
+302:       CMP  [EBP-12], EAX
+305:       JEQ  L3
+307:       MOV  EAX, [#x582701E8]  ; :DEC
+30D:       CMP  [EBP-12], EAX
+310:       JEQ  L2
 </pre></div>
 </div>
 <p>但为了方便起见，我们要避免每创建个对象或类时都要编写一个对应的条件语句。这里就要
 用到宏了。我喜欢用的宏是 <strong>dlambda</strong>，他会展开成 lambda 结构。这个展开包括一种方法，
 这个方法可以根据应用的参数执行许多不同的代码分支。这种运行时解构的类型就是
 <strong>dlambda</strong> 名称的来源：它是 <strong>lambda</strong> 的解构或调度版本。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro! dlambda (&amp;rest ds)
-<span class="linenos"> 2</span>  `(lambda (&amp;rest ,g!args)
-<span class="linenos"> 3</span>    (case (car ,g!args)
-<span class="linenos"> 4</span>      ,@(mapcar
-<span class="linenos"> 5</span>          (lambda (d)
-<span class="linenos"> 6</span>            `(,(if (eq t (car d))
-<span class="linenos"> 7</span>                t
-<span class="linenos"> 8</span>                (list (car d)))
-<span class="linenos"> 9</span>            (apply (lambda ,@(cdr d))
-<span class="linenos">10</span>                  ,(if (eq t (car d))
-<span class="linenos">11</span>                      g!args
-<span class="linenos">12</span>                      `(cdr ,g!args)))))
-<span class="linenos">13</span>        ds))))
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nv">defmacro!</span><span class="w"> </span><span class="nv">dlambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="nv">ds</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="o">`</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="k">&amp;rest</span><span class="w"> </span><span class="o">,</span><span class="nv">g!args</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nb">case</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="o">,</span><span class="nv">g!args</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="o">,@</span><span class="p">(</span><span class="nb">mapcar</span><span class="w"></span>
+<span class="w">          </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="nv">d</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="o">`</span><span class="p">(</span><span class="o">,</span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">d</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="no">t</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">d</span><span class="p">)))</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="o">,@</span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="nv">d</span><span class="p">))</span><span class="w"></span>
+<span class="w">                  </span><span class="o">,</span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="no">t</span><span class="w"> </span><span class="p">(</span><span class="nb">car</span><span class="w"> </span><span class="nv">d</span><span class="p">))</span><span class="w"></span>
+<span class="w">                      </span><span class="nv">g!args</span><span class="w"></span>
+<span class="w">                      </span><span class="o">`</span><span class="p">(</span><span class="nb">cdr</span><span class="w"> </span><span class="o">,</span><span class="nv">g!args</span><span class="p">)))))</span><span class="w"></span>
+<span class="w">        </span><span class="nv">ds</span><span class="p">))))</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>dlambda</strong> 的第一个参数是个关键词符号。根据使用的关键字符号，<strong>dlambda</strong> 将执行相应
 的代码段。例如，我们最喜欢的闭包例子：简单的计数器，可以使用 <strong>dlambda</strong>，根据第一个
 参数增加或减少计数。这就是所谓的 <strong>let over dlambda</strong> 模式：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;count-test)
-<span class="linenos">2</span>    (let ((count 0))
-<span class="linenos">3</span>      (dlambda
-<span class="linenos">4</span>        (:inc () (incf count))
-<span class="linenos">5</span>        (:dec () (decf count)))))
-<span class="linenos">6</span>
-<span class="linenos">7</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;count-test)
+    (let ((count 0))
+      (dlambda
+        (:inc () (incf count))
+        (:dec () (decf count)))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>既可以递增</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :inc)
-<span class="linenos">2</span>
-<span class="linenos">3</span>1
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :inc)
+
+1
 </pre></div>
 </div>
 <p>也可以递减</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :dec)
-<span class="linenos">2</span>
-<span class="linenos">3</span>0
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :dec)
+
+0
 </pre></div>
 </div>
 <p>闭包取决于传递的第一个参数。尽管在上面的 let over dlambda 中为空，关键字符号后面
 的列表实际上是 lambda 析构列表。每个调度，或者说每个关键字参数，都可以有自己特定
 的 lambda 解构列表，就像下面对计数器闭包的增强:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (setf (symbol-function &#39;count-test)
-<span class="linenos"> 2</span>    (let ((count 0))
-<span class="linenos"> 3</span>      (dlambda
-<span class="linenos"> 4</span>        (:reset () (setf count 0))
-<span class="linenos"> 5</span>        (:inc (n) (incf count n))
-<span class="linenos"> 6</span>        (:dec (n) (decf count n))
-<span class="linenos"> 7</span>        (:bound (lo hi)
-<span class="linenos"> 8</span>          (setf count
-<span class="linenos"> 9</span>            (min hi
-<span class="linenos">10</span>                (max lo
-<span class="linenos">11</span>                      count)))))))
-<span class="linenos">12</span>
-<span class="linenos">13</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;count-test)
+    (let ((count 0))
+      (dlambda
+        (:reset () (setf count 0))
+        (:inc (n) (incf count n))
+        (:dec (n) (decf count n))
+        (:bound (lo hi)
+          (setf count
+            (min hi
+                (max lo
+                      count)))))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>现在，我们有几个不同的 lambda 解构列表可以使用，具体取决于第一个关键词参数，
 <strong>:reset</strong> 不需要参数，然后会将 <strong>count</strong> 置为 0：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :reset)
-<span class="linenos">2</span>
-<span class="linenos">3</span>0
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :reset)
+
+0
 </pre></div>
 </div>
 <p><strong>:inc</strong> 和 <strong>:dec</strong> 都接受数字参数，<strong>n</strong>：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :inc 100)
-<span class="linenos">2</span>
-<span class="linenos">3</span>100
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :inc 100)
+
+100
 </pre></div>
 </div>
 <p><strong>:bound</strong> 确保 <strong>count</strong> 的值时在边界值 <strong>lo</strong> 和 <strong>hi</strong> 之中。若 <strong>count</strong> 的值落在
 边界值之外，那么它会变成离该值较近的那个边界值：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :bound -10 10)
-<span class="linenos">2</span>
-<span class="linenos">3</span>10
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :bound -10 10)
+
+10
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1250,9 +1246,9 @@ LISP 中定义了。</p>
 <p><strong>dlambda</strong> 一个重要的属性是，它使用 lambda 进行所有的解构，因此保留了正常的
 错误检查和 COMMON LISP 环境中的调试（debugging）。例如，当只给 <strong>count-test</strong>
 一个参数时，就会直接得到个和 lambda 程序类似的报错：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :bond -10)
-<span class="linenos">2</span>
-<span class="linenos">3</span>ERROR: Wrong argument count, wanted 2 and got 1.
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (count-test :bond -10)
+
+ERROR: Wrong argument count, wanted 2 and got 1.
 </pre></div>
 </div>
 <p>特别是当 <strong>dlambda</strong> 嵌入到词法环境中形成个闭包，<strong>dlambda</strong> 可以让我们使用面向
@@ -1266,32 +1262,32 @@ lambda 表达式，因此，它的求值结果与对 <strong>lambda</strong> 求
 我们希望能够添加特殊情况的 <strong>dlambda</strong> 方法，而不改变其他代码调用接口的方式。</p>
 <p>如果说最后可能的方法是给定符号 <strong>t</strong> 而不是关键字参数，在没有发现任何特殊情况的
 关键字参数方法适用时，所提供的方法将始终被调用。以下是个特意编造的例子：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (setf (symbol-function &#39;dlambda-test)
-<span class="linenos">2</span>    (dlambda
-<span class="linenos">3</span>      (:something-special ()
-<span class="linenos">4</span>        (format t &quot;SPECIAL~%&quot;))
-<span class="linenos">5</span>      (t (&amp;rest args)
-<span class="linenos">6</span>        (format t &quot;DEFAULT: ~a~%&quot; args))))
-<span class="linenos">7</span>
-<span class="linenos">8</span>#&lt;Interpreted Function&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (setf (symbol-function &#39;dlambda-test)
+    (dlambda
+      (:something-special ()
+        (format t &quot;SPECIAL~%&quot;))
+      (t (&amp;rest args)
+        (format t &quot;DEFAULT: ~a~%&quot; args))))
+
+#&lt;Interpreted Function&gt;
 </pre></div>
 </div>
 <p>有了这个定义，调用该函数的主要方法就是调用默认情况。默认情况用了 lambda 解构
 参数的 <strong>&amp;rest</strong> 来接收所有可能的参数，我们可以通过提供更具体的 lambda 解构参数
 自由地缩小可接受的参数。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (dlambda-test 1 2 3)
-<span class="linenos">2</span>DEFAULT: (1 2 3)
-<span class="linenos">3</span>NIL
-<span class="linenos">4</span>* (dlambda-test)
-<span class="linenos">5</span>DEFAULT: NIL
-<span class="linenos">6</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (dlambda-test 1 2 3)
+DEFAULT: (1 2 3)
+NIL
+* (dlambda-test)
+DEFAULT: NIL
+NIL
 </pre></div>
 </div>
 <p>然而，尽管这个匿名函数的行为很像用默认情况定义的常规 lambda 结构，但我们可以
 传递一个关键字参数来调用这个特殊方法。</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (dlambda-test :something-special)
-<span class="linenos">2</span>SPECIAL
-<span class="linenos">3</span>NIL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* (dlambda-test :something-special)
+SPECIAL
+NIL
 </pre></div>
 </div>
 <p>一个关键特性(后面的章节将会大量利用)是，默认方法和所有特殊方法当然都是在包含
@@ -1311,7 +1307,7 @@ lambda 表达式，因此，它的求值结果与对 <strong>lambda</strong> 求
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang.</p>
+    <p>&#169; Copyright 2021-2022, Yuqi Liu, Xuting Yang, Chuangxiu Chen.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

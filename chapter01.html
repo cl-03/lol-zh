@@ -234,7 +234,7 @@ Doug Hoyte
 <p>由于讨论宏涉及到讨论本身，所以需要明确本书采用的格式约定。正如你正在阅读和领会到
 的所传达给你的那样，我现在所写的本身就是个值得规范化和分析的表达式系统。</p>
 <p>没有人比 Haskell Curry <a class="footnote-reference brackets" href="#id6" id="id5">1</a> 更了解这一点。这是因为 Curry 不仅想将思想形式化，
-甚至还有思想的表达。他认为把作者与读者之间交流的语言中的概念抽象出来是有必要的，并
+甚至还有思想的表达也形式化。他认为把作者与读者之间交流的语言中的概念抽象出来是有必要的，并
 把它称为 U 语言。</p>
 <dl class="footnote brackets">
 <dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
@@ -244,11 +244,11 @@ Doug Hoyte
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>每一项研究,包括当前的研究都必须通过语言的方式从一个人传达给另一个人。在我们研究
 之初，关注这个明显的事实是可取的，即可以命名正在使用的语言，并明确说明它的几个
 特点。我们将把正在使用的语言称为 “ U 语言”。如果不是因为此语言比其
-他大多数人的语言和我们的工作更密切相关的事实，那么引起人们对它的关注是没有意义的。
+他大多数人的语言，和我们的工作更密切相关的事实，那么引起人们对它的关注是没有意义的。
 </pre></div>
 </div>
 <p>贯穿全书，我们将使用 <em>斜体</em> 来表示一些关键的概念和要点。用 <strong>粗体</strong> 来表示程序中的特殊结构、函数、宏和其他的标识符，不论它们有没有出现过。注意有些词有多种含义，例如 <strong>lambda</strong>
-是 COMMON LISP 的宏，而 <em>lambda</em> 是概念； <strong>let</strong> 既是特殊操作符，也是作为 <strong>let</strong> 形
+是 COMMON LISP 的宏，而 <em>lambda</em> 是概念； <strong>let</strong> 是特殊操作符，而 <em>let</em> 是作为形
 式体的列表 。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun example-program-listing()
 <span class="linenos">2</span>  &#39;(this is
@@ -256,9 +256,14 @@ Doug Hoyte
 <span class="linenos">4</span>      (listing)))))
 </pre></div>
 </div>
-<p>在本书中，新出现的程序代码都会单独的显示在”代码框”中。正如 <strong>example-program-listing</strong>
+<p>在本书中，新出现的程序代码都会单独的显示在 <em>代码框</em> 中。正如 <strong>example-program-listing</strong>
 函数的定义一样，代码是为重复使用而设计，或者为恰当地实现范例而设计的。但有时我们仅希
-望展示一点代码的使用，或者只是想去讨论一些与书面文本不脱离太多的表达式的特性。在这些情况下，代码或代码的使用示例将像这样出现</p>
+望展示一点代码的使用，或者只是想去讨论一些与书面文本 <sup>【4】</sup> 不脱离太多的表达式的特性。在这些情况下，代码或代码的使用示例将像这样出现</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>【4】
+这是一种脚注，与主体相关但更简洁偏离主题。</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(this is
 <span class="linenos">2</span>  (demonstration code))
 </pre></div>
@@ -266,9 +271,9 @@ Doug Hoyte
 <p>许多教学编程的文章都使用大量孤立的、设计好的例子来说明问题，但却忘了将其与现实相结合。
 本书试图用尽量少而直接的例子来说明宏观的编程思想。有些文章试图在例子中使用可爱、古怪
 的标识符名称或肤浅的类比来掩盖其无趣。但我们的例子只是为了说明观点。也就是说，这本书
-首先试图不使自己（或任何东西）太严肃。这里有幽默，不同的是，你需要去寻找它。
+首先试图不使自己（或任何东西）太严肃。不同的是，其中的幽默需要你自己去发现。
 由于 lisp 的交互性质，其计算一个简单表达式的结果往往比等量的 U 语言表达地要多。在这种情
-况下，我们将这样显示 COMMON LISP Read Evaluate Print Loop（称为 REPL ）的输出：</p>
+况下，我们将这样显示 COMMON LISP Read Evaluate Print Loop（称为 <em>REPL</em> ）的输出：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (this is
 <span class="linenos">2</span>    (the expression
 <span class="linenos">3</span>      (to evaluate)))
@@ -280,17 +285,25 @@ Doug Hoyte
 COMMON LISP 的一个特点。更确切地说，这个特点能使我们立即知道 LISP 文件以及任何屏
 幕内容是否已被 lisp 阅读器处理。星号（*）代表一个提示。星号（*）是一个理想的符号，因为它不会与输入字符相混淆，并且它的高像素数使它在REPL输出时更加突出。</p>
 <p>编写复杂的 lisp 宏是一个迭代的过程。没有人会用其在他语言程序中常见的轻率风格来写出一
-个长达几页的宏。一部分原因是 lisp 代码每页包含的信息比大多数其他语言多得多。另部分原
+个长达几页的宏。一部分原因是 lisp 代码每页包含的信息比大多数其他语言多得多。另外部分原
 因是 lisp 技术鼓励程序员发展他们的程序：根据应用的需要，通过一系列的指定的增强来完善它们。</p>
 <p>本书将 lisp 的类型，如 COMMON LISP， Scheme ，同更抽象的 lisp 组成要素进行了区分。还介绍了 lisp 编程语言和非 lisp 编程语言之间的区别。当需要谈论非 lisp 语言时，会避免直接指明语言名字以减少树敌。为了做到这一点，我们采用了下面这个不寻常的定义。</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>没有 lisp 宏的语言就是 Blub。
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>没有 lisp 宏的语言就是 *Blub*。
 </pre></div>
 </div>
 <p>U 语言中的 Blub 一词来自 Paul Graham 的一篇文章 <a class="reference external" href="http://www.paulgraham.com/avg.html">Beating the Averages</a>，
 Blub 是一种隐喻，用来强调 lisp 与其他语言不同的事实。 Blub 的特征有中缀语法、烦人的类型
 系统和残缺的对象系统，但不同 blub 的唯一统一的特征是没有 lisp 宏。 Blub 术语很有用，
 因为有时理解一个高级宏的最简单方法就是考虑为什么这个技术在 Blub 中不可能实现。 Blub
-术语的目的不是为了取笑非 lisp 语言。</p>
+术语的目的不是为了取笑非 lisp 语言 <sup>【5】</sup> 。</p>
+<blockquote>
+<div><p><sup>【4】</sup></p>
+</div></blockquote>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>【5】
+是有一点诙谐。</p>
+</div>
 <p>为了说明写宏的迭代过程，本书采用了这样的惯例：在定义不完整或尚未以其他方式改进的函数
 和宏的名称后面加上百分数（%）字符。在确定最终版本之前，多次修订可能会导致一个名称的末
 尾出现多个 % 字符。</p>
@@ -302,11 +315,10 @@ Blub 是一种隐喻，用来强调 lisp 与其他语言不同的事实。 Blub 
 <span class="linenos">6</span>  t)
 </pre></div>
 </div>
-<p>Curry 将宏描述为“元编程（ metaprogramming ）”。元编程的唯一目的是使程序员能够更好地编
+<p>Curry 将宏描述为 <em>元编程</em> <sup>（2）</sup> 。元编程的唯一目的是使程序员能够更好地编
 写软件。尽管元编程在所有的编程语言都被不同程度地采用，但没有一种语言像 lisp 那
-样彻底地采用了它。没有其他语言中的程序员需要用编译元编程技术的方式写代码。这就是
-为什么 lisp 程序在非 lisp 程序员看来很奇怪： lisp 代码如何表达是其元编程需求的直接
-结果。正如本书试图描述的那样， lisp 的这一设计决定–在 lisp 本身中编写元程序，使得
+样彻底地采用了它。其他语言中的程序员写代码没有如此便捷的元编程技术可用。这就是
+为什么 lisp 程序在非 lisp 程序员看来 <em>很奇怪</em> ： lisp 代码如何表达直接源于其元编程需求。正如本书试图描述的那样， lisp 的这一设计决定–在 lisp 本身中编写元程序，使得
 lisp 具有惊人的生产力优势。然而，由于我们在 lisp 中创建元程序，我们必须牢记元编程
 与 U 语言规范不同。我们可以从不同的角度讨论元语言包括其他的元语言，但只有一种 U 语言。 Curry 为他的 U 语言明确了这一点</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>我们可以形成具有任何数量级别的语言层次结构。然而，无论有多少个层次，U语言都将是
@@ -314,8 +326,13 @@ lisp 具有惊人的生产力优势。然而，由于我们在 lisp 中创建元
  类推。因此，U语言和元语言这两个术语必须保持区别。
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（2）
+metaprogramming</p>
+</div>
 <p>当然，这是本关于 lisp 的书，而 lisp 的逻辑系统与 Curry 描述的非常不同，所以我们将少
-量采用他作品中的其他约定。但 Curry 对逻辑和元编程的贡献至今仍激励着我们。这不仅是因为他对符号引文有深刻的见解，而且还因为他的 U 语言措辞优美，执行高效。</p>
+量采用他作品中的其他约定。但 Curry 对逻辑和元编程的贡献至今仍激励着我们。这不仅是因为他对符号引文的洞见，而且还因为他的 U 语言措辞优美，执行高效。</p>
 </section>
 <section id="lisp">
 <span id="lisp-utility"></span><h3>1.3 Lisp 实用程序<a class="headerlink" href="#lisp" title="Permalink to this heading"></a></h3>

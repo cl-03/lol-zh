@@ -46,9 +46,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#environments-and-extent">2.2 环境及拓展</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lexical-and-dynamic-scope">2.3 词法作用域与动态作用域</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#let-lambda-14">2.4 Let 是 Lambda  <sup>（14）</sup></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#let-over-lambda-lambda-let">2.5 Let Over Lambda（封闭 Lambda 的 Let ）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#lambda-over-let-over-lambda-lambda-let-lambda">2.6 Lambda Over Let Over Lambda（封闭“封闭 Lambda 的 Let ”的 Lambda ）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#let-over-lambda-over-let-over-lambda-lambda-let-lambda-let">2.7 Let Over Lambda Over Let Over Lambda（封闭“”封闭“封闭 Lambda 的 Let ”的 Lambda“”的 Let ）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#let-over-lambda-20">2.5 Let Over Lambda <sup>（20）</sup></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lambda-over-let-over-lambda-23">2.6 Lambda Over Let Over Lambda <sup>（23）</sup></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#let-over-lambda-over-let-over-lambda-26">2.7 Let Over Lambda Over Let Over Lambda <sup>（26）</sup></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="chapter03.html">第三章：宏基础</a></li>
@@ -529,11 +529,16 @@ lambda 折叠 lambda folding</p>
 闭包也将被编译[ON-LISP-P25]。</p>
 <p>使用上述封闭 lambda 的 let 非常重要，我们将在本章的剩余部分中讨论它的模式和变体。</p>
 </section>
-<section id="let-over-lambda-lambda-let">
-<span id="let-over-lambda"></span><h2>2.5 Let Over Lambda（封闭 Lambda 的 Let ）<a class="headerlink" href="#let-over-lambda-lambda-let" title="Permalink to this heading"></a></h2>
+<section id="let-over-lambda-20">
+<span id="let-over-lambda"></span><h2>2.5 Let Over Lambda <sup>（20）</sup><a class="headerlink" href="#let-over-lambda-20" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（20）
+可理解为封闭 Lambda 的 Let 形式体</p>
+</div>
 <p><em>Let over lambda</em> 是词法闭包的昵称。 Let over lambda 比大多数术语更清晰地反映用于创建闭包
 的 lisp 代码。在 let over lambda 场景中， <strong>let</strong> 语句返回的最后一个结构是一个 <strong>lambda</strong>
-表达式。它看起来就像 <strong>let</strong> 坐在 <strong>lambda</strong> 之上：</p>
+表达式。它看起来就像 <strong>let</strong> 封闭在 <strong>lambda</strong> 之外：</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="go">* (let ((x 0))</span>
 <span class="linenos">2</span><span class="go">    (lambda () x))</span>
 <span class="linenos">3</span>
@@ -541,10 +546,14 @@ lambda 折叠 lambda folding</p>
 </pre></div>
 </div>
 <p>回顾一下， <strong>let</strong> 结构返回计算其主体内最后一个结构的结果，这就是为什么计算这个 let over
-lambda 结构会产生一个函数。但是， <strong>let</strong> 中的最后一个结构有特别之处。它是个以 <strong>x</strong> 作为自
-由变量的 <strong>lambda</strong> 结构。 Lisp 很聪明，针对这个产生的函数， lisp 可以确定自由变量 <strong>x</strong> 应该引用什么：即来自由
-<strong>let</strong> 结构创建的周围词法环境的 <strong>x</strong> 。而且，因为在 lisp 中，默认情况下一切都是没限定范围的，只
-要需要，该函数就可以使用这个环境。</p>
+lambda 结构会产生一个函数。但是， <strong>let</strong> 中的最后一个结构有特别之处。它是个以 <strong>x</strong> 作为 <em>自
+由变量</em> <sup>（21）</sup> 的 <strong>lambda</strong> 结构。 Lisp 很聪明，针对这个产生的函数， lisp 可以确定自由变量 <strong>x</strong> 应该引用什么：即来自由
+<strong>let</strong> 结构创建的周围词法环境的 <strong>x</strong> 。而且，因为在 lisp 中，默认情况下一切都是不限定范围的，一旦需要，该函数就可以使用这个环境。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（21）
+自由变量 free variable</p>
+</div>
 <p>因此，词法作用域是一种工具，用于准确指定对变量的引用在何处有效，以及引用所指的确切内容。一个简单
 的闭包示例是一个“计数器”，一个在环境中存储整数并在每次调用时递增并返回其值的闭包。下面是使用 let
 over lambda 技术的典型的实现：</p>
@@ -552,11 +561,16 @@ over lambda 技术的典型的实现：</p>
 <span class="linenos">2</span>  (lambda () (incf counter)))
 </pre></div>
 </div>
-<p>这个闭包在第一次被调用时返回 1，随后返回 2，以此类推。考虑闭包的一种方式是它们是具有状态的函
+<p>这个闭包在第一次被调用时返回 1，随后返回 2，以此类推。考虑闭包的一种方式是它们是具有 <em>状态</em> <sup>（22.1）</sup> 的函
 数。这些函数不是数学函数，而是程序，每个都有一点自己的内存。有时将代码和数据捆绑在一起的数据结构
-称为“对象”。对象是程序和一些相关状态的集合。由于对象与闭包密切相关，因此它们通常可以被认为是一回
+称为 <em>对象</em> <sup>（22.2）</sup> 。对象是程序和一些相关状态的集合。由于对象与闭包密切相关，因此它们通常可以被认为是一回
 事。闭包就像个只有一个方法的对象，这个方法是（ <strong>funcall</strong> ）。一个对象就像一个闭包，你可以使用 <strong>funcall</strong> ，通过多种方式调
 用它。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（22）
+状态 state；对象 objects</p>
+</div>
 <p>尽管闭包总是单个函数及其封闭环境，但对象系统的多个方法、内部类和静态变量都有其对应的闭包。模拟多
 个方法的一种可能方式是简单地从同一词法作用域内返回多个 <strong>lambda</strong> ：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(let ((counter 0))
@@ -570,8 +584,13 @@ over lambda 技术的典型的实现：</p>
 论的 <strong>dlambda</strong> 。基于后续会解释的一些原因，本书中的代码将使用闭包而不是对象来构造所有数据。提示：
 它必然与宏有关。</p>
 </section>
-<section id="lambda-over-let-over-lambda-lambda-let-lambda">
-<span id="lambda-over-letoverlambda"></span><h2>2.6 Lambda Over Let Over Lambda（封闭“封闭 Lambda 的 Let ”的 Lambda ）<a class="headerlink" href="#lambda-over-let-over-lambda-lambda-let-lambda" title="Permalink to this heading"></a></h2>
+<section id="lambda-over-let-over-lambda-23">
+<span id="lambda-over-letoverlambda"></span><h2>2.6 Lambda Over Let Over Lambda <sup>（23）</sup><a class="headerlink" href="#lambda-over-let-over-lambda-23" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（23）
+可理解为封闭“封闭 Lambda 形式体的 Let ”的 Lambda 形式体</p>
+</div>
 <p>在一些对象系统中，对象、具有关联状态的过程集合和类（用于创建对象的数据结构）之间存在明显区别。闭
 包不存在这种区别。我们看到了可以执行以创建闭包的结构示例，其中大多数遵循 lambda 模式，但是我们的程序
 如何根据需要创建这些对象？</p>
@@ -586,7 +605,12 @@ over lambda 技术的典型的实现：</p>
 lambda 表达式是常量：仅仅是指向机器代码的指针集。这个表达式是一段简单的代码，它创建新的环境来封闭内部的 <strong>lambda</strong> 表达式（这个 <strong>lambda</strong> 表达式本身是一个常量，编译后的形式），就像我们在 REPL 中所做的那样。</p>
 <p>对于对象系统，创建对象的一段代码称为类。但是 lambda over let over lambda 与许多语言的类略
 有不同。虽然大多数语言都需要命名类，但这种模式完全避免了命名。 Lambda over let over lambda
-形式可以称为匿名类。</p>
+形式可以称为 <em>匿名类</em> <sup>（24）</sup> 。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（24）
+匿名类 anonymous classes</p>
+</div>
 <p>尽管匿名类通常很有用，但我们通常会命名类。给它们命名的最简单方法是认识到这些类是常规函数。我们通
 常如何命名函数？ 当然是用 <strong>defun</strong> 关键字了。命名后，上面的匿名类就变成了：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun counter-class ()
@@ -594,8 +618,13 @@ lambda 表达式是常量：仅仅是指向机器代码的指针集。这个表�
 <span class="linenos">3</span>    (lambda () (incf counter))))
 </pre></div>
 </div>
-<p>第一个 <strong>lambda</strong> 去哪儿了？ <strong>defun</strong> 在其主体中的结构周围提供了个隐式 lambda 。当用
+<p>第一个 <strong>lambda</strong> 去哪儿了？ <strong>defun</strong> 在其主体中的结构周围提供了个 <em>隐式 lambda</em> <sup>（25）</sup> 。。当用
 <strong>defun</strong> 编写常规函数时，实际上还是 lambda 结构，但这个事实隐藏在 <strong>defun</strong> 语法之下了。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（25）
+隐式 lambda：implicit lambda</p>
+</div>
 <p>不幸的是，大多数 lisp 编程书籍都没有提供闭包使用的实际示例，给读者留下了一种不准确的印象，即
 闭包只适用于像计数器这样的玩具示例。这与事实相去甚远。闭包是 lisp 的基石。环境，在这些环境中定
 义的函数，以及像 <strong>defun</strong> 这样方便使用的宏，是建模任何问题都需要的。本书旨在阻止那些习惯
@@ -642,11 +671,48 @@ lambda 的很好演示。下面是它使用，假装是某种留意特定的单�
 </pre></div>
 </div>
 </section>
-<section id="let-over-lambda-over-let-over-lambda-lambda-let-lambda-let">
-<span id="letoverlambda-over-letoverlambda"></span><h2>2.7 Let Over Lambda Over Let Over Lambda（封闭“”封闭“封闭 Lambda 的 Let ”的 Lambda“”的 Let ）<a class="headerlink" href="#let-over-lambda-over-let-over-lambda-lambda-let-lambda-let" title="Permalink to this heading"></a></h2>
-<p>对象系统的用户将他们希望在某个类的所有对象之间共享的值存储到所谓的类变量或静态变量中（术语静态是最重载的编程语言术语之一。类的所有对象共享的变量在 Java 等语言中称为静态变量，这与 C 中静态的含义有很大关系）。在 lisp
+<section id="let-over-lambda-over-let-over-lambda-26">
+<span id="letoverlambda-over-letoverlambda"></span><h2>2.7 Let Over Lambda Over Let Over Lambda <sup>（26）</sup><a class="headerlink" href="#let-over-lambda-over-let-over-lambda-26" title="Permalink to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（26）
+可理解为封闭“封闭“封闭 Lambda 形式体的 Let ”的 Lambda 形式体”的 Let 。译者建议掰开来理解，这样可体会其内涵，即形式体最外围是 let 形式体还是 lambda 形式体。在具体应用时用户会体会到细微的差别。例如下面代码</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>CL-USER&gt;  (defvar x 4)
+<span class="linenos"> 2</span>X
+<span class="linenos"> 3</span>CL-USER&gt; (let ((x 1))
+<span class="linenos"> 4</span>    (defun add-x (y)
+<span class="linenos"> 5</span>      (+ x y)))
+<span class="linenos"> 6</span>ADD-X
+<span class="linenos"> 7</span>CL-USER&gt; (add-x 3)
+<span class="linenos"> 8</span>8
+<span class="linenos"> 9</span>CL-USER&gt; (add-x 3)
+<span class="linenos">10</span>8
+<span class="linenos">11</span>CL-USER&gt; (add-x 3)
+<span class="linenos">12</span>8
+<span class="linenos">13</span>CL-USER&gt; (defun addx (y)
+<span class="linenos">14</span>    (let ((x 1))
+<span class="linenos">15</span>      (+ x y)))
+<span class="linenos">16</span>ADDX
+<span class="linenos">17</span>CL-USER&gt; (addx 3)
+<span class="linenos">18</span>4
+<span class="linenos">19</span>CL-USER&gt; (addx 3)
+<span class="linenos">20</span>4
+</pre></div>
+</div>
+<p>对象系统的用户将他们希望在某个类的所有对象之间共享的值存储到所谓的 <em>类变量或静态变量</em> <sup>（27）</sup> 中 <sup>【8】</sup> 。在 lisp
 中，闭包之间共享状态的概念由环境处理，就像闭包本身存储状态一样。由于环境可以无限访问，只要仍然
 可以引用到它，就能保证它在需要时可用。</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>【8】
+术语静态是最重载的编程语言术语之一。类的所有对象共享的变量在 Java 等语言中称为静态变量，这与 C 中静态的含义有很大关系</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（27）
+类变量或静态变量 class variables or static variables</p>
+</div>
 <p>如果想为所有计数器维护一个全局方向， <strong>up</strong> 向上递增， <strong>down</strong> 向下递减，那么可能想要使用
 let over lambda over let over lambda 模式：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(let ((direction &#39;up))
@@ -669,11 +735,25 @@ let over lambda over let over lambda 模式：</p>
 名为 <strong>toggle-counter-direction</strong> 的函数来利用参数 direction 环境中的另一个 lambda ，该函数更改所有
 计数器的当前参数 direction 值。</p>
 <p>虽然 <strong>let</strong> 和 <strong>lambda</strong> 的这种组合非常有用，以至于其他语言以类或静态变量的形式将它采纳，但
-还有其他的 <strong>let</strong> 和 <strong>lambda</strong> 组合允许用没有直接类似物的方式在对象系统中 构造代码和状态（但这些类似物有时可以建立在对象系统之上）
-。对象系统是 let 和 lambda 组合子集的形式化，有时带有类似继承的噱头（拥有宏比拥有继承更重要）。正因为如此， lisp 程序员
+还有其他的 <strong>let</strong> 和 <strong>lambda</strong> 组合，允许用没有直接类似物的方式，在对象系统中构造代码和状态 <sup>【9】</sup> 。对象系统是 let 和 lambda 组合子集的形式化，有时带有类似 <em>继承</em> <sup>（28）</sup>  的噱头 <sup>【10】</sup> 。正因为如此， lisp 程序员
 通常不会考虑类和对象。 Let 和 lambda 是基本的； 对象和类是衍生物。正如 Steele（人名）所说，“对象”不必是
 编程语言中的原始概念。一旦可分配的值单元和好的旧有 lambda 表达式是可用的，对象系统充其量只是偶尔有用
 的抽象，并且，最糟糕的特殊情况（对象系统）是冗余的。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>【9】
+但这些类似物有时可以建立在对象系统之上</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>【10】
+拥有宏比拥有继承更重要</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（28）
+继承 inheritance</p>
+</div>
 </section>
 </section>
 

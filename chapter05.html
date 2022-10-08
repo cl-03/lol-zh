@@ -233,7 +233,7 @@ Lisp 更好的实现函数式语言的平台或工具。</p>
 结果，或者说更重要的是，与其他计算结果尽可能保持一致，都使用英里做单位。这是因为
 我们可以添加找到的最精确的转换因子，而不需要自己进行任何转换，宏让我们在其他语言
 中无法实现的表达式级别上构建转换例程。</p>
-<p>使用 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 异常捕获</span></a> 中的 <strong>gensym</strong> ，<strong>defunits%</strong> 就很容易编写。
+<p>使用 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中的 <strong>gensym</strong> ，<strong>defunits%</strong> 就很容易编写。
 Graham 的 <strong>symb</strong> 函数可以将转换宏生成个新的名字。例如，当 <strong>time</strong> 是内置的表示单位，
 那么转换宏就是 <strong>unit-of-time</strong>。 <strong>defunits%</strong> 是由最初定义的 <strong>unit-of-time</strong> 构建
 的，<strong>unit-of-time</strong> 是在 <a class="reference internal" href="chapter03.html#domain-specific"><span class="std std-ref">3.2 领域特定语言</span></a> 中定义的，在 <strong>defunits%</strong> 中，

@@ -791,7 +791,7 @@ Acc went negative
 </section>
 <section id="sub-lexical-scope">
 <span id="id5"></span><h2>6.6 子词法作用域<a class="headerlink" href="#sub-lexical-scope" title="Permalink to this heading"></a></h2>
-<p>在 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 异常捕获</span></a> 中定义的 <strong>defmacro!</strong> 宏中用了 Graham 的 <strong>flatten</strong> 实用工具来查找代
+<p>在 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中定义的 <strong>defmacro!</strong> 宏中用了 Graham 的 <strong>flatten</strong> 实用工具来查找代
 码中的自动 gensyms。现在是时候承认本书撒的一个小谎了。在此之前，因为没有解释自由变量插入和回
 指，我们假设 G-bang 符号名在 <strong>defmacro!</strong> 定义适用于宏定义的词法范围。实质上这是不对的 ——
 <strong>defmacro!</strong> 在略微不同类型的作用域（叫做 <em>子词法作用域 sub-lexical scope</em> ）下提供了这

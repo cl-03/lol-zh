@@ -1100,7 +1100,7 @@ cons 单元格。 Teitelman 没有发明一些 API 来满足每个人的需求�
 <span class="w">  </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">b</span><span class="p">))</span><span class="w"></span>
 </pre></div>
 </div>
-<p>Common Lisp 没有为监听或控制内存分配指定太多功能。 所以需要自己写一些。 首先，回顾 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 异常捕获</span></a>，
+<p>Common Lisp 没有为监听或控制内存分配指定太多功能。 所以需要自己写一些。 首先，回顾 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a>，
 我们不允许重新定义或重新绑定 Common Lisp 指定的函数。 我们不能直接拦截对 cons 的调
 用，所以改为使用包装器。 <strong>counting-cons</strong> 与 cons 相同，只是每次调用它时都会增加
 <strong>number-of-conses</strong>。</p>

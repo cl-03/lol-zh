@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="第五章：Programs that program" href="chapter05.html" />
+    <link rel="next" title="第五章：Programs that program （1）" href="chapter05.html" />
     <link rel="prev" title="第三章：宏基础" href="chapter03.html" /> 
 </head>
 
@@ -44,17 +44,15 @@
 <li class="toctree-l1"><a class="reference internal" href="chapter02.html">第二章：闭包</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter03.html">第三章：宏基础</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">第四章：读取宏 <sup>（1）</sup></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#runtime-at-readtime">4.1 读取时执行  <sup>（2）</sup></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#backquote">4.2 反引用</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reading-strings">4.3 读取字符串</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cl-ppcre">4.4 CL-PPCRE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cyclic-expressions">4.5 循环表达式</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reader-security">4.6 读取器的安全</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-at-readtime">4.1 读取时执行  <sup>（2）</sup></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#backquote">4.2 反引用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reading-strings">4.3 读取字符串</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cl-ppcre">4.4 CL-PPCRE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cyclic-expressions">4.5 循环表达式</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reader-security">4.6 读取器的安全</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="chapter05.html">第五章：Programs that program</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter05.html">第五章：Programs that program <sup>（1）</sup></a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter06.html">第六章：回指（Anaphoric）宏</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter07.html">第七章：宏的效率</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chapter08.html">第八章：Lisp 和 Forth</a></li>
@@ -195,8 +193,9 @@ lisp ，所以也许这些语言本质上也是 lisp 。 代码和数据、lisp 
 <span class="linenos">3</span>NIL ; unless you&#39;re really fast and lucky 除非你真的又快又幸运
 </pre></div>
 </div>
+</section>
 <section id="backquote">
-<span id="id3"></span><h3>4.2 反引用<a class="headerlink" href="#backquote" title="Permalink to this heading"></a></h3>
+<span id="id3"></span><h2>4.2 反引用<a class="headerlink" href="#backquote" title="Permalink to this heading"></a></h2>
 <p><em>反引号</em> <sup>（6.1）</sup>  ，有时也被叫做 <em>准引用</em> <sup>（6.2）</sup> <sup>【2】</sup> ，显示为 <strong>`</strong>  <sup>（7）</sup> ，是主流 lisp 编
 程相对较新的概念，而且这个概念对于 lisp 外的语言几乎是完全陌生的。</p>
 <div class="admonition hint">
@@ -388,7 +387,7 @@ quine 示例：</p>
 </div>
 </section>
 <section id="reading-strings">
-<span id="id4"></span><h3>4.3 读取字符串<a class="headerlink" href="#reading-strings" title="Permalink to this heading"></a></h3>
+<span id="id4"></span><h2>4.3 读取字符串<a class="headerlink" href="#reading-strings" title="Permalink to this heading"></a></h2>
 <p>在 lisp 中，字符串是由双引号 ( <strong>“</strong> ) 定界的字符。虽然字符串可以包含 lisp 实现的字符集中的任何字
 符，但你不能直接将某些特殊字符插入到字符串。如果要在字符串中插入双引号（ ” ）和反斜杠（ ），你需要在其前
 面加上反斜杠前缀 <cite>\</cite> 。 <cite>\</cite> 由被称为转义字符 <sup>（13）</sup> 。例如，以下是包含 <strong>“</strong> 和 <cite>\</cite> 的字符串：</p>
@@ -497,7 +496,7 @@ lisp <em>借鉴</em> <sup>（14）</sup> 的好想法。 从某种意义上说�
 </div>
 </section>
 <section id="cl-ppcre">
-<span id="id5"></span><h3>4.4 CL-PPCRE<a class="headerlink" href="#cl-ppcre" title="Permalink to this heading"></a></h3>
+<span id="id5"></span><h2>4.4 CL-PPCRE<a class="headerlink" href="#cl-ppcre" title="Permalink to this heading"></a></h2>
 <p>CL-PPCRE[CL-PPCRE] 是一个基于 COMMON LISP 编写的高性能正则表达式库。 是由备受尊崇的 lisp 黑
 客 Edi Weitz 创建的。代表所有从 CL-PPCRE 和 Edi Weitz 的其他软件中受益匪浅的 lisp 专业人
 士，本章节献给 Edi Weitz 。 当其他人在争论时，Edi 在编码； 代码比争论更有说服力。</p>
@@ -716,7 +715,7 @@ Perl 中一样编写正则表达式——无需转义。 请参阅上面的&lt; 
 <strong>unread-char</strong> ，这在读取宏中很常见，以避免意外 <em>吞掉</em> 其他读取宏可能期望的字符。</p>
 </section>
 <section id="cyclic-expressions">
-<span id="id8"></span><h3>4.5 循环表达式<a class="headerlink" href="#cyclic-expressions" title="Permalink to this heading"></a></h3>
+<span id="id8"></span><h2>4.5 循环表达式<a class="headerlink" href="#cyclic-expressions" title="Permalink to this heading"></a></h2>
 <p>所有关于 lisp 程序是 cons 单元的树的讨论实际上都是一个小小的谎言。 对此很抱歉。 Lisp 程序实际
 上不是树，而是 <em>有向无环图</em> <sup>（19）</sup>  —— 具有可能共享分支的树。 由于执行者不关心所执行的分支来自哪里，因此执
 行具有共享结构的代码并没有错。</p>
@@ -825,7 +824,7 @@ Perl 中一样编写正则表达式——无需转义。 请参阅上面的&lt; 
 </div>
 </section>
 <section id="reader-security">
-<span id="id9"></span><h3>4.6 读取器的安全<a class="headerlink" href="#reader-security" title="Permalink to this heading"></a></h3>
+<span id="id9"></span><h2>4.6 读取器的安全<a class="headerlink" href="#reader-security" title="Permalink to this heading"></a></h2>
 <p>可扩展性，让原本不打算或未预期的事情发生的能力，几乎总是一件好事。 事实上，尽量鼓励可扩展性是
 lisp 这么出色的原因。 但是，有时我们希望事物尽可能不可扩展。 特别是，我们不希望外部人员在我们
 不知情或未经同意的情况下将他们自己扩展到我们的系统中。这被称为 <em>被黑客入侵</em> <sup>（21.1）</sup> 或 <em>被入侵</em> <sup>（21.2）</sup> 。 今天，有趣
@@ -1022,14 +1021,13 @@ lambda 列表视为模式。 有鉴于此，数据验证似乎很容易。 Lisp 
 少的。 没有其他语言具有 lisp 所具备的安全软件潜力，且随着时间的推移，这一点只会变得更加明显。</p>
 </section>
 </section>
-</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="chapter03.html" class="btn btn-neutral float-left" title="第三章：宏基础" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="chapter05.html" class="btn btn-neutral float-right" title="第五章：Programs that program" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="chapter05.html" class="btn btn-neutral float-right" title="第五章：Programs that program （1）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

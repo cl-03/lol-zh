@@ -265,12 +265,13 @@ Lisp 更好的实现函数式语言的平台或材料。</p>
 我们可以添加找到的最精确的转换因子，而不必自己费心进行任何转换，这个宏让我们在表达式级别上构建转换例程，（而这）在其他语言
 中无法实现。</p>
 <p>使用我们在 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中的描述的自动化 <strong>gensym</strong> ， <strong>defunits%</strong> 就很容易编写。
-Graham （注： on lisp 的作者）的 <strong>symb</strong> 函数可以让我们为转换宏生成新的名字。例如，当 <strong>time</strong> 是提供的单位类型，
+Graham  <sup>（6 ）</sup> 的 <strong>symb</strong> 函数可以让我们为转换宏生成新的名字。例如，当 <strong>time</strong> 是提供的单位类型，
 那么转换宏就是 <strong>unit-of-time</strong> 。 <strong>defunits%</strong> 是由最初定义的 <strong>unit-of-time</strong> 构建
 的， <strong>unit-of-time</strong> 是在 <a class="reference internal" href="chapter03.html#domain-specific"><span class="std std-ref">3.2 领域特定语言</span></a> 中定义的，在 <strong>defunits%</strong> 中，
 由 <strong>defmacro!</strong> 和反引号组成，用来替换每次宏调用时需要重新生成的部分。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
+<p>（6）</p>
 <p>Graham 是 On Lisp 的作者，会经常出现一些上面的内容，如果有时间的话，推荐去看一下这本书。</p>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro! defunits% (quantity base-unit &amp;rest units)
@@ -283,11 +284,16 @@ Graham （注： on lisp 的作者）的 <strong>symb</strong> 函数可以让�
 <span class="linenos">8</span>                    (group units 2))))))
 </pre></div>
 </div>
-<p><strong>defunits%</strong> 用了 <em>嵌套了的反引号 * （ **`*</em> ）：一个非常难以理解的结构。用反引号编程就像在代码
-中增加了一个维度的含义。在其他的语言中，给定的语句通常都有非常简单的求解语义。你知道每段代码会在什么时候执行，因为每段代码都必须同一时间执行：运行时（run-time）。
-梯度往上提了一级：我们的代码是一个后续可能求解也可能不求解的列表。
+<p><strong>defunits%</strong> 用了 <em>嵌套了的反引号</em> （ <strong>`</strong> ）：一个非常难以理解的结构。用反引号编程就像在代码
+中增加了一个维度的含义。在其他的语言中，给定的语句通常都有非常简单的求解语义。你知道每段代码会在什么时候执行，因为每段代码都必须在同一时间执行：即运行时（run-time）。
+但是在 Lisp 中，通过嵌套反引号，我们可以在 <em>引用的梯度</em> <sup>（7 ）</sup> 上进退自如。我们编写的每个反引号都将梯度往上提了一级：我们的代码是一个后续可能求解也可能不求解的列表。
 但在里面的原始列表中，每遇到逗号，就将我们带回到上一个引用梯度，然后以合适的方式
 执行对应梯度的代码。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（7）</p>
+<p>引用的梯度  ladder of quotation</p>
+</div>
 <p>因此，有一种简单的算法可以确定何时 lisp 代码会被求值。只需从表达式的根部开始，在遇到
 反引号后，标记一层引号。每遇到一个逗号，就把引号调低一级。正如 Steel 所指出的，
 遵循这种级别的引用很具挑战性。追踪当前引用深度的这种困难，让使用反引用感觉像是在
@@ -424,13 +430,18 @@ lisp 中却很容易，所以 lisp 程序员通常不会对把所有东西都塞
 </section>
 <section id="implicit-contexts">
 <span id="id2"></span><h2>5.3 隐式上下文<a class="headerlink" href="#implicit-contexts" title="Permalink to this heading"></a></h2>
-<p>宏可以利用一种被叫做 <em>隐式上下文</em> 的技术。在常用的代码中，或者说是需要绝对简洁且缺少任何周边账簿繁琐的东西，
+<p>宏可以利用一种被叫做 <em>隐式上下文</em>  <sup>（8.1）</sup> 的技术。在常用的代码中，或者说是需要绝对简洁且缺少任何周边账簿繁琐的东西，
 我们有时选择要隐式地在表达式的某些部分添加 lisp 代码，这样我们就不必每次使用抽象时都去编写它。之前
 也有介绍过隐式上下文，而且也很清楚的表达了，即便是不使用宏，隐式上下文也是 lisp 编程的
-基础部分： <strong>let</strong> 和 <strong>lambda</strong> 表达式就有个 <em>隐式的 progn</em> 。因为这两个表达式是顺序的执
-行表达式的主体并返回最后的那个结果。 <strong>defun</strong> 会在表达式外添加 <em>隐式的 lambda</em> ，因此不需
+基础部分： <strong>let</strong> 和 <strong>lambda</strong> 表达式就有个 <em>隐式的 progn</em>  <sup>（8.2）</sup> 。因为这两个表达式是顺序的执
+行表达式的主体并返回最后的那个结果。 <strong>defun</strong> 会在表达式外添加 <em>隐式的 lambda</em>  <sup>（8.3）</sup> ，因此不需
 要在已命名的函数中使用 lambda 格式。</p>
-<p>本节介绍的是本书中后面要用到的 <em>遍历代码 的宏—— **tree-leaves*</em> <sup>【4】</sup> 的派生以及构造。和
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（8）</p>
+<p>隐式上下文  implicit context；隐式的 progn：implicit progn；隐式的 lambda：implicit lambda</p>
+</div>
+<p>本节介绍的是本书中后面要用到的 <em>遍历代码</em> 的宏—— <strong>tree-leaves</strong> <sup>【4】</sup> 的派生以及构造。和
 <strong>flatten</strong> 一样， <strong>tree-leaves</strong> 宏会检查一段 lisp 代码，将这段代码当作一个树
 （ <strong>tree</strong> ），然后做一些改动后返回一个新树。原表达式的列表结构不会被更改： <strong>flatten</strong> 和
 <strong>tree-leaves</strong> 都是构建新的结构。这两者之间的不同之处在于， <strong>flatten</strong> 的目的是移除嵌套列表
@@ -478,15 +489,15 @@ lisp 中却很容易，所以 lisp 程序员通常不会对把所有东西都塞
 <p>当然，更改每个元素,是没有什么意义的。我们真正想要的是一种挑选和选择具体化原子方法，并有选择地对它们应用转换，以使新原子插入到新的列表结构中，让我们不感兴趣的原子保持不变。择性地对其进行转换，之后再将转换后的原语插入到新的列表结构中，对不相关
 的就不用去管他了。在 lisp 中，编写一个可自定义的使用函数的最直接的方法就是有 <em>插
 件</em> ——即用户可以使用自定义的代码来控制实用程序的功能。 <strong>COMMON LISP</strong> 内置的
-<strong>sort</strong> 函数就是典型的代表。以下的代码中，小于（&lt;）函数对 <strong>sort</strong> 来说就是个插件：</p>
+<strong>sort</strong> 函数就是典型的代表。以下的代码中，小于（&lt;）函数对 <strong>sort</strong> 来说就是个 <em>插件</em> ：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (sort &#39;(5 1 2 4 3 8 9 6 7) #&#39;&lt;)
 <span class="linenos">2</span>(1 2 3 4 5 6 7 8 9)
 </pre></div>
 </div>
 <p>使用函数作为参数来控制程序的行为的这个理念很方便，因为我们可以创建适合
 手头任务的匿名函数。或者说，当需要更强大的功能时，可以创建一个生成匿名函数的
-函数。这种行为被称为 <em>函数组合</em> <sup>（6.1）</sup> 。尽管函数组合没
-有 <em>宏组合</em> <sup>（6.2）</sup> 那么有趣 <sup>【6】</sup> ，但这仍是个很有用的技术，且这个
+函数。这种行为被称为 <em>函数组合</em> <sup>（9.1）</sup> 。尽管函数组合没
+有 <em>宏组合</em> <sup>（9.2）</sup> 那么有趣 <sup>【6】</sup> ，但这仍是个很有用的技术，且这个
 技术是专业 lisp 程序员必须掌握的。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
@@ -495,7 +506,7 @@ lisp 中却很容易，所以 lisp 程序员通常不会对把所有东西都塞
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>（6）
+<p>（9）
 函数组合 function composition； 宏组合 macro composition</p>
 </div>
 <p>有个关于函数组合的简单示例是 —— <strong>predicate-splitter</strong> 。</p>
@@ -609,9 +620,14 @@ Lisp 会发现它实际上是不容忽视的。</p>
 </pre></div>
 </div>
 <p>注意，变量 <strong>x</strong> 实际上是在没有定义的情况下就使用了。这是因为围绕后面两个表达式都有
-一个 <em>隐式词法变量</em> 绑定。这种不可见变量的引入被认为违反了 <em>词法透明性</em> 。另一种说法是，
-引入了一个名为 <strong>x</strong> 的重复词供这些形式使用。我们将在[第六章：回指(Anaphoric) 宏]
+一个 <em>隐式词法变量</em> <sup>（10.1）</sup> 绑定。这种不可见变量的引入被认为违反了 <em>词法透明性</em> <sup>（10.2）</sup> 。另一种说法是，
+引入了一个名为 <strong>x</strong> 的 <em>回指语</em> <sup>（10.3）</sup> 供这些形式使用。我们将在[第六章：回指(Anaphoric) 宏]
 中进一步介绍。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（10）
+隐式词法变量 implicit lexical variable； 词法透明性 lexical transparency；回指语 anaphor</p>
+</div>
 </section>
 <section id="macrolet">
 <span id="code-walking-with-macrolet"></span><h2>5.4 使用 <strong>macrolet</strong> 遍历代码<a class="headerlink" href="#macrolet" title="Permalink to this heading"></a></h2>
@@ -693,10 +709,15 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 含义。当重写全局宏时，我们无法确定 COMMON LISP 之前使用过的宏，是否已经展开过，
 或者之后是不是还需不需要再次进行展开。</p>
 <p>举一个这个代码遍历是有用的的例子，让我们重新讨论在 [3.3 控制结构](chapter03.md) 中忽略
-的问题。我们的Scheme “命名的 let （ named let ）”宏的初始版本—— <strong>nlet</strong> ，这个 <strong>label</strong> 的使用允许我们去
-临时定义一个函数，以便在“命名的 let （ named let ）”的代码体中使用，这样可能允许我们去递归，就像我们为 <strong>let</strong> 绑定而中再次用新值开始 <strong>let over</strong> 一样。当我们定义这个函数时，我们提起到，因为 COMMON LISP 不能保证它将优化掉“尾部调用”，
+的问题。我们的Scheme <em>命名的 let</em>  <sup>（11.1）</sup> 宏的初始版本—— <strong>nlet</strong> ，这个 <strong>label</strong> 的使用允许我们去
+临时定义一个函数，以便在 <em>命名的 let</em> 的代码体中使用，这样可能允许我们去递归，就像我们为 <strong>let</strong> 绑定而中再次用新值开始 <strong>let over</strong> 一样。当我们定义这个函数时，我们提起到，因为 COMMON LISP 不能保证它将优化掉“尾部调用”，
 所以（这个 <strong>let</strong> 控制结构）每次迭代都可能会占用不必要的额外堆栈空间。换句话说，不同
-于 Scheme ， COMMON LISP 函数调用不能保证是“优化的尾部调用”。</p>
+于 Scheme ， COMMON LISP 函数调用不能保证是 <em>优化的尾部调用</em>  <sup>（11.2）</sup> 。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（11）
+命名的 let：named let ；优化的尾部调用  tail call optimised</p>
+</div>
 <p>即使大部分像样的 COMMON LISP 编译器都会执行适当的 <em>尾部调用优化</em> ，有时我们需要
 确认优化已经执行过了。最简单的、可移植的完成（此意图的）方法是改变 <strong>nlet</strong> 宏，这样它生成展开式不会使用不必要的堆栈空间。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro! nlet-tail (n letargs &amp;rest body)
@@ -729,7 +750,7 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 <p>【9】
 很奇怪 Loop 是 COMMON LISP 中最具争议的问题之一。然而，大多数反对它是完全没有根据的。 Loop 是一种非常方便的领域特定语言，用于循环领域。</p>
 </div>
-<p><strong>nlet-tail</strong> 的使用方式和我们最初的 <strong>nlet</strong> 是一样的，除了非尾部位置处的“命名的 let （ named let ）”是被
+<p><strong>nlet-tail</strong> 的使用方式和我们最初的 <strong>nlet</strong> 是一样的，除了非尾部位置处的 <em>命名的 let</em> 是被
 禁用的，因为它们会被展开成尾部调用。下面是一个和我们介绍 <strong>nlet</strong> 时使用的一样无趣
 的例子，不同的是这个例子中可以保证，即使在不执行尾部调用优化的 lisp 中，也不会
 消耗额外的堆栈空间。</p>
@@ -742,8 +763,8 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 </div>
 <p>因为这是本节的励志的示例，注意，我们用 <strong>macrolet</strong> 对提供的内容进行代码遍历，来查找
 <strong>fact</strong> 的使用。在之前的 <strong>nlet</strong> 使用 <strong>labels</strong> 特殊形式绑定函数的地方，我们希望确保当我们调用
-“命名的 let （ named let ）”时不会消耗额外的堆栈空间。从技术上来说，我们希望改变一些词法环境中的
-绑定，然后跳转回“命名的 let （ named let ）”的顶部。因此 <strong>nlet-tail</strong> 接受提供了的“命名的 let （ named let ）”，我们上面示例中的 fact ，然后创建一个 <em>局部宏</em> ，该宏只在提供的代码主体中生效。这个宏展开的代码，使用
+<em>命名的 let</em> 时不会消耗额外的堆栈空间。从技术上来说，我们希望改变一些词法环境中的
+绑定，然后跳转回 <em>命名的 let</em> 的顶部。因此 <strong>nlet-tail</strong> 接受提供了的 <em>命名的 let</em> ，我们上面示例中的 fact ，然后创建一个 <em>局部宏</em> <sup>（12）</sup> ，该宏只在提供的代码主体中生效。这个宏展开的代码，使用
 <strong>psetq</strong> 将 <strong>let</strong> 的绑定设为提供的新的值，然后跳转回顶部，不需要堆栈空间。最重要
 的是，我们可以在我们的程序中为其他不相关的宏使用 <strong>fact</strong> 这个名字 <sup>【10】</sup> 。</p>
 <div class="admonition hint">
@@ -751,14 +772,24 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 <p>【10】
 不管什么样类型的编程书怎么会没有几个阶乘实现？</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（12）
+局部宏  local macro</p>
+</div>
 <p>为了实现这个跳转， <strong>nlet-tail</strong> 使用了 lisp 的特殊结构 —— <strong>tagbody</strong> 和 <strong>go</strong> 的组
-合。这两个结构提供了个跳转（ goto ）系统。尽管 goto 给结构化编程带来的问题被广泛讨论着，不管这意味着什么，COMMON LISP 提供这些特殊结构正是我们在这里使用它们的原因。通过
-控制 <em>程序计数器</em> ，在我们正在执行的代码的当前位置，我们可以创建很有效的宏展开式。虽然在现代高级语
+合。这两个结构提供了个跳转（ goto ）系统。尽管 goto 给 <em>结构化编程</em> <sup>（13.1）</sup> 带来的问题被广泛讨论着，不管这意味着什么，COMMON LISP 提供这些特殊结构正是我们在这里使用它们的原因。通过
+控制 <em>程序计数器</em> <sup>（13.2）</sup> ，在我们正在执行的代码的当前位置，我们可以创建很有效的宏展开式。虽然在现代 <em>高级</em> <sup>（13.3）</sup> 语
 言中，通常都不鼓励使用 <strong>goto</strong> ，但快速浏览任意块的汇编代码，就会发现 <strong>goto</strong> 在我们计算机软件
-最底层上非常活跃。即使是最坚定的反 <strong>goto</strong> 倡导者也不建议抛弃像 C 语言和汇编语言这样的低级语言的
+最底层上非常活跃。即使是最坚定的反 <strong>goto</strong> 倡导者也不建议抛弃像 C 语言和汇编语言这样的 <em>低级</em> <sup>（13.4）</sup> 语言的
 <strong>goto</strong> 和跳转（ <strong>jump</strong> ）指令。似乎是这样，在底层编程中，至少编写高效代码，我们只需要 <strong>goto</strong> ，</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（13）
+结构化编程  structured programming；程序计数器 program counter；高级 high-level；低级 low-level</p>
+</div>
 <p>然而，正如 Alan Kay 所说， lisp 不是一门语言，而是一个构建原料。讨论 lisp 是否是高级还是
-低级语言完全没有意义。这里有有很高级的 lisp ，如特定域（ domain specific ）语言。通过我们编写的
+低级语言完全没有意义。这里有有很高级的 lisp ，如特定域  <sup>（14）</sup> 语言。通过我们编写的
 用于处理这些语言的宏，我们将它们的用法转换为较低层次的 lisp 。当然，这些展开式也是
 lisp 代码，只是不像原始版本那样压缩。接下来，我们通常将这个中间层次的 lisp 代码交给编译器，
 编译器会成功地将这些代码转换为越来越低级别的 lisp 代码。用不了多久，诸如 <strong>go-to</strong> 、条件分支和位
@@ -766,6 +797,11 @@ lisp 代码，只是不像原始版本那样压缩。接下来，我们通常将
 你的高级 lisp 程序将会被向下层转换成汇编语言。但即便如此，你的程序依然还是 lisp 。这是因为大部分 lisp
 汇编程序都是用 lisp 本身编写的，所以很自然地将这些汇编程序都保存为 lisp 对象，这样就产生
 真正的 lisp 底层程序。只有程序真正组装成二进制机器码时，它才不再是 lisp 。难道不是吗？</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（14）
+特定领域 domain specific</p>
+</div>
 <p>高阶或低阶的区别在 lisp 中不适用，lisp 程序的级别完全取决于视角。 Lisp 不是门语言，而是
 迄今为止所发现的最灵活的软件构建原料。</p>
 </section>
@@ -773,14 +809,14 @@ lisp 代码，只是不像原始版本那样压缩。接下来，我们通常将
 <span id="id5"></span><h2>5.5 递归展开式<a class="headerlink" href="#recursive-expansions" title="Permalink to this heading"></a></h2>
 <p>在用例子教初学者 lisp 时，在课程中不可避免地会出现一个问题</p>
 <blockquote>
-<div><p>cadr 是什么玩意?</p>
+<div><p>cadr 是什么?</p>
 </div></blockquote>
 <p>这时有两种方法来继续。第一种方法就是向学生解释 lisp 的列表（ list ）是由 <strong>cons</strong>
 单元组成，每个 <strong>cons</strong> 单元都有两个指针： <strong>car</strong> 和 <strong>cdr</strong> 。一旦理解了这个概念，就很容易
 展示如何将这些指针的访问器函数（也称为 <strong>car</strong> 和 <strong>cdr</strong> ），这两个函数可以组合成 <strong>cadr</strong>
 函数，而 <strong>cadr</strong> 函数会遍历列表并检索列表中的第二个元素。</p>
 <p>第二种方法就是给学生引入 <strong>second</strong> 这个 COMMON LISP 函数，然后完全地忽略 <strong>cadr</strong> 。而
-<strong>cadr</strong> 和 <strong>second</strong> 效果是一样的：获取列表中的第二个元素。不同之处在于 <strong>second</strong> 是以它做的事命名，而 <strong>cadr</strong> 是以它如何做事来命名的。 <strong>cadr</strong> 是 <em>显然的具体说明</em> ，而
+<strong>cadr</strong> 和 <strong>second</strong> 效果是一样的：获取列表中的第二个元素。不同之处在于 <strong>second</strong> 是以它做的事命名，而 <strong>cadr</strong> 是以它如何做事来命名的。 <strong>cadr</strong> 是 <em>显然的具体说明</em> <sup>（15）</sup> ，而
 <strong>second</strong> 是个容易记住的函数名，但它不合需要地掩盖了操作的含义 <sup>【11】</sup> 。 易读的具体说明通常更好，
 因为我们可以考虑使用 <strong>cadr</strong> 函数来不仅仅是获取列表的第二个元素。 例如，我们显然可以用
 <strong>cadr</strong> 作为获取 <strong>lambda</strong> 形式的参数解构列表的概念。 <strong>cadr</strong> 和 <strong>second</strong> 在底层都执行相同的任务，但可以概念上代表不同的操作。</p>
@@ -788,6 +824,11 @@ lisp 代码，只是不像原始版本那样压缩。接下来，我们通常将
 <p class="admonition-title">Hint</p>
 <p>【11】
 特别是因为 second 与 cadr 完全相同：您不能使用它来获取其他序列（如向量）的第二个元素。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（15）
+显然的具体说明 transparently specified</p>
 </div>
 <p>对易读的具体说明来说，比哲学偏好更重要的是， <strong>car</strong> 和 <strong>cdr</strong> 的组合可以表示更多的列表访问操作，
 而且比一小撮英文词组的访问器更加一致。 <strong>car</strong> 和 <strong>cdr</strong> 用处很大，因为可以把他们组合成新的、任意
@@ -857,8 +898,13 @@ A 或 D 字符被替换为 X <sup>【13】</sup> 。 在 <strong>cxr%</strong> �
 <span class="linenos">2</span>  (cxr% (1 a 10 d) x))
 </pre></div>
 </div>
-<p>本节的重点是说明 <em>递归展开</em> 的实际用途。当一个宏将一个形式展开位将一个结构展开为一个新的结构时，递归展开就会出现。 与所有递归一样，此过程必须有个基本的终止条件。宏最终会展开
+<p>本节的重点是说明 <em>递归展开式</em> <sup>（16.1）</sup> 的实际用途。当一个宏将一个形式展开位将一个结构展开为一个新的结构时，递归展开就会出现。 与所有递归一样，此过程必须有个 <em>基本的终止条件</em> <sup>（16.2）</sup>。宏最终会展开
 为不包含使用相关宏的结构，然后这个展开器就会结束。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（16）
+递归展开式 recursive expansions；基本条件 base case</p>
+</div>
 <p>下面我们将 <strong>cxr%</strong> 宏的实例宏展开（ <strong>macroexpand</strong> ）成一个同样使用 <strong>cxr%</strong> 的结构：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (macroexpand
 <span class="linenos">2</span>    &#39;(cxr% (1 a 2 d) some-list))
@@ -919,7 +965,12 @@ A 或 D 字符被替换为 X <sup>【13】</sup> 。 在 <strong>cxr%</strong> �
 没有意义； 相反，应该使用像 <strong>nth</strong> 或 <strong>nthcdr</strong> 这样的循环函数。</p>
 <p>为了修复这两种情况，我们添加了一个替代展开式。如果 A 或 D 前面的参数不是整型的话，就会调用
 新的操作，而且，如果我们不想内联大量的 <strong>car</strong> 或 <strong>cdr</strong> ，也可以选择调用新的操作。任选 <em>内联
-阈值</em> 为 10，这个新的操作由 <strong>cxr</strong> 宏提供。</p>
+阈值</em> <sup>（17）</sup> 为 10，这个新的操作由 <strong>cxr</strong> 宏提供。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（17）
+内联阈值 inline threshold</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defvar cxr-inline-thresh 10)
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span>(defmacro! cxr (x tree)
@@ -955,10 +1006,15 @@ A 或 D 字符被替换为 X <sup>【13】</sup> 。 在 <strong>cxr%</strong> �
 <span class="linenos">2</span>  (cxr (1 a n d) list))
 </pre></div>
 </div>
-<p>因为编写宏是个迭代的、分层次的过程，我们经常被鼓励 <em>组合</em> 或 <em>结合</em> 我们之前实现的宏。
+<p>因为编写宏是个迭代的、分层次的过程，我们经常被鼓励 <em>组合</em> <sup>（18.1）</sup> 或 <em>结合</em> <sup>（18.2）</sup> 我们之前实现的宏。
 例如，在 <strong>cxr</strong> 的定义中，替代展开式用到了上一节中定义的宏： <strong>nlet-tail</strong> 。
 <strong>nlet-tail</strong> 很方便，因为它允许我们给迭代构造命名，同时，因为我们只计划将迭代作为
 尾部调用，我们就能确保我们可以使用它来避免不必要的堆栈消耗。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（18）
+组合 combine ；结合  compose</p>
+</div>
 <p>下面是 <strong>xcr</strong> 在 <strong>nthcdr%</strong> 中的展开：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (macroexpand
 <span class="linenos"> 2</span>  &#39;(cxr (n d) list))
@@ -1224,14 +1280,24 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 <p>通常，一个听起来很难的任务，如定义无限个英文列表访问器和 <strong>car-cdr</strong> 组合，
 其实就是将简单的问题聚合到一起。与之相反，对单个难题，可以通过递归处理问题
 来解决一系列较简单的问题。通过思考如何将一个问题转化为一系列更简单的问题，
-我们采用了经过验证的解决方法：<em>分而治之</em> 。</p>
+我们采用了经过验证的解决方法：<em>分而治之</em>  <sup>（19）</sup> 。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（19）
+分而治之 divide and conquer</p>
+</div>
 </section>
 <section id="dlambda">
 <span id="id7"></span><h2>5.7 Dlambda<a class="headerlink" href="#dlambda" title="Permalink to this heading"></a></h2>
 <p>在讨论闭包时，我们提到了怎么将闭包当作对象使用，以及一般情况下，不确定范围和词法
 作用域能够替代复杂的对象系统。但是，到目前为止，我们忽略了对象通常都有的一个特性：
-多 <em>方法</em> 。换句话说，虽然我们简单的计数器闭包示例只允许一个操作，即增量，但对象通常
-希望能够用不同的行为响应不同的 <em>消息</em> 。</p>
+多 <em>方法</em> <sup>（20.1）</sup>。换句话说，虽然我们简单的计数器闭包示例只允许一个操作，即增量，但对象通常
+希望能够用不同的行为响应不同的 <em>消息</em> <sup>（20.2）</sup>。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（20）
+方法 methods；消息 messages</p>
+</div>
 <p>尽管闭包可以被认为是个只有一个方法（ <strong>apply</strong> ）的对象，但这个方法可以根据传递给它的参数
 来具备不同的行为。例如，如果我们将第一个参数指定为表示正在传递消息
 的符号，则可以基于第一个参数用简单的 <strong>case</strong> 语句提供多个行为。</p>
@@ -1245,11 +1311,16 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 <span class="linenos">7</span>        (decf count)))))
 </pre></div>
 </div>
-<p>注意，我们已经选择了 <em>关键字符号</em> ，也就是以冒号 <strong>:</strong> 开头的符号，并且总是求解为自身用来
+<p>注意，我们已经选择了 <em>关键字符号</em> <sup>（21.1）</sup> ，也就是以冒号 <strong>:</strong> 开头的符号，并且总是求解为自身用来
 指示消息。关键字很方便，因为我们不需要引用它们或将它们从包中导出，而且也很直观，因为它们
-就是被设计用来执行这个和其他的各种 <em>解构</em> 。通常在 <strong>lambda</strong> 或 <strong>defmacro</strong> 结构中，关键字
-在 <em>运行时</em> 不会被 <em>解构</em> 。但是由于我们正在实现一个消息传递系统，其是一类运行时解构，
+就是被设计用来执行这个和其他的各种 <em>解构</em> <sup>（21.2）</sup> 。通常在 <strong>lambda</strong> 或 <strong>defmacro</strong> 结构中，关键字
+在 <em>运行时</em> 不会被 <em>解构</em> 。但是由于我们正在实现一个消息传递系统，其是一类 <em>运行时解构</em> <sup>（21.3）</sup>，
 所以我们将关键字处理操作留在运行时执行。如前所述，符号的解构是个高效的操作（只是指针比较）。在我们的计数器例子被编译后，它可能会被缩减为以下机器码：</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（21）
+关键字符号 keyword symbols；解构 destructuring；运行时解构 run-time destructuring</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>2FC:       MOV  EAX, [#x582701E4]  ; :INC
 <span class="linenos">2</span>302:       CMP  [EBP-12], EAX
 <span class="linenos">3</span>305:       JEQ  L3
@@ -1260,7 +1331,12 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 </div>
 <p>但为了方便起见，我们希望避免必须为我们创建的每个对象或类书写条件语句。像这种情况就需要宏了。我喜欢用的宏是 <strong>dlambda</strong> ，他会展开成 lambda 结构。这个展开式包括一种方法，
 这个方法可以根据它被应用的参数来执行许多不同的代码分支。这种运行时解构的类型就是
-<strong>dlambda</strong> 名称的来源：它是 <strong>lambda</strong> 的 <em>解构</em> 或 <em>分发</em> 版本。</p>
+<strong>dlambda</strong> 名称的来源：它是 <strong>lambda</strong> 的 <em>解构</em> <sup>（22.1）</sup> 或 <em>分发</em> <sup>（22.2）</sup> 版本。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（22）
+解构 destructuring；分发 dispatching</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro! dlambda (&amp;rest ds)
 <span class="linenos"> 2</span>  `(lambda (&amp;rest ,g!args)
 <span class="linenos"> 3</span>    (case (car ,g!args)
@@ -1331,8 +1407,13 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 <span class="linenos">3</span>100
 </pre></div>
 </div>
-<p><strong>:bound</strong> 确保 <strong>count</strong> 的值时在 <em>边界值</em> <strong>lo</strong> 和 <strong>hi</strong> 之中。若 <strong>count</strong> 的值落在
+<p><strong>:bound</strong> 确保 <strong>count</strong> 的值时在 <em>边界值</em> <sup>（23）</sup> <strong>lo</strong> 和 <strong>hi</strong> 之中。若 <strong>count</strong> 的值落在
 边界值之外，那么它会变成离该值较近的那个边界值：</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（23）
+边界值 boundary values</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :bound -10 10)
 <span class="linenos">2</span>
 <span class="linenos">3</span>10
@@ -1343,8 +1424,13 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 <p>上面代码的结果之所以为 10 是因为上面的值已经将 <strong>count</strong> 设置为 100 了，加上了
 <strong>:bond</strong> 后就变成 10 了</p>
 </div>
-<p><strong>dlambda</strong> 一个重要的属性是，它使用 lambda 进行所有的解构，因此保留了由COMMON LISP 环境提供的正常的错误检查和调试（ debugging ）。例如，当我们只给到 <strong>count-test</strong>
-一个参数时，就会直接得到一个和 lambda 程序类似的报错：</p>
+<p><strong>dlambda</strong> 一个重要的属性是，它使用 lambda 进行所有的解构，因此保留了由COMMON LISP 环境提供的正常的错误检查和调试 <sup>（24.1）</sup> 。例如，当我们只给到 <strong>count-test</strong>
+一个参数时，就会直接得到一个 lambda 应用不正确 <em>元数</em> <sup>（24.2）</sup> 的报错：</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（24）
+调试 debugging ；元数 arity</p>
+</div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (count-test :bond -10)
 <span class="linenos">2</span>
 <span class="linenos">3</span>ERROR: Wrong argument count, wanted 2 and got 1.
@@ -1354,7 +1440,12 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 对象的术语编程，就像我们正在创建一个具有多 <em>方法</em> 的对象一样。 <strong>dlambda</strong> 被定制，为了在不偏离
 lambda 语法和用法的情况下，让函数式（编程）更简单。 <strong>dlambda</strong> 仍然会展开成单个
 lambda 表达式，因此，它的求值结果与对 <strong>lambda</strong> 求值的结果完全相同：一个可以保存、
-应用的 <em>匿名函数</em> ，最重要的是，可以将这个 lambda 控件用作词法闭包。</p>
+应用的 <em>匿名函数</em> <sup>（25）</sup> ，最重要的是，可以将这个 lambda 控件用作词法闭包。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>（25）
+匿名函数  anonymous function</p>
+</div>
 <p>但 <strong>dlambda</strong> 将这种与 <strong>lambda</strong> 的同步更进一步。为了让 <strong>dlambda</strong> 提供一个包含 <strong>lambda</strong> 宏的代码的尽可能平滑的转换， <strong>dlambda</strong> 也允许我们不传递一个关键字参数作为第一个符号来处理匿名函数的调用。当我们拥有通过正常的 <strong>lambda</strong> 接口使用闭包写就的大量的代码时，
 我们希望能够添加特殊情况的 <strong>dlambda</strong> 方法，而不改变其他代码调用接口的方式。</p>
 <p>如果说最后可能的方法是给定符号 <strong>t</strong> 而不是关键字参数，在没有发现任何特殊情况的

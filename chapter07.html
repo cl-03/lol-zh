@@ -782,7 +782,7 @@ C 程序慢一些，但几乎总是更安全。因为 lisp 为程序员提供了
 将两个寄存器相加，然后将控制权返回给调用者。虽然反汇编程序可以为 lisp
 效率的所有领域提供许多见解，但它会教你两项主要的技能。第一个技巧在
 本节中主要介绍：如何使用声明来获得有效的数值行为，特别是在循环内部。
-第二个问题是如何有效地使用数组/向量数据结构。这将在 [7.4 指针作用域]
+第二个问题是如何有效地使用数组/向量数据结构。这将在  <a class="reference internal" href="#pointer-scope"><span class="std std-ref">7.4 指针作用域</span></a>
 中讨论。</p>
 <p>就像技术进步将浮点运算的效率现实从应该避免的东西变成了应该利用的
 东西一样，lisp 编译器技术的进步 —— 结合 COMMON LISP 的 <em>正确</em> 类型
@@ -1989,84 +1989,76 @@ Perl 和正则表达式，这对我们懂多种语言的程序员来说不是问
 可以避免数组访问。 但是我的没有，所以我重新构建了代码，从而实现了更高效的展开式。</p>
 <p><strong>sn-to-lambda-form</strong> 是 <strong>sn-to-lambda-form%</strong> 的改进版本。 它为读入的变量创建临时绑
 定，因此不会为交换操作重新执行数组读取指令。 下面是高级编译展开式：</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (disassemble
-<span class="linenos">2</span>    (compile nil
-<span class="linenos">3</span>      (sn-to-lambda-form%
-<span class="linenos">4</span>        (build-batcher-sn 3))))
-<span class="linenos">5</span>...
-<span class="linenos">6</span>;;; (LET ((A (AREF ARR 0)) (B (AREF ARR 2))) ...)
+<div class="highlight-lisp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun sn-to-lambda-form (sn)
+<span class="linenos"> 2</span>  `(lambda (arr)
+<span class="linenos"> 3</span>    #f
+<span class="linenos"> 4</span>    (declare (type (simple-array fixnum) arr))
+<span class="linenos"> 5</span>    ,@(mapcar
+<span class="linenos"> 6</span>  #`(let ((a #1=( aref arr ,(car a1)))
+<span class="linenos"> 7</span>    (b #2=( aref arr ,(cadr a1))))
+<span class="linenos"> 8</span>      (if (&gt; a b)
+<span class="linenos"> 9</span>    (setf #1# b
+<span class="linenos">10</span>          #2# a)))
+<span class="linenos">11</span>  sn)
+<span class="linenos">12</span>    arr))
 </pre></div>
 </div>
-<dl>
-<dt>(defun sn-to-lambda-form (sn)</dt><dd><dl>
-<dt><a href="#id7"><span class="problematic" id="id8">`</span></a>(lambda (arr)</dt><dd><blockquote>
-<div><p>#f
-(declare (type (simple-array fixnum) arr))
-,&#64;(mapcar</p>
-<blockquote>
-<div><dl>
-<dt>#`(let ((a #1=( aref arr ,(car a1)))</dt><dd><blockquote>
-<div><p>(b #2=( aref arr ,(cadr a1))))</p>
-</div></blockquote>
-<dl class="simple">
-<dt>(if (&gt; a b)</dt><dd><dl class="simple">
-<dt>(setf #1# b</dt><dd><p>#2# a)))</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>sn)</p>
-</div></blockquote>
-<p>arr))</p>
-</div></blockquote>
-<p>2E:       MOV
-31:       MOV
-34:       CMP
-36:       JLE</p>
-<p>EAX, [EDX+1]
-ECX, [EDX+9]
-EAX, ECX
-L0</p>
-<dl class="simple">
-<dt>;;; (SETF (AREF ARR 0) B (AREF ARR 2) A)</dt><dd><p>38:       MOV     [EDX+1], ECX
-3B:       MOV     [EDX+9], EAX</p>
-</dd>
-</dl>
-<p>;;; (LET ((A (AREF ARR 0)) (B (AREF ARR 1))) …)
-3E: L0:   MOV
-41:       MOV
-44:       CMP
-46:       JLE</p>
-<p>EAX, [EDX+1]
-ECX, [EDX+5]
-EAX, ECX
-L1</p>
-<dl class="simple">
-<dt>;;; (SETF (AREF ARR 0) B (AREF ARR 1) A)</dt><dd><p>48:       MOV     [EDX+1], ECX
-4B:       MOV     [EDX+5], EAX</p>
-</dd>
-</dl>
-<p>;;; (LET ((A (AREF ARR 1)) (B (AREF ARR 2))) …)
-4E: L1:   MOV
-51:       MOV
-54:       CMP
-56:       JLE</p>
-<p>EAX, [EDX+5]
-ECX, [EDX+9]
-EAX, ECX
-L2</p>
-<dl class="simple">
-<dt>;;; (SETF (AREF ARR 1) B (AREF ARR 2) A)</dt><dd><p>58:       MOV     [EDX+5], ECX
-5B:       MOV     [EDX+9], EAX
-5E: L2: …</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>* (disassemble
+<span class="linenos"> 2</span>    (compile nil
+<span class="linenos"> 3</span>      (sn-to-lambda-form%
+<span class="linenos"> 4</span>        (build-batcher-sn 3))))
+<span class="linenos"> 5</span>...
+<span class="linenos"> 6</span>;;; (LET ((A (AREF ARR 0)) (B (AREF ARR 2))) ...)
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span>2E:       MOV
+<span class="linenos">14</span>31:       MOV
+<span class="linenos">15</span>34:       CMP
+<span class="linenos">16</span>36:       JLE
+<span class="linenos">17</span>
+<span class="linenos">18</span>EAX, [EDX+1]
+<span class="linenos">19</span>ECX, [EDX+9]
+<span class="linenos">20</span>EAX, ECX
+<span class="linenos">21</span>L0
+<span class="linenos">22</span>
+<span class="linenos">23</span>;;; (SETF (AREF ARR 0) B (AREF ARR 2) A)
+<span class="linenos">24</span>      38:       MOV     [EDX+1], ECX
+<span class="linenos">25</span>      3B:       MOV     [EDX+9], EAX
+<span class="linenos">26</span>;;; (LET ((A (AREF ARR 0)) (B (AREF ARR 1))) ...)
+<span class="linenos">27</span>3E: L0:   MOV
+<span class="linenos">28</span>41:       MOV
+<span class="linenos">29</span>44:       CMP
+<span class="linenos">30</span>46:       JLE
+<span class="linenos">31</span>
+<span class="linenos">32</span>EAX, [EDX+1]
+<span class="linenos">33</span>ECX, [EDX+5]
+<span class="linenos">34</span>EAX, ECX
+<span class="linenos">35</span>L1
+<span class="linenos">36</span>
+<span class="linenos">37</span>;;; (SETF (AREF ARR 0) B (AREF ARR 1) A)
+<span class="linenos">38</span>      48:       MOV     [EDX+1], ECX
+<span class="linenos">39</span>      4B:       MOV     [EDX+5], EAX
+<span class="linenos">40</span>;;; (LET ((A (AREF ARR 1)) (B (AREF ARR 2))) ...)
+<span class="linenos">41</span>4E: L1:   MOV
+<span class="linenos">42</span>51:       MOV
+<span class="linenos">43</span>54:       CMP
+<span class="linenos">44</span>56:       JLE
+<span class="linenos">45</span>
+<span class="linenos">46</span>EAX, [EDX+5]
+<span class="linenos">47</span>ECX, [EDX+9]
+<span class="linenos">48</span>EAX, ECX
+<span class="linenos">49</span>L2
+<span class="linenos">50</span>
+<span class="linenos">51</span>;;; (SETF (AREF ARR 1) B (AREF ARR 2) A)
+<span class="linenos">52</span>      58:       MOV     [EDX+5], ECX
+<span class="linenos">53</span>      5B:       MOV     [EDX+9], EAX
+<span class="linenos">54</span>      5E: L2: ...
+</pre></div>
+</div>
 <p>熟悉你的 lisp 编译器以便了解你的宏展开式的效率对编写高效的 lisp 非常重要。 反汇编 lisp 系统的源代码，
 使用像 <strong>time</strong> 宏这样的基准测试工具，以及大量的耐心，不幸的是，这是真正获得如何编写快速 lisp
 代码的直觉的唯一方法。</p>

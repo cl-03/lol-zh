@@ -155,11 +155,7 @@ Graham 的回指和相关代码值得深究。特别是宏 <strong>defanaph</str
 这是没有尖引号 lambda 形式的另一个原因。将一个带引号的 lambda 形式改变为 alambda 形式也需要删除两个字符。</p>
 </div>
 <p>OnLisp* 中的另一个方便的回指宏是 <strong>aif</strong> ，这个宏将测试子句的结果绑定到 <strong>it</strong> ，以便
-true 子句(次要的子句或随之而来的子句)使用 <sup>【4】</sup> 。 <strong>aif</strong> 用了一个 COMMON LISP 很重要的特性：</p>
-<blockquote>
-<div><p><em>广义布尔值</em> <sup>（5.1）</sup> 。在 COMMON LISP 中，任何非 nil 值都是一个布尔值真，所以 COMMON LISP 程序员</p>
-</div></blockquote>
-<p>通常会在真值中嵌入有趣的信息。保留了真值和假值的语言(尤其是 Scheme )使用 <em>显式布尔值</em> <sup>（5.2）</sup> ，
+true 子句(次要的子句或随之而来的子句)使用 <sup>【4】</sup> 。 <strong>aif</strong> 用了一个 COMMON LISP 很重要的特性： <em>广义布尔值</em> <sup>（5.1）</sup> 。在 COMMON LISP 中，任何非 nil 值都是一个布尔值真，所以 COMMON LISP 程序员通常会在真值中嵌入有趣的信息。保留了真值和假值的语言(尤其是 Scheme )使用 <em>显式布尔值</em> <sup>（5.2）</sup> ，
 这有时会强制你抛出额外的信息来满足冗余的类型约束。 Scheme 实际上添加了一个 <em>蹩脚产品</em> <sup>（5.3）</sup> ，以支持 <strong>if</strong> 、 <strong>cond</strong> 、 <strong>and</strong> 、 <strong>or</strong> 和 <strong>do</strong> 来接受非布尔值 <sup>【5】</sup> 。当然，COMMON LISP 的设计
 才是 <em>对</em> 的 —— 一切都是布尔值。</p>
 <div class="admonition hint">
@@ -419,21 +415,14 @@ lambda 表达式 <sup>【9】</sup> 是个常量值，因此特别适合用在 <
 <p>【9】
 Dlambda 展开为 lambda 形式。</p>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro alet (letargs &amp;rest body)
+<span class="linenos">2</span>  `(let ((this) ,@letargs)
+<span class="linenos">3</span>    (setq this ,@(last body))
+<span class="linenos">4</span>    ,@(butlast body)
+<span class="linenos">5</span>    (lambda (&amp;rest params)
+<span class="linenos">6</span>      (apply this params))))
 </pre></div>
 </div>
-<dl>
-<dt>(defmacro alet (letargs &amp;rest body)</dt><dd><dl>
-<dt><a href="#id4"><span class="problematic" id="id5">`</span></a>(let ((this) ,&#64;letargs)</dt><dd><p>(setq this ,&#64;(last body))
-,&#64;(butlast body)
-(lambda (&amp;rest params)</p>
-<blockquote>
-<div><p>(apply this params))))</p>
-</div></blockquote>
-</dd>
-</dl>
-</dd>
-</dl>
 <p>与许多宏增强一样，因为有许多可用的自由度，对该宏的改进是反常的。虽然这里有许多
 可能性，但本节将考虑一种这类具体的改进。可以让 <strong>alet%</strong> 不返回其主体的最后一个
 结构（我们预期是 lambda 结构)，而是一个在 let 结构词法作用域内查找另一个函数的
@@ -615,7 +604,7 @@ turning a macro inside out</p>
 抓住扔向你的任何东西。</p>
 </section>
 <section id="indirection-chains">
-<span id="id6"></span><h2>6.4 间接链<a class="headerlink" href="#indirection-chains" title="Permalink to this heading"></a></h2>
+<span id="id4"></span><h2>6.4 间接链<a class="headerlink" href="#indirection-chains" title="Permalink to this heading"></a></h2>
 <p>我们有很多方法来利用 <strong>alet</strong> 提供的 <strong>this</strong> 回指语的优点。由于环境是通过虚拟闭包来访问的，它将所有
 调用转发给 <strong>this</strong> 所指向的真实闭包，我们可以到处传递虚拟闭包引用，根据需要经常复制它。
 这样的 <em>间接</em> 很有用，因为我们可以改变调用这个虚拟闭包时发生的事情，而不必改变对虚拟
@@ -821,11 +810,11 @@ turning a macro inside out</p>
 </div>
 <p>当然，将所有这些闭包透明地引入操作会影响运行时性能。幸运的是，现代 lisp 编译器擅长优化闭包。
 如果你的应用程序可以忍受几个间接引用指针（通常是可以的），那么间接链就可能是构建它的最佳方式。关于
-间接链的另一个有趣的思考方式，请参阅第 [7.4 指针作用域](chapter07.md) 。还可以查看 CLOS 的
+间接链的另一个有趣的思考方式，请参阅 <a class="reference internal" href="chapter07.html#pointer-scope"><span class="std std-ref">7.4 指针作用域</span></a> 。还可以查看 CLOS 的
 <strong>before</strong> 、 <strong>after</strong> 和 <strong>around</strong> 函数。</p>
 </section>
 <section id="hotpatching-closures">
-<span id="id7"></span><h2>6.5 热修复闭包<a class="headerlink" href="#hotpatching-closures" title="Permalink to this heading"></a></h2>
+<span id="id5"></span><h2>6.5 热修复闭包<a class="headerlink" href="#hotpatching-closures" title="Permalink to this heading"></a></h2>
 <p>重要的本章节的目的有三个。首先，描述 <strong>alet</strong> 中 <strong>this</strong> 回指的另一个有趣的用法。其次，讨论
 <em>alet over dlambda</em> 模式。最后，介绍了一种很有用的宏技术，称为 <em>回指语闭合</em>  <sup>（15）</sup> 。
 为了清楚地说明回指语闭合，我们将不用 <strong>alet</strong> 宏，而是使用一个由内而外的展开式。 <strong>alet-hotpatch%</strong>
@@ -896,7 +885,7 @@ turning a macro inside out</p>
 </pre></div>
 </div>
 <p>注意计数器的值是怎么重置为 0 的，因为我们还用计数器的累加器 <strong>acc</strong> 的一个新值热补丁了闭包的环境。
-我们之前见过这种关键字符号的*运行时解构*  <sup>（17.1）</sup>  吗？没错，实际上我们在 [5.7 Dlambda]中编写了个宏来完成这个操
+我们之前见过这种关键字符号的*运行时解构*  <sup>（17.1）</sup>  吗？没错，实际上我们在 <a class="reference internal" href="chapter05.html#dlambda"><span class="std std-ref">5.7 Dlambda</span></a> 中编写了个宏来完成这个操
 作。 <strong>alet-hotpatch</strong> 是 <strong>alet-hotpatch%</strong> 的吸纳了 <strong>dlambda</strong> 优点的版本。有时甚至在没有意识到
 的情况下，通过在新的宏定义中使用之前定义过的宏，我们实现了 <em>宏组合</em>  <sup>（17.2）</sup>  。使用精心设
 计的宏可以完全理解展开式，尽管它可能在许多方面违背词汇透明性，但不会有组合问题出现，因为所有组件都能有
@@ -951,8 +940,8 @@ turning a macro inside out</p>
 这个有效范围。</p>
 </section>
 <section id="sub-lexical-scope">
-<span id="id8"></span><h2>6.6 子词法作用域<a class="headerlink" href="#sub-lexical-scope" title="Permalink to this heading"></a></h2>
-<p>在 [3.5 异常捕获]中定义的 <strong>defmacro!</strong> 宏中用了 Graham 的 <strong>flatten</strong> 实用工具来查找提供的代
+<span id="id6"></span><h2>6.6 子词法作用域<a class="headerlink" href="#sub-lexical-scope" title="Permalink to this heading"></a></h2>
+<p>在  <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中定义的 <strong>defmacro!</strong> 宏中用了 Graham 的 <strong>flatten</strong> 实用工具来查找提供的代
 码中的自动 gensyms 。现在是时候承认本书撒的一个小谎了。在此之前，因为没有解释自由变量注入和回
 指，我们假装在 <strong>defmacro!</strong> 的定义中的 G-bang 符号名称适用于宏定义的词法范围。实质上这是不对的 ——
 <strong>defmacro!</strong> 在略微不同类型的作用域（叫做 <em>子词法作用域</em>  <sup>（19）</sup>）下提供了这
@@ -1031,7 +1020,7 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 <span class="linenos">11</span>T
 </pre></div>
 </div>
-<p>子词法作用域在复杂宏中惊人的频繁出现。还有 <strong>defmacro!</strong> ，我们已经至少在另外一个例子中看到过它：在[5.6 递归方案]中的
+<p>子词法作用域在复杂宏中惊人的频繁出现。还有 <strong>defmacro!</strong> ，我们已经至少在另外一个例子中看到过它：在 <a class="reference internal" href="chapter05.html#recursive-solutions"><span class="std std-ref">5.6 递归方案</span></a> 中的
 <strong>with-all-cxrs</strong> 宏的子词法绑定列表访问器函数（中就用到了这个宏）。子词法绑定的结果是，我们不能从宏
 展开式中引用这种绑定。有时这种访问限制很有用，有时不是。在 <strong>with-all-cxrs</strong> 中，子词法可能被
 认为是不可取的。当我们的访问器在 <strong>with-all-cxrs</strong> 的子词法作用域中时，没有问题：</p>
@@ -1082,12 +1071,12 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 <span class="linenos">4</span>((A) (B) (C NIL))
 </pre></div>
 </div>
-<p><strong>sublet</strong> 还需要用到 [5.3 隐式上下文](chapter05.md) 中的 <strong>tree-leaves</strong> 。回想一下，
+<p><strong>sublet</strong> 还需要用到  <a class="reference internal" href="chapter05.html#implicit-contexts"><span class="std std-ref">5.3 隐式上下文</span></a> 中的 <strong>tree-leaves</strong> 。回想一下，
 <strong>tree-leaves</strong> 宏有三个参数：一个任意的列表结构，一个用 <strong>x</strong> 变量来确定是否应该更改叶子
 的表达式，以及另一个用不同的 <strong>x</strong> 来确定应该更改哪些有效叶子的表达式。</p>
 <p>选择隐式化具有相同名称 <strong>x</strong> 的绑定证明是一种有用的 <em>语法二义性</em> 。
 当不用通用的方式在表达式中分解公共代码时，有时我们可以用其他方式使用语法对偶来获得这种简洁的优势。
-<strong>sublet</strong> 的定义用到了 [4.5 循环表达式](chapter04.md) 中的自引用读取宏。特别是对于像访问器
+<strong>sublet</strong> 的定义用到了  <a class="reference internal" href="chapter04.html#cyclic-expressions"><span class="std std-ref">4.5 循环表达式</span></a> 中的自引用读取宏。特别是对于像访问器
 这样在编写程序的过程中可以多次更改的东西，读取宏允许我们有且只有一种结构来表示访问器。幸亏使用了 <em>隐式的</em>
 <strong>tree-leaves</strong> 宏，很容易找到和理解代码重复，因为代码紧密地结合在一起。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defmacro sublet (bindings% &amp;rest body)
@@ -1141,8 +1130,7 @@ G-bang 的词法绑定从未创建过。下面是 G-bang 的经典用法：</p>
 <p>子词法作用域在列表结构被系统代码遍历程序解释为 lisp 代码之前生效。这是个重要的观测结果，
 但其结果仍未被完全探索。 <strong>sublet</strong> 对代码的解释不同于 COMMON LISP 的代码遍历程序。</p>
 <p>这里，我们处于宏理解的众多边缘之一。在未扩展的子词法作用域和完全扩展的词法作用域之间有哪些
-有趣的作用域类型？因为没有更好的名称，我们将这个无限大的范围称为 <em>超级子词法作用域</em> （ <em>super_
-_sub-lexical scope</em> ） <sup>【15】</sup> 。</p>
+有趣的作用域类型？因为没有更好的名称，我们将这个无限大的范围称为 <em>超级子词法作用域</em> （ <em>super sub-lexical scope</em> ） <sup>【15】</sup> 。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【15】
@@ -1223,7 +1211,7 @@ Walker:macroexpand-all 是 CMUCL 中具有完整代码遍历功能的组成部�
 编程宏（ macro-programmable ）的宏展开器。</p>
 </section>
 <section id="pandoric-macros">
-<span id="id9"></span><h2>6.7 潘多拉宏<a class="headerlink" href="#pandoric-macros" title="Permalink to this heading"></a></h2>
+<span id="id7"></span><h2>6.7 潘多拉宏<a class="headerlink" href="#pandoric-macros" title="Permalink to this heading"></a></h2>
 <p><em>潘多拉魔盒</em>  <sup>（20）</sup>  是个关于世界上第一个女人的希腊神话：潘多拉。潘朵拉，U 语言的符号，希腊语
 翻译过来是全能。潘多拉，这个女人，在好奇心的诱惑下，打开了一个小盒子，无可挽回地释放
 了人类所有的邪恶和罪恶。虽然本节中描述的宏非常强大，可能会教你一种永远不会忘记的编程
@@ -1249,7 +1237,7 @@ Queinnec 是一位广受尊敬的 lisp 专家，对 lisp 知识做出了很大�
 <blockquote>
 <div><p>Lisp in Small Pieces: <a class="reference external" href="https://pages.lip6.fr/Christian.Queinnec/WWW/LiSP.html">https://pages.lip6.fr/Christian.Queinnec/WWW/LiSP.html</a></p>
 </div></blockquote>
-<p>《Lisp In Small Pieces》中有个简短但有趣的宏的讨论。感谢 Scheme 宏规范的模糊性 <sup>【18】</sup> ，这本书中提及到描述不同的宏系统变化，但是也有许多有趣的注意事项，关于为什么我们可能想要使用宏以及如何使用它们。如果你已经阅读并理解了 [第三章：宏基础](chapter03.md)，那么 《Lisp in Small
+<p>《Lisp In Small Pieces》中有个简短但有趣的宏的讨论。感谢 Scheme 宏规范的模糊性 <sup>【18】</sup> ，这本书中提及到描述不同的宏系统变化，但是也有许多有趣的注意事项，关于为什么我们可能想要使用宏以及如何使用它们。如果你已经阅读并理解了 <a class="reference internal" href="chapter03.html"><span class="doc">第三章：宏基础</span></a> ，那么 《Lisp in Small
 Pieces》章节中介绍的大多数宏，对你来说，都属于微不足道的类别，除了我们现在要讨论的这个诱人的宏。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>

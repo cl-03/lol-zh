@@ -167,7 +167,7 @@ previously impossible thoughts. -—Edsger Dijkstra
 </pre></div>
 </div>
 <p>但在 lisp 中，最明显的方法就是使用符号来代表所需单元。 lisp 中的符号大部分与其他符号不相
-等。<strong>Eq</strong> 是最快的 lisp 比较运算符，大致对应于指针比较。 由于可以非常快速地比较指针，因此符
+等。<strong>eq</strong> 是最快的 lisp 比较运算符，大致对应于指针比较。 由于可以非常快速地比较指针，因此符
 号提供了一种非常快速和方便的方法来让两个或多个不同的 lisp 表达式知道指向同一个值。 在 lisp
 中，可以定义 <strong>sleep-units%</strong> 函数，这样就能指定单位：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(sleep-units% 2 &#39;m)
@@ -328,7 +328,7 @@ Scheme只有一个名称空间，因此此函数绑定在那里。</p>
 <span class="linenos">12</span>T
 </pre></div>
 </div>
-<p>上面的展开中使用 <strong>labels</strong> 特殊结构在给定的主体周围绑定一个函数。 该函数根据 <em>命名的 let （ named let ）</em> 结构中
+<p>上面的展开中使用 <strong>labels</strong> 特殊结构在给定的主体周围绑定一个函数。 该函数根据 <em>命名的 let</em> 结构中
 使用的符号命名。 它将与 <strong>nlet</strong> 绑定的值作为参数，这里只有 <strong>n</strong> 。 由于这个函数可以是递归
 的，所以 <strong>nlet</strong> 实现了一个有用的迭代构造。</p>
 <p>尽管简单的宏可能只是填充反引号模板，但大多数复杂的宏至少会使用 lisp 的扩展列表处理函数。
@@ -354,12 +354,11 @@ nil)</strong> 定义为返回 <strong>nil</strong> ，即使空的 let 变量约
 <p>【6】
 COMMON LISP 甚至允许我们写 (let (a) a) 来达到同样的效果</p>
 </div>
-<p>我们的 <strong>nlet</strong> 宏与 Scheme 的 <em>命名的 let （ named let ）</em> 有微妙的差异。 在这种情况下，宏的接口是可以接受
+<p>我们的 <strong>nlet</strong> 宏与 Scheme 的 <em>命名的 let</em>  有微妙的差异。 在这种情况下，宏的接口是可以接受
 的，但展开式可能不是。在跨多个层次进行编程时很常见，我们代码的理想模型很容易与现实略有不同。在
-Scheme 中， <em>命名的 let （ named let ）</em> 的尾部调用保证不会占用额外的堆栈空间，因为根据标准， Scheme 需要进行这种特
+Scheme 中， <em>命名的 let</em>  的尾部调用保证不会占用额外的堆栈空间，因为根据标准， Scheme 需要进行这种特
 定的优化。然而，在 COMMON LISP 中情况并非如此，因此在 COMMON LISP 版本的 <strong>nlet</strong> 中可
-能会发生堆栈溢出，而在 Scheme 中的*命名的 let （ named let ）*中不会发生这种情况。 在[5.4 使用 Macrolet 代码
-遍历]中，我们将看到如何编写具有相同接口但可能更有效的扩展的 <strong>nlet</strong> 版本 <sup>【7】</sup> 。</p>
+能会发生堆栈溢出，而在 Scheme 中的 <em>命名的 let</em> 中不会发生这种情况。 在 <a class="reference internal" href="chapter05.html#code-walking-with-macrolet"><span class="std std-ref">5.4 使用 macrolet 遍历代码</span></a> 中，我们将看到如何编写具有相同接口但可能更有效的扩展的 <strong>nlet</strong> 版本 <sup>【7】</sup> 。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【7】
@@ -430,17 +429,14 @@ lisp 根本不需要在代码中保留对符号 <strong>x</strong> 的引用。�
 <p>（10）
 自由变量注入 free variable injection</p>
 </div>
-<p>最简单的“自由变量注入”就是一个宏展开成（对）一个符号的引用：</p>
+<p>最简单的 <em>自由变量注入</em> 就是一个宏展开成（对）一个符号的引用：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defmacro x-injector ()
 <span class="linenos">2</span>  &#39;x)
 </pre></div>
 </div>
 <p>因为宏仅仅是一个函数，它以常规的 lisp 结构执行其函数体。 上面的注入宏求解引用的符号，当然，返回一
 个符号——一个自由变量——然后拼接到任何使用 <strong>x-injector</strong> 宏的表达式中。 Paul Graham 在
-<em>On Lisp</em> 中讨论过这种自由变量注入</p>
-<blockquote>
-<div><p><sup>（11）</sup></p>
-</div></blockquote>
+<em>On Lisp</em> 中讨论过这种自由变量注入 <sup>（11）</sup></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>这种词汇交流通常被视为传染的来源，而不是快乐的来源。通常编写这样的宏是不好的风格。在本书的所有宏中，只有【两个孤立的案例】以这种方式使用调用环境。
 </pre></div>
 </div>
@@ -456,12 +452,8 @@ the calling environment in this way.</p>
 的情况下编写宏——只是 lisp 宏编程的另一种方法，当有一些略微不同的词法上下文，而想在其中编写基本
 相同的代码时，这种方法很有用。虽然函数调用的主要优点通常是抛弃了词法环境，但有时对 lisp 程序员
 来说，这只是个可以通过使用宏而忽略的指南。事实上，一旦习惯了它，一些 lisp 程序员总是尝试编写宏，尽可
-能地扩展词法上下文，仅在需要求解参数或只是临阵退缩停止并想要一个新的词法上下文时才使用函数。在 [3.6 Once
-Only] 中，我们将看到一种方法，可以在需要求解参数时避免丢弃您的词法环境。尽量保持词法环境允许非常有趣的宏</p>
-<blockquote>
-<div><p><em>组合</em> <sup>（12）</sup>，其中宏在使用一个或多个其他宏时添加词法上下文。展开成所定义的宏的代码是宏组合的一种特殊情</p>
-</div></blockquote>
-<p>况，在 <a class="reference internal" href="chapter05.html#recursive-expansions"><span class="std std-ref">5.5 递归展开式</span></a> 中进行了讨论。</p>
+能地扩展词法上下文，仅在需要求解参数或只是临阵退缩停止并想要一个新的词法上下文时才使用函数。在  <a class="reference internal" href="#once-only"><span class="std std-ref">3.6 Once Only 仅仅一次</span></a> 中，我们将看到一种方法，可以在需要求解参数时避免丢弃您的词法环境。尽量保持词法环境允许非常有趣的宏 <em>组合</em> <sup>（12）</sup>，其中宏在使用一个或多个其他宏时添加词法上下文。展开成所定义的宏的代码是宏组合的一种特殊情
+况，在 <a class="reference internal" href="chapter05.html#recursive-expansions"><span class="std std-ref">5.5 递归展开式</span></a> 中进行了讨论。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>（12）
@@ -550,10 +542,7 @@ Only] 中，我们将看到一种方法，可以在需要求解参数时避免�
 很多情况下，包（ packages ）和智能的变量命名可以解决变量捕获的问题。 但是，多
 数严重的变量捕获错误不会出现在程序员直接创建的代码中。大多数变量捕获问题只有在其他宏以未预料到
 的方式调用宏（与你的宏结合）时才会出现。 Paul Graham’s 对为什么要防止不想要的变量捕获有个直接的答
-案：</p>
-<blockquote>
-<div><p><sup>（16）</sup></p>
-</div></blockquote>
+案： <sup>（16）</sup></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>当您可以编写没有错误的程序时，为什么还要编写带有小错误的程序？
 </pre></div>
 </div>
@@ -615,7 +604,7 @@ Never assign or re-bind a special form, macro, or function specified by COMMON L
 在 COMMON LISP 中一样避免变量捕获。但是，在编写复杂的宏时，很难跟踪在单个隔离的命名空间中的符号。考虑名称的交叉引用只会使宏编写比设想的更困难。</p>
 <p>除了不完整的标准之外 <sup>【12】</sup> ，比任何其他属性更重要的是，单一命名空间的这种缺陷使得 Scheme 这种原本优秀
 的语言不适合严肃的宏构造  <sup>【13】</sup> 。 Richard Gabriel 和 Kent Pitman 用以下令人难忘的引述
-[LISP2-4LIFE] 总结了这个问题：</p>
+[LISP2-4LIFE] 总结了这个问题：<sup>（20）</sup></p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【12】
@@ -626,7 +615,6 @@ Never assign or re-bind a special form, macro, or function specified by COMMON L
 <p>【13】
 尽管我们将在本书中看到，有很多理由更喜欢 COMMON LISP 而不是 Scheme</p>
 </div>
-<p><sup>（20）</sup></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>看待有关宏和命名空间的争论有两种方式。首先是单个命名空间至关重要，因此宏是有问题的。第二种（观点）是宏是基本的，因此单个命名空间是有问题的。
 </pre></div>
 </div>
@@ -687,11 +675,10 @@ and therefore a single namespace is problematic.</p>
 </div>
 <p>变量名 <strong>g</strong> 在宏展开式中消失了。因为 <strong>g</strong> 只绑定在展开器环境中，所以给到这样一个变量的名称，与展开式
 中的捕获无关。在展开式中，所有出现的 <strong>g</strong> 都被替换成打印名称为 <strong>G1605</strong> 的符号。以 <strong>#:</strong>
-为前缀，因为该符号没有 <em>内化</em> :sup:<a href="#id7"><span class="problematic" id="id8">`</span></a>（21）`在任何包中——它是一个 gensym 。当打印结构时，以这种方式为
+为前缀，因为该符号没有 <em>内化</em> <sup>（21）</sup> 在任何包中——它是一个 gensym 。当打印结构时，以这种方式为
 gensyms 添加前缀是有必要的，因为如果在再次读回该结构后使用（或求解）该结构，我们希望 lisp 会中断。希望
 lisp 中断，是因为我们无法通过查看两个 gensym 的打印名称来确定它们是否相等——这就是它们的目
-的。 Lisp 以一种有趣的方式中断：因为每次读取 <strong>#:</strong> 符号时都会创建一个新符号，并且因为 **
-(eq ‘#:a ‘#:a)** 永远不为真，所以上述展开式中的内部 <strong>#:G1605</strong> 符号不会引用 let 结构创建的
+的。 Lisp 以一种有趣的方式中断：因为每次读取 <strong>#:</strong> 符号时都会创建一个新符号，并且因为 <strong>(eq ‘#:a ‘#:a)</strong> 永远不为真，所以上述展开式中的内部 <strong>#:G1605</strong> 符号不会引用 let 结构创建的
 绑定，所以 lisp 认为表达式有一个自由变量，向我们表明一个带有 gensyms 的结构被再次读入。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -759,7 +746,7 @@ G-bang 符号 G-bang symbol</p>
 <span class="linenos">12</span>        ,@body))))
 </pre></div>
 </div>
-<p>既然我们已经标准化了 G-bang 符号，我们可以创建一个宏来编写宏的定义并利宏书写叫做 <em>自动 gensyms</em> :sup:<a href="#id9"><span class="problematic" id="id10">`</span></a>（24）`的快
+<p>既然我们已经标准化了 G-bang 符号，我们可以创建一个宏来编写宏的定义并利宏书写叫做 <em>自动 gensyms</em> <sup>（24）</sup> 的快
 捷方式。 宏 <strong>defmacro/g!</strong> 为宏编写领域定义了一种特定于领域的语言，但尝试保留了 lisp 的所有功
 能。 <strong>defmacro/g!</strong> 很简单，但是如何使用它以及它是如何工作的，可能并不是那么简单。 基于此，
 且因为这是本书中介绍的第一个真正的宏之一，我们慢慢地对 <strong>defmacro/g!</strong> 进行分析。</p>
@@ -875,12 +862,12 @@ g!</strong> 中 <strong>flatten</strong> 的使用是 <em>代码遍历</em> 的�
 一个前面有两个消引号（两个逗号），会出现什么问题？</p>
 </section>
 <section id="once-only">
-<span id="id11"></span><h2>3.6 Once Only 仅仅一次<a class="headerlink" href="#once-only" title="Permalink to this heading"></a></h2>
+<span id="id7"></span><h2>3.6 Once Only 仅仅一次<a class="headerlink" href="#once-only" title="Permalink to this heading"></a></h2>
 <p>Peter Norvig 是一位出色的程序员和作家。 在解决我们作为计算机科学家目前面临的许多最困难的问题之前，需
-要阅读他关于人工智能的书籍，尤其是《Artificial Intelligence: A Modern Approach》 <sup>（27.1）</sup> [AIMA] 。 lisp 程序员可能更熟悉
-Norvig 的著作《Paradigms Of Artificial Intelligence Programming: Case Studies in Common Lisp》:sup:<cite>（27.2）</cite> [PAIP]。这本书可能有点过时，但对于认真
+要阅读他关于人工智能的书籍，尤其是《Artificial Intelligence: A Modern Approach》 <sup>（27.1）</sup>  [AIMA] 。 lisp 程序员可能更熟悉
+Norvig 的著作《Paradigms Of Artificial Intelligence Programming: Case Studies in Common Lisp》 <sup>（27.2）</sup> [PAIP]。这本书可能有点过时，但对于认真
 的 lisp 学生来说仍然是必读的，且这本书包含许多重要的 lisp 见解 <sup>【20】</sup> 。 本节专门针对 Peter
-Norvig ，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐藏在对序列函数实现的描述中，是</p>
+Norvig ，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐藏在对序列函数实现的描述中，是 <sup>（28）</sup></p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【20】
@@ -891,7 +878,6 @@ Norvig ，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐
 <p>（27）
 原作为英文，因此译文里仍用原作品名称。同时备注一下书籍名称的译文，便于读者使用。《人工智能：一种现代方法》 Artificial Intelligence: A Modern Approach；《人工智能编程范式： COMMON LISP 中的案例研究》Paradigms Of Artificial Intelligence Programming: Case Studies in Common Lisp</p>
 </div>
-<p><sup>（28）</sup></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>只求解一次：宏学科的一课。
 </pre></div>
 </div>
@@ -900,10 +886,7 @@ Norvig ，甚至以 PAIP 中描述的宏命名。 在它的最后几页中，隐
 <p>（28）
 once-only：A Lesson in Macrology</p>
 </div>
-<dl class="simple">
-<dt>紧接着是句更有趣的话：</dt><dd><p><sup>（29）</sup></p>
-</dd>
-</dl>
+<p>紧接着是句更有趣的话： <sup>（29）</sup></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>如果你能理解如何编写以及何时使用 once-only （技术），那么你就真正的理解了宏。
 </pre></div>
 </div>
@@ -1072,7 +1055,7 @@ gensym 呢？通过调用上面由 <strong>o!-symbol-to-g!-symbol</strong> 定�
 lambda 参数。</p>
 </section>
 <section id="duality-of-syntax">
-<span id="id12"></span><h2>3.7 语法二义性 <sup>（33）</sup><a class="headerlink" href="#duality-of-syntax" title="Permalink to this heading"></a></h2>
+<span id="id8"></span><h2>3.7 语法二义性 <sup>（33）</sup><a class="headerlink" href="#duality-of-syntax" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>（33）

@@ -292,7 +292,7 @@ lisp 解释器将以下结构看作原始数据，而不是要执行的代码。
 坏性拼接并修改了一个不是新生成的列表——引用列表——我们可以预料到各种不良后果。 在这种情况下，第二次执
 行 <strong>dangerous-use-of-bq</strong> 时，<strong>(B C D)</strong> 列表现在实际上是 <strong>(B C D E)</strong> 列表，并且
 当反引号试图破坏性地将该列表拼接到反引号模板的其余部分时， <strong>(E)</strong> ——它自己的尾巴——创建了一个
-包含 <em>循环</em> 的列表。 我们在[4.5 循环表达式](chapter04.md)中会详细地讨论循环。</p>
+包含 <em>循环</em> 的列表。 我们在 <a class="reference internal" href="#cyclic-expressions"><span class="std std-ref">4.5 循环表达式</span></a> 中会详细地讨论循环。</p>
 <p>但是，在许多情况下，破坏性拼接是完全安全的。 如果需要提高反引号结构的效率，不要被
 <strong>dangerous-use-of-bq</strong> 吓到。 有许多操作可以创建新的列表结构，你可能无论如何都要丢弃它们。
 例如，拼接 <strong>mapcar</strong> 的结果是如此普遍和安全，以至于以下可能成为编程习惯：</p>
@@ -657,7 +657,7 @@ Perl 语言化的   Perlish</p>
 </div>
 <p>这些值由 <strong>cl-ppcre:scan</strong> 函数返回，函数文档可在 [CL-PPCRE] 中找到。 如果只对字符串是否匹
 配感兴趣，则返回的第一个值不是 nil 的事实意味着它匹配成功。 广义布尔值，以及为什么它们是
-COMMON LISP 的一个重要特性，将在[第六章：回指宏]进一步讨论。</p>
+COMMON LISP 的一个重要特性，将在 <a class="reference internal" href="chapter06.html"><span class="doc">第六章：回指 （1） 宏</span></a> 进一步讨论。</p>
 <p>我们还可以创建替换正则表达式函数。 Perl 和读取宏之间的细微差别是&lt;替换正则表达式函数&gt;不会修改
 他们的参数。 它们将返回新字符串，这些字符串是原始字符串的副本，并进行了替换。 另一个区别是，默认情况
 下，这个读取宏会替换所有匹配的模式，而不仅仅是字符串中匹配的第一个。 在 Perl 中，需要在你的正则表
@@ -724,7 +724,7 @@ Perl 中一样编写正则表达式——无需转义。 请参阅上面的&lt; 
 <p>（19）
 有向无环图 directed acyclic graphs</p>
 </div>
-<p>一个有用的读取宏是 <strong>#=</strong> 。 在[3.5 节：异常捕获]中，我们已经看到了如何在序列化宏展开式时使用
+<p>一个有用的读取宏是 <strong>#=</strong> 。 在 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中，我们已经看到了如何在序列化宏展开式时使用
 <strong>#=</strong> 宏将 lisp 转换为输出形式体。 <strong>#=</strong> 和它的伙伴 <strong>##</strong> 可以让你创建&lt;自引用&gt;的 S 表达式。 这可以让
 你毫不费力地做一些事情，例如在有向无环图中表示共享分支和其他有趣的数据结构。</p>
 <p>但最重要的是，它允许你无需拆卸和重组一个高效的内存数据结构来序列化数据，（内存数据结构）其中大部分数据是共享的。 以

@@ -194,7 +194,7 @@ C 语言程序员犯这个错误是因为他们习惯了一个对其他没什么
 能力，立竿见影。本书是利用高级编程技术来帮助你更好地编程。与其他许多刻意使用
 简单编程风格，以提高可读性的编程书籍相比，本书认为教授编程的最佳方法是充分利用语言。
 尽管提供的许多代码样例使用了 COMMON LISP 深奥的特性，这些潜在的、不熟悉的特性在使用
-时就被描述了。对于自检，如果你已经阅读并理解 <sup>【3】</sup> 了:doc:<cite>chapter02</cite> 和 <a class="reference internal" href="chapter03.html"><span class="doc">第三章：宏基础</span></a> 中的所有内容，那么你可以认为自己已经通过了领悟 lisp 的中间阶段，这也是本书的目标。</p>
+时就被描述了。对于自检，如果你已经阅读并理解 <sup>【3】</sup> 了 <a class="reference internal" href="chapter02.html"><span class="doc">第二章：闭包</span></a> 和 <a class="reference internal" href="chapter03.html"><span class="doc">第三章：宏基础</span></a> 中的所有内容，那么你可以认为自己已经通过了领悟 lisp 的中间阶段，这也是本书的目标。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【3】
@@ -206,7 +206,7 @@ C 语言程序员犯这个错误是因为他们习惯了一个对其他没什么
 内容都是在一个巨大的、未被开发的灰色区域的知识领域中。就像所有的高级宏编程一样，
 本书在很大程度上关注宏的 <em>组合</em> 。这个话题有个可怕的名声，很少有程序员能很好地理解它。
 宏的组合代表了当今编程语言中最广阔、最肥沃的研究领域。学术界已经从类型、对象和
-<em>prolog</em> :sup:<a href="#id3"><span class="problematic" id="id4">`</span></a>（1）`式逻辑中得出了大部分有趣的结果，但宏编程仍然遗留一个巨大的、有缺口的黑洞。
+<em>prolog</em> <sup>（1）</sup> 式逻辑中得出了大部分有趣的结果，但宏编程仍然遗留一个巨大的、有缺口的黑洞。
 没有人真正知道后面是什么。我们所知道的是，是的，它很复杂，很可怕，目前看来潜力无
 穷。与其他太多的编程理念不同，宏既不是用来发表无用理论文章的学术概念，也不是空洞
 的企业软件流行语。宏是黑客的最好朋友。宏让你的编程更聪明，而不是更难。大多数程序
@@ -217,11 +217,8 @@ C 语言程序员犯这个错误是因为他们习惯了一个对其他没什么
 <strong>prolog</strong> 是一种逻辑编程语言。它创建在逻辑学的理论基础之上， 诞生于 1972 年，
 最初被运用于自然语言等研究领域，具体介绍请参考：<a class="reference external" href="https://en.wikipedia.org/wiki/Prolog">Prolog</a></p>
 </div>
-<dl class="simple">
-<dt>虽然大多数 lisp 书籍都是为了让 lisp 更受欢迎而写的，但我完全不关心 lisp 的公众吸引力。</dt><dd><p>lisp 并没有消失。如果能够在余下的编程生涯中继续使用 lisp 作为 <em>秘密武器</em> ，我将会非常高兴。</p>
-</dd>
-</dl>
-<p>如果这本书只有一个目的，那就是激励人们对宏的学习和研究，就像我在 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 中受到的启发
+<p>虽然大多数 lisp 书籍都是为了让 lisp 更受欢迎而写的，但我完全不关心 lisp 的公众吸引力。 lisp 并没有消失。如果能够在余下的编程生涯中继续使用 lisp 作为 <em>秘密武器</em> ，我将会非常高兴。
+如果这本书只有一个目的，那就是激励人们对宏的学习和研究，就像我在 <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 中受到的启发
 一样。我希望本书的读者也能受到这样的启发，以至于有一天我可能会享受到更好的 lisp 宏工具和
 更有趣的 lisp 宏书籍。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>仍然对 lisp 的力量感到敬畏。
@@ -233,11 +230,11 @@ Doug Hoyte
 <span id="u-language"></span><h3>1.2 U 语言<a class="headerlink" href="#u" title="Permalink to this heading"></a></h3>
 <p>由于讨论宏涉及到讨论本身，所以需要明确本书采用的格式约定。正如你正在阅读和领会到
 的所传达给你的那样，我现在所写的本身就是个值得规范化和分析的表达式系统。</p>
-<p>没有人比 Haskell Curry <a class="footnote-reference brackets" href="#id6" id="id5">1</a> 更了解这一点。这是因为 Curry 不仅想将思想形式化，
+<p>没有人比 Haskell Curry <a class="footnote-reference brackets" href="#id4" id="id3">1</a> 更了解这一点。这是因为 Curry 不仅想将思想形式化，
 甚至还有思想的表达也形式化。他认为把作者与读者之间交流的语言中的概念抽象出来是有必要的，并
 把它称为 U 语言。</p>
 <dl class="footnote brackets">
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
 <dd><p>Haskell Curry, <a class="reference external" href="https://www.amazon.com/Foundations-Mathematical-Logic-Dover-Mathematics/dp/0486634620">Foundations Of Mathematical Logic</a> 的作者</p>
 </dd>
 </dl>
@@ -248,8 +245,7 @@ Doug Hoyte
 </pre></div>
 </div>
 <p>贯穿全书，我们将使用 <em>斜体</em> 来表示一些关键的概念和要点。用 <strong>粗体</strong> 来表示程序中的特殊结构、函数、宏和其他的标识符，不论它们有没有出现过。注意有些词有多种含义，例如 <strong>lambda</strong>
-是 COMMON LISP 的宏，而 <em>lambda</em> 是概念； <strong>let</strong> 是特殊操作符，而 <em>let</em> 是作为形
-式体的列表 。</p>
+是 COMMON LISP 的宏，而 <em>lambda</em> 是概念； <strong>let</strong> 是特殊操作符，而 <em>let</em> 是作为形式体的列表。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>(defun example-program-listing()
 <span class="linenos">2</span>  &#39;(this is
 <span class="linenos">3</span>    (a (program
@@ -269,11 +265,8 @@ Doug Hoyte
 </pre></div>
 </div>
 <p>许多教学编程的文章都使用大量孤立的、设计好的例子来说明问题，但却忘了将其与现实相结合。
-本书试图用尽量少而直接的例子来说明宏观的编程思想。有些文章试图在例子中使用可爱、古怪
-的标识符名称或肤浅的类比来掩盖其无趣。但我们的例子只是为了说明观点。也就是说，这本书
-首先试图不使自己（或任何东西）太严肃。不同的是，其中的幽默需要你自己去发现。
-由于 lisp 的交互性质，其计算一个简单表达式的结果往往比等量的 U 语言表达地要多。在这种情
-况下，我们将这样显示 COMMON LISP Read Evaluate Print Loop（称为 <em>REPL</em> ）的输出：</p>
+本书试图用尽量少而直接的例子来说明宏观的编程思想。有些文章试图在例子中使用可爱、古怪的标识符名称或肤浅的类比来掩盖其无趣。但我们的例子只是为了说明观点。也就是说，这本书首先试图不使自己（或任何东西）太严肃。不同的是，其中的幽默需要你自己去发现。
+由于 lisp 的交互性质，其计算一个简单表达式的结果往往比等量的 U 语言表达地要多。在这种情况下，我们将这样显示 COMMON LISP Read Evaluate Print Loop（称为 <em>REPL</em> ）的输出：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (this is
 <span class="linenos">2</span>    (the expression
 <span class="linenos">3</span>      (to evaluate)))
@@ -281,9 +274,7 @@ Doug Hoyte
 <span class="linenos">5</span>THIS-IS-THE-RESULT
 </pre></div>
 </div>
-<p>注意输入的文本是小写的，但 lisp 返回的文本是大写的。能简便地区分 REPL 的输入输出是
-COMMON LISP 的一个特点。更确切地说，这个特点能使我们立即知道 LISP 文件以及任何屏
-幕内容是否已被 lisp 阅读器处理。星号（*）代表一个提示。星号（*）是一个理想的符号，因为它不会与输入字符相混淆，并且它的高像素数使它在REPL输出时更加突出。</p>
+<p>注意输入的文本是小写的，但 lisp 返回的文本是大写的。能简便地区分 REPL 的输入输出是 COMMON LISP 的一个特点。更确切地说，这个特点能使我们立即知道 LISP 文件以及任何屏幕内容是否已被 lisp 阅读器处理。星号（*）代表一个提示。星号（*）是一个理想的符号，因为它不会与输入字符相混淆，并且它的高像素数使它在REPL输出时更加突出。</p>
 <p>编写复杂的 lisp 宏是一个迭代的过程。没有人会用其在他语言程序中常见的轻率风格来写出一
 个长达几页的宏。一部分原因是 lisp 代码每页包含的信息比大多数其他语言多得多。另外部分原
 因是 lisp 技术鼓励程序员发展他们的程序：根据应用的需要，通过一系列的指定的增强来完善它们。</p>
@@ -296,9 +287,6 @@ Blub 是一种隐喻，用来强调 lisp 与其他语言不同的事实。 Blub 
 系统和残缺的对象系统，但不同 blub 的唯一统一的特征是没有 lisp 宏。 Blub 术语很有用，
 因为有时理解一个高级宏的最简单方法就是考虑为什么这个技术在 Blub 中不可能实现。 Blub
 术语的目的不是为了取笑非 lisp 语言 <sup>【5】</sup> 。</p>
-<blockquote>
-<div><p><sup>【4】</sup></p>
-</div></blockquote>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>【5】
@@ -315,12 +303,9 @@ Blub 是一种隐喻，用来强调 lisp 与其他语言不同的事实。 Blub 
 <span class="linenos">6</span>  t)
 </pre></div>
 </div>
-<p>Curry 将宏描述为 <em>元编程</em> <sup>（2）</sup> 。元编程的唯一目的是使程序员能够更好地编
-写软件。尽管元编程在所有的编程语言都被不同程度地采用，但没有一种语言像 lisp 那
-样彻底地采用了它。其他语言中的程序员写代码没有如此便捷的元编程技术可用。这就是
-为什么 lisp 程序在非 lisp 程序员看来 <em>很奇怪</em> ： lisp 代码如何表达直接源于其元编程需求。正如本书试图描述的那样， lisp 的这一设计决定–在 lisp 本身中编写元程序，使得
-lisp 具有惊人的生产力优势。然而，由于我们在 lisp 中创建元程序，我们必须牢记元编程
-与 U 语言规范不同。我们可以从不同的角度讨论元语言包括其他的元语言，但只有一种 U 语言。 Curry 为他的 U 语言明确了这一点</p>
+<p>Curry 将宏描述为 <em>元编程</em> <sup>（2）</sup> 。元编程的唯一目的是使程序员能够更好地编写软件。尽管元编程在所有的编程语言都被不同程度地采用，但没有一种语言像 lisp 那
+样彻底地采用了它。其他语言中的程序员写代码没有如此便捷的元编程技术可用。这就是为什么 lisp 程序在非 lisp 程序员看来 <em>很奇怪</em> ： lisp 代码如何表达直接源于其元编程需求。正如本书试图描述的那样， lisp 的这一设计决定–在 lisp 本身中编写元程序，使得
+lisp 具有惊人的生产力优势。然而，由于我们在 lisp 中创建元程序，我们必须牢记元编程与 U 语言规范不同。我们可以从不同的角度讨论元语言包括其他的元语言，但只有一种 U 语言。 Curry 为他的 U 语言明确了这一点</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>我们可以形成具有任何数量级别的语言层次结构。然而，无论有多少个层次，U语言都将是
 最高的层次：如果有两个层次，它将是元语言；如果有三个层次，它将是元-元语言；以此
  类推。因此，U语言和元语言这两个术语必须保持区别。
@@ -340,8 +325,7 @@ lisp 具有惊人的生产力优势。然而，由于我们在 lisp 中创建元
 开始， <a class="reference external" href="http://www.paulgraham.com/onlisp.html">OnLisp</a> 是关于创建编程抽象的，这些抽象是 <em>Lisp 之上</em> 的层次。在创建了这些
 抽象之后，就可以基于这些早期抽象自由地延展创建更多的编程抽象。</p>
 <p>在几乎所有值得使用的语言中，语言的大部分功能都是用语言本身实现的； Blub 语言通常
-有大量用 Blub 编写的标准库。当连程序员都不想用目标语言编程时，你可能也不会想这
-样做。</p>
+有大量用 Blub 编写的标准库。当连程序员都不想用目标语言编程时，你可能也不会想这样做。</p>
 <p>但即使考虑了其他语言的标准库， lisp 也是不同的。从其他语言是由原语 <sup>（3.1）</sup> 组成
 的意义上来讲， lisp 是由元原语 <sup>（3.2）</sup> 组成的。一旦宏像在 COMMON LISP 中那样被
 标准化，语言的其他部分就可以从根本上被 <em>自举</em> <sup>（3.3）</sup> 起来了。大多数语言只是试图提供一套
@@ -430,7 +414,7 @@ C 语言或 lisp 编译器来处理。但是 lisp 用户要求对其他几乎所
 <p><strong>fact</strong> 和 <strong>choose</strong> 明显是阶乘和二项式系数函数的实现。</p>
 </section>
 <section id="license">
-<span id="id7"></span><h3>1.4 许可证<a class="headerlink" href="#license" title="Permalink to this heading"></a></h3>
+<span id="id5"></span><h3>1.4 许可证<a class="headerlink" href="#license" title="Permalink to this heading"></a></h3>
 <p>因为我相信藏在本书代码背后的概念就像物理观察或数学证明一样基础，所以即使我想，
 我也不相信我可以拥有它们的所有权。因此，你基本可以自由地使用本书的代码。下面是
 随代码分发的非常自由的许可证：</p>
@@ -453,7 +437,7 @@ C 语言或 lisp 编译器来处理。但是 lisp 用户要求对其他几乎所
 <p>The text of this book is (C) 2008 Doug Hoyte. All rights reserved.</p>
 </section>
 <section id="thanks">
-<span id="id8"></span><h3>1.5 致谢<a class="headerlink" href="#thanks" title="Permalink to this heading"></a></h3>
+<span id="id6"></span><h3>1.5 致谢<a class="headerlink" href="#thanks" title="Permalink to this heading"></a></h3>
 <p>感谢 Brian Hoyte , Nancy Holmes , Rosalie Holmes , Ian ,
 Alex , 所有我的家人; syke , madness , fyodor ,
 cyb0rg/asm , theclone , blackheart , d00tz , rt , magma ,

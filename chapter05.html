@@ -202,7 +202,7 @@ Lisp 更好的实现函数式语言的平台或材料。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>你教不会初学者自顶向下编程，因为他们不知道哪一端是上。 --C.A.R. Hoare
 </pre></div>
 </div>
-<p>在 [3.2 领域特定语言](chapter03.md) 中，当我们第一次考虑特定域语言时，我们创建了个简单
+<p>在  <a class="reference internal" href="chapter03.html#domain-specific"><span class="std std-ref">3.2 领域特定语言</span></a> 中，当我们第一次考虑特定域语言时，我们创建了个简单
 的宏 <strong>unit-of-time</strong> 。这个宏允许我们用一种直观的、基于符号的语法，可以方便地以不
 同的单位指定时间段：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span>* (unit-of-time 1 d)
@@ -469,7 +469,7 @@ lisp 中却很容易，所以 lisp 程序员通常不会对把所有东西都塞
 <span class="linenos">9</span>      result)))
 </pre></div>
 </div>
-<p>该函数在 <strong>tree</strong> 表达式中递归，然后构造出一个新的具有相同形状 :sup:<a href="#id3"><span class="problematic" id="id4">`</span></a>【5】`的列表结构。
+<p>该函数在 <strong>tree</strong> 表达式中递归，然后构造出一个新的具有相同形状 <sup>【5】</sup> 的列表结构。
 当遇到一个（数状结构的）原子时，函数会返回 <strong>result</strong> 参数的值，而不是返回这个原子。</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
@@ -621,8 +621,7 @@ Lisp 会发现它实际上是不容忽视的。</p>
 </div>
 <p>注意，变量 <strong>x</strong> 实际上是在没有定义的情况下就使用了。这是因为围绕后面两个表达式都有
 一个 <em>隐式词法变量</em> <sup>（10.1）</sup> 绑定。这种不可见变量的引入被认为违反了 <em>词法透明性</em> <sup>（10.2）</sup> 。另一种说法是，
-引入了一个名为 <strong>x</strong> 的 <em>回指语</em> <sup>（10.3）</sup> 供这些形式使用。我们将在[第六章：回指(Anaphoric) 宏]
-中进一步介绍。</p>
+引入了一个名为 <strong>x</strong> 的 <em>回指语</em> <sup>（10.3）</sup> 供这些形式使用。我们将在 <a class="reference internal" href="chapter06.html"><span class="doc">第六章：回指 （1） 宏</span></a> 中进一步介绍。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>（10）
@@ -708,7 +707,7 @@ COMMON LISP 的代码遍历程序通信，而 COMMON LISP 对宏何时展开的�
 宏展开的时间或频次，因此无法可靠地使相同的变量名（而让其）在不同的词法上下文中具有不同的
 含义。当重写全局宏时，我们无法确定 COMMON LISP 之前使用过的宏，是否已经展开过，
 或者之后是不是还需不需要再次进行展开。</p>
-<p>举一个这个代码遍历是有用的的例子，让我们重新讨论在 [3.3 控制结构](chapter03.md) 中忽略
+<p>举一个这个代码遍历是有用的的例子，让我们重新讨论在  <a class="reference internal" href="chapter03.html#control-structures"><span class="std std-ref">3.3 控制结构</span></a> 中忽略
 的问题。我们的Scheme <em>命名的 let</em>  <sup>（11.1）</sup> 宏的初始版本—— <strong>nlet</strong> ，这个 <strong>label</strong> 的使用允许我们去
 临时定义一个函数，以便在 <em>命名的 let</em> 的代码体中使用，这样可能允许我们去递归，就像我们为 <strong>let</strong> 绑定而中再次用新值开始 <strong>let over</strong> 一样。当我们定义这个函数时，我们提起到，因为 COMMON LISP 不能保证它将优化掉“尾部调用”，
 所以（这个 <strong>let</strong> 控制结构）每次迭代都可能会占用不必要的额外堆栈空间。换句话说，不同
@@ -806,7 +805,7 @@ lisp 代码，只是不像原始版本那样压缩。接下来，我们通常将
 迄今为止所发现的最灵活的软件构建原料。</p>
 </section>
 <section id="recursive-expansions">
-<span id="id5"></span><h2>5.5 递归展开式<a class="headerlink" href="#recursive-expansions" title="Permalink to this heading"></a></h2>
+<span id="id3"></span><h2>5.5 递归展开式<a class="headerlink" href="#recursive-expansions" title="Permalink to this heading"></a></h2>
 <p>在用例子教初学者 lisp 时，在课程中不可避免地会出现一个问题</p>
 <blockquote>
 <div><p>cadr 是什么?</p>
@@ -1057,7 +1056,7 @@ A 或 D 字符被替换为 X <sup>【13】</sup> 。 在 <strong>cxr%</strong> �
 有时将宏自身组合起来也很有用，这样就会有递归展开。</p>
 </section>
 <section id="recursive-solutions">
-<span id="id6"></span><h2>5.6 递归方案<a class="headerlink" href="#recursive-solutions" title="Permalink to this heading"></a></h2>
+<span id="id4"></span><h2>5.6 递归方案<a class="headerlink" href="#recursive-solutions" title="Permalink to this heading"></a></h2>
 <p>似乎在上一节中我们定义的 <strong>cxr</strong> 宏已经包含了函数 <strong>car</strong> 和 <strong>cdr</strong> 的组合，以及普通的扁平列表
 <strong>(flat list)</strong> 访问器函数 <strong>nth</strong> 和 <strong>nthcdr</strong> 。但是像 <strong>first</strong>, <strong>second</strong> 和 <strong>tenth</strong>
 这样的英语访问器呢？</p>
@@ -1176,42 +1175,23 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 重新绑定 COMMON LISP 指定的函数是被禁止的。</p>
 </div>
 <p>接下来，因为我们打算用 <strong>cxr</strong> 来实现任意 <strong>car</strong> 和 <strong>cdr</strong> 组合的功能，我们创建了
-函数 <strong>cxr-symbol-to-cxr-list</strong> 。
-.. code-block:: none</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">linenos</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-<dl>
-<dt>(defun cxr-symbol-to-cxr-list (s)</dt><dd><dl>
-<dt>(labels ((collect (l)</dt><dd><dl>
-<dt>(if l (list*</dt><dd><p>1
-(if (char= (car l) #A)</p>
-<blockquote>
-<div><p>‘A
-‘D)</p>
-</div></blockquote>
-<p>(collect (cdr l))))))</p>
-</dd>
-</dl>
-</dd>
-<dt>(collect</dt><dd><dl class="simple">
-<dt>(cdr       ; chop off C</dt><dd><dl class="simple">
-<dt>(butlast ; chop off R</dt><dd><dl class="simple">
-<dt>(coerce</dt><dd><p>(symbol -name s)
-‘list))))))</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
+函数 <strong>cxr-symbol-to-cxr-list</strong> 。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>(defun cxr-symbol-to-cxr-list (s)
+<span class="linenos"> 2</span>  (labels ((collect (l)
+<span class="linenos"> 3</span>            (if l (list*
+<span class="linenos"> 4</span>                    1
+<span class="linenos"> 5</span>                    (if (char= (car l) #\A)
+<span class="linenos"> 6</span>                      &#39;A
+<span class="linenos"> 7</span>                      &#39;D)
+<span class="linenos"> 8</span>                    (collect (cdr l))))))
+<span class="linenos"> 9</span>  (collect
+<span class="linenos">10</span>    (cdr       ; chop off C
+<span class="linenos">11</span>      (butlast ; chop off R
+<span class="linenos">12</span>        (coerce
+<span class="linenos">13</span>            (symbol -name s)
+<span class="linenos">14</span>            &#39;list))))))
+</pre></div>
+</div>
 <p><strong>cxr-symbol-to-cxr-list</strong> 函数用来将 <strong>cxr</strong> 符号（由 <strong>cxr-symbol-p</strong> 定义）
 转换为一个可以用作 <strong>cxr</strong> 第一个参数的列表 <sup>【18】</sup> 。下面是它的用法示例：</p>
 <div class="admonition hint">
@@ -1231,7 +1211,7 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 数字 1 和符号 A 或 D。</p>
 <p>最后，我们决定有效地提供任意深度的 <strong>cxr</strong> 函数的唯一方法是，对提供的表达式进行
 代码遍历并只定义必要的函数。 <strong>with-all-cxrs</strong> 宏使用 Graham 的 <strong>flatten</strong> 实用
-程序对所提供的表达式进行代码遍历，方法与 [3.5 异常捕获]中的 <strong>defmacro/g!</strong> 宏一样。
+程序对所提供的表达式进行代码遍历，方法与 <a class="reference internal" href="chapter03.html#unwanted-capture"><span class="std std-ref">3.5 不想要的捕获</span></a> 中的 <strong>defmacro/g!</strong> 宏一样。
 <strong>with -all-cxrs</strong> 寻找所有满足 <strong>cxr-symbol-p</strong> 的符号，用 <strong>cxr</strong> 宏创建它们引用的函
 数，然后用 labels 形式将这些函数绑定到提供的代码周围 <sup>【19】</sup> 。</p>
 <div class="admonition hint">
@@ -1288,7 +1268,7 @@ LISP 中被定义了 <sup>【17】</sup> 。</p>
 </div>
 </section>
 <section id="dlambda">
-<span id="id7"></span><h2>5.7 Dlambda<a class="headerlink" href="#dlambda" title="Permalink to this heading"></a></h2>
+<span id="id5"></span><h2>5.7 Dlambda<a class="headerlink" href="#dlambda" title="Permalink to this heading"></a></h2>
 <p>在讨论闭包时，我们提到了怎么将闭包当作对象使用，以及一般情况下，不确定范围和词法
 作用域能够替代复杂的对象系统。但是，到目前为止，我们忽略了对象通常都有的一个特性：
 多 <em>方法</em> <sup>（20.1）</sup>。换句话说，虽然我们简单的计数器闭包示例只允许一个操作，即增量，但对象通常
